@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javier Rebull - Data Scientist Resume</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Fonts and Basic Reset */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
+
+        :root {
+            /* Light Mode */
+            --bg-color: #f8f9fa; /* Lighter overall background */
+            --sidebar-bg: #343a40; /* Dark sidebar */
+            --sidebar-text: #f8f9fa;
+            --sidebar-accent: #4361ee; /* Updated accent color */
+            --main-bg: #ffffff;
+            --text-color: #495057; /* Darker gray text */
+            --heading-color: #212529; /* Near black heading */
+            --accent-color: #4361ee; /* Updated accent color */
+            --accent-light: #e7f1ff;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.07);
+            --link-color: var(--accent-color);
+            --tag-bg: var(--accent-light);
+            --tag-text: var(--accent-color);
+            --icon-color: var(--accent-color);
+            --controls-bg: #ffffff;
+
+            /* Dark Mode */
+            --dark-bg-color: #121212;
+            --dark-sidebar-bg: #1f1f1f;
+            --dark-sidebar-text: #e9ecef;
+            --dark-sidebar-accent: #4cc9f0;
+            --dark-main-bg: #1e1e1e;
+            --dark-text-color: #ced4da;
+            --dark-heading-color: #f8f9fa;
+            --dark-accent-color: #4cc9f0;
+            --dark-accent-light: #2a2d3a;
+            --dark-border-color: #3a3a3a;
+            --dark-shadow-color: rgba(0, 0, 0, 0.2);
+            --dark-link-color: var(--dark-accent-color);
+            --dark-tag-bg: #2a2d3a;
+            --dark-tag-text: var(--dark-accent-color);
+            --dark-icon-color: var(--dark-accent-color);
+            --dark-controls-bg: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-image: radial-gradient(#4361ee15 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg-color);
+            color: var(--dark-text-color);
+            background-image: radial-gradient(#4cc9f015 1px, transparent 1px);
+        }
+
+        .resume-wrapper {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto 30px;
+            background-color: var(--main-bg);
+            box-shadow: 0 5px 25px var(--shadow-color);
+            border-radius: 12px;
+            overflow: hidden; /* Ensures sidebar/main bg applies correctly */
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        body.dark-mode .resume-wrapper {
+            background-color: var(--dark-main-bg);
+            border: 1px solid var(--dark-border-color);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Controls --- */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--controls-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            gap: 20px;
+        }
+        
+        body.dark-mode .controls {
+            background-color: var(--dark-controls-bg);
+            border-bottom-color: var(--dark-border-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .lang-menu {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lang-menu button, .mode-toggle {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-mode .lang-menu button, body.dark-mode .mode-toggle {
+            background-color: var(--dark-accent-color);
+            color: #121212;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .lang-menu button:hover, .mode-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .lang-menu button.active {
+            background-color: var(--heading-color);
+            transform: translateY(0);
+        }
+        
+        body.dark-mode .lang-menu button.active {
+            background-color: var(--dark-heading-color);
+        }
+        
+        .mode-toggle i {
+            margin-right: 5px;
+        }
+
+        /* --- Data Science Theme Decoration --- */
+        .data-science-decoration {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 150px;
+            height: 150px;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 30px 25px;
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 80%);
+            z-index: 0;
+        }
+        
+        body.dark-mode .sidebar {
+            background-color: var(--dark-sidebar-bg);
+            color: var(--dark-sidebar-text);
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 25px;
+            border: 5px solid var(--sidebar-accent);
+            object-fit: cover; /* Ensure image covers the area */
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.dark-mode .profile-pic {
+            border-color: var(--dark-sidebar-accent);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .sidebar h2 {
+            color: var(--sidebar-accent);
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--sidebar-accent);
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        body.dark-mode .sidebar h2 {
+            color: var(--dark-sidebar-accent);
+            border-bottom-color: var(--dark-sidebar-accent);
+        }
+        
+        .sidebar h2 i {
+            margin-right: 8px;
+        }
+
+        .contact-item {
+            margin-bottom: 12px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .contact-item i {
+            width: 20px; /* Align icons */
+            margin-right: 10px;
+            color: var(--sidebar-accent);
+            text-align: center;
+        }
+        
+        body.dark-mode .contact-item i {
+             color: var(--dark-sidebar-accent);
+        }
+        
+        .contact-item a {
+            color: var(--sidebar-text);
+            text-decoration: none;
+            word-break: break-word; /* Handle long links */
+            transition: color 0.2s ease;
+        }
+        
+        body.dark-mode .contact-item a {
+             color: var(--dark-sidebar-text);
+        }
+        
+        .contact-item a:hover {
+            color: var(--sidebar-accent);
+        }
+        
+        body.dark-mode .contact-item a:hover {
+             color: var(--dark-sidebar-accent);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .sidebar li {
+            margin-bottom: 8px;
+        }
+        
+        .sidebar h4 {
+            color: var(--sidebar-text);
+            margin: 15px 0 8px;
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+        
+        body.dark-mode .sidebar h4 {
+            color: var(--dark-sidebar-text);
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+            margin: 0 -3px;
+        }
+        
+        .skills-list li {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--sidebar-text);
+            margin: 4px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        body.dark-mode .skills-list li {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--dark-sidebar-text);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        
+        .skills-list li:hover {
+             background-color: var(--sidebar-accent);
+             color: var(--sidebar-bg);
+             transform: translateY(-2px);
+             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-mode .skills-list li:hover {
+             background-color: var(--dark-sidebar-accent);
+             color: var(--dark-sidebar-bg);
+             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Highlight ML/DS skills */
+        .skills-list li.highlight {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--sidebar-accent);
+        }
+        
+        body.dark-mode .skills-list li.highlight {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--dark-sidebar-accent);
+        }
+
+        .languages p {
+            margin: 5px 0;
+            font-size: 0.95em;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            padding: 30px 40px;
+            flex-grow: 1; /* Allow main content to take remaining space */
+            overflow: auto; /* Handle potential overflow */
+            position: relative;
+        }
+
+        .main-content h1 {
+            font-size: 2.8em;
+            color: var(--heading-color);
+            margin-bottom: 5px;
+            text-align: left; /* Align name left */
+            position: relative;
+        }
+        
+        body.dark-mode .main-content h1 {
+            color: var(--dark-heading-color);
+        }
+        
+        .data-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-color) 60%, #7209b7);
+            color: white;
+            font-size: 0.4em;
+            padding: 4px 8px;
+            border-radius: 20px;
+            vertical-align: middle;
+            margin-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        body.dark-mode .data-badge {
+            background: linear-gradient(135deg, var(--dark-accent-color), var(--dark-accent-color) 60%, #7209b7);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            font-weight: 500;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        body.dark-mode .subtitle {
+             color: var(--dark-accent-color);
+        }
+        
+        .subtitle-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .subtitle-item i {
+            margin-right: 6px;
+            font-size: 0.9em;
+        }
+
+        .main-content h2 {
+            font-size: 1.6em;
+            color: var(--heading-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        body.dark-mode .main-content h2 {
+            color: var(--dark-heading-color);
+            border-bottom-color: var(--dark-accent-color);
+        }
+        
+        .main-content h2 i {
+            margin-right: 10px;
+            color: var(--icon-color);
+        }
+        
+        body.dark-mode .main-content h2 i {
+             color: var(--dark-icon-color);
+        }
+
+        .main-content h3 {
+            font-size: 1.2em;
+            color: var(--heading-color);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        body.dark-mode .main-content h3 {
+             color: var(--dark-heading-color);
+        }
+
+        .main-content p {
+            margin-bottom: 15px;
+        }
+
+        .main-content ul {
+            list-style: none;
+            padding-left: 5px;
+        }
+        
+        .main-content li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px; /* Space for icon */
+        }
+        
+        .main-content li::before { /* Custom bullet point */
+             content: "\f0da"; /* Font Awesome angle-right */
+             font-family: "Font Awesome 6 Free";
+             font-weight: 900;
+             position: absolute;
+             left: 0;
+             top: 2px;
+             color: var(--accent-color);
+             font-size: 1em;
+        }
+        
+        body.dark-mode .main-content li::before {
+             color: var(--dark-accent-color);
+        }
+
+        .main-content a {
+             color: var(--link-color);
+             text-decoration: underline;
+             text-decoration-color: var(--accent-light);
+             font-weight: 500;
+             transition: color 0.2s ease, text-decoration-color 0.2s ease;
+        }
+        
+        body.dark-mode .main-content a {
+              color: var(--dark-link-color);
+              text-decoration-color: var(--dark-accent-light);
+        }
+        
+        .main-content a:hover {
+             color: var(--heading-color);
+             text-decoration-color: var(--accent-color);
+        }
+        
+        body.dark-mode .main-content a:hover {
+             color: var(--dark-heading-color);
+             text-decoration-color: var(--dark-accent-color);
+        }
+
+        .job, .education-entry, .project {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        body.dark-mode .job, body.dark-mode .education-entry, body.dark-mode .project {
+             border-bottom-color: var(--dark-border-color);
+        }
+        
+        .job:hover, .education-entry:hover, .project:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+        
+        body.dark-mode .job:hover, body.dark-mode .education-entry:hover, body.dark-mode .project:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: rgba(76, 201, 240, 0.03);
+        }
+        
+        .job:last-child, .education-entry:last-child, .project:last-child {
+            border-bottom: none; /* Remove border for last item in section */
+            padding-bottom: 0;
+        }
+
+        .job-title, .degree {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: var(--heading-color);
+        }
+        
+        body.dark-mode .job-title, body.dark-mode .degree {
+             color: var(--dark-heading-color);
+        }
+        
+        .company, .institution {
+            font-style: normal;
+            font-weight: 500;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            display: block; /* Ensure it takes its own line if needed */
+        }
+        
+        body.dark-mode .company, body.dark-mode .institution {
+              color: var(--dark-accent-color);
+        }
+        
+        .date-location {
+            font-style: normal;
+            font-weight: 400;
+            font-size: 0.9em;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        
+        body.dark-mode .date-location {
+              color: var(--dark-text-color);
+        }
+
+        .cert-list li {
+             padding-left: 0; /* Remove bullet padding for certs */
+        }
+        
+        .cert-list li::before {
+             content: none; /* Remove bullet for certs */
+        }
+        
+        .cert-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+        }
+        
+        .cert-item {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 6px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        body.dark-mode .cert-item {
+            background-color: rgba(76, 201, 240, 0.05);
+            border: 1px solid var(--dark-border-color);
+        }
+        
+        .cert-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-mode .cert-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cert-item a {
+            display: flex;
+            align-items: center;
+        }
+        
+        .cert-item i {
+            margin-right: 8px;
+            color: var(--accent-color);
+        }
+        
+        body.dark-mode .cert-item i {
+            color: var(--dark-accent-color);
+        }
+        
+        /* ML project highlight */
+        .project.ml-project {
+            border-left: 3px solid var(--accent-color);
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+        
+        body.dark-mode .project.ml-project {
+            border-left: 3px solid var(--dark-accent-color);
+            background-color: rgba(76, 201, 240, 0.03);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .resume-wrapper {
+                flex-direction: column;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+            .sidebar {
+                width: 100%;
+                box-sizing: border-box; /* Include padding in width */
+                height: auto;
+                padding-bottom: 10px;
+            }
+            .profile-pic {
+                width: 120px;
+                height: 120px;
+                margin-bottom: 15px;
+            }
+            .main-content {
+                 padding: 20px 25px;
+            }
+            .controls {
+                 position: static; /* Unstick controls on mobile */
+                 border-radius: 0;
+                 margin: 0;
+            }
+            .cert-list {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .main-content h1 { font-size: 2em; }
+            .subtitle { font-size: 1.1em; }
+            .main-content h2 { font-size: 1.4em; }
+            .sidebar { padding: 20px 15px; }
+            .main-content { padding: 20px 15px; }
+            .controls { 
+                padding: 10px; 
+                flex-direction: column;
+                gap: 10px;
+            }
+            .lang-menu button, .mode-toggle { 
+                padding: 6px 10px; 
+                font-size: 0.8em; 
+            }
+            .data-badge {
+                display: block;
+                margin: 5px 0 0 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <div class="lang-menu">
+            <button id="lang-en" class="active" onclick="switchLanguage('en')">ENG</button>
+            <button id="lang-es" onclick="switchLanguage('es')">SPA</button>
+            <button id="lang-zh" onclick="switchLanguage('zh')">中文</button>
+        </div>
+        <button class="mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
+            <i class="fa-solid fa-circle-half-stroke"></i> Mode
+        </button>
+    </div>
+
+    <div id="resume-en">
+        <div class="resume-wrapper">
+            <!-- Data Science SVG decoration -->
+            <svg class="data-science-decoration" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <g fill="currentColor">
+                    <circle cx="100" cy="100" r="50" fill-opacity="0.2"/>
+                    <circle cx="100" cy="70" r="10"/>
+                    <circle cx="130" cy="100" r="10"/>
+                    <circle cx="70" cy="100" r="10"/>
+                    <circle cx="100" cy="130" r="10"/>
+                    <path d="M100 70 L130 100 L100 130 L70 100 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 70 L70 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 70 L130 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 130 L70 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 130 L130 100" stroke="currentColor" stroke-width="2"/>
+                </g>
+            </svg>
+            
+            <aside class="sidebar">
+                 <img src="Images/ProfilePic.JPG" alt="Javier Rebull Profile Picture" class="profile-pic">
+
+                 <h2><i class="fas fa-address-book"></i> Contact</h2>
+                 <div class="contact-item"><i class="fas fa-map-marker-alt"></i> Abington, MA</div>
+                 <div class="contact-item"><i class="fas fa-phone"></i> <a href="tel:+18572429661">+1 857-242-9661</a></div>
+                 <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:rebull@outlook.com">rebull@outlook.com</a></div>
+                 <div class="contact-item"><i class="fab fa-github"></i> <a href="https://github.com/jrebull" target="_blank">github.com/jrebull</a></div>
+                 <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://linkedin.com/in/rebull" target="_blank">linkedin.com/in/rebull</a></div>
+                 <div class="contact-item"><i class="fas fa-award"></i> <a href="https://www.credly.com/users/rebull" target="_blank">credly.com/users/rebull</a></div>
+
+                 <h2><i class="fas fa-laptop-code"></i> Skills</h2>
+                 <h4>Programming & Data Science</h4>
+                 <ul class="skills-list">
+                     <li class="highlight">Python</li>
+                     <li class="highlight">Pandas</li>
+                     <li class="highlight">PyTorch</li>
+                     <li class="highlight">NumPy</li>
+                     <li class="highlight">Scikit-learn</li>
+                     <li>SQL</li><li>SAS</li><li>R</li><li>COBOL</li><li>Java</li><li>C/C++</li><li>C#</li>
+                 </ul>
+                 <h4>Cloud, AI & ML</h4>
+                 <ul class="skills-list">
+                     <li class="highlight">AWS</li>
+                     <li class="highlight">SageMaker</li>
+                     <li class="highlight">OpenAI API</li>
+                     <li class="highlight">ML</li>
+                     <li class="highlight">Deep Learning</li>
+                     <li class="highlight">Statistical Modeling</li>
+                     <li class="highlight">NLP</li>
+                 </ul>
+                 <h4>Databases & Visualization</h4>
+                 <ul class="skills-list">
+                     <li>Oracle</li><li>DB2</li><li>MongoDB</li><li>MySQL</li>
+                     <li class="highlight">Tableau</li>
+                     <li class="highlight">Power BI</li>
+                     <li>Looker (Familiar)</li>
+                 </ul>
+                 <h4>Tools & Platforms</h4>
+                 <ul class="skills-list">
+                     <li>Mainframe</li><li>WebSphere</li><li>Linux</li><li>Git/GitHub</li><li>REST/SOAP API</li><li>ServiceNow</li>
+                 </ul>
+
+                 <h2><i class="fas fa-language"></i> Languages</h2>
+                 <div class="languages">
+                    <p><strong>Spanish:</strong> Native</p>
+                    <p><strong>English:</strong> Fluent</p>
+                    <p><strong>Chinese (Mandarin):</strong> Conversational (HSK 2)</p>
+                    <p><strong>French:</strong> Conversational</p>
+                 </div>
+            </aside>
+
+            <main class="main-content">
+                <h1>Javier Rebull <span class="data-badge">Data Scientist</span></h1>
+                <div class="subtitle">
+                    <span class="subtitle-item"><i class="fas fa-brain"></i> Data Science</span>
+                    <span class="subtitle-item"><i class="fas fa-code"></i> Application Development</span>
+                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> FinTech</span>
+                    <span class="subtitle-item"><i class="fas fa-robot"></i> Machine Learning</span>
+                </div>
+
+                <div class="section summary">
+                    <h2><i class="fas fa-user-tie"></i> Summary</h2>
+                    <p>
+                        Results-oriented Data Scientist and Application Developer with a Master's degree in Applied Artificial Intelligence (in progress) and 5+ years of leveraging analytics, statistical modeling, machine learning, and coding (Python, SQL, SAS) to solve complex business problems, primarily in the financial sector. Proven ability to manage projects, lead technical implementations including cloud migrations, and develop robust software applications. Seeking to apply strong quantitative skills, expertise in AI/ML, and cloud technologies (<a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/a5fb75c6a7b048749ffea4f5c9048ba0" target="_blank">AWS Certified Cloud Practitioner</a>) to drive data-driven insights and solutions. Experienced with data visualization tools like Tableau and Power BI.
+                    </p>
+                </div>
+
+                <div class="section experience">
+                    <h2><i class="fas fa-briefcase"></i> Work Experience</h2>
+                     <div class="job">
+                        <div class="job-title">Sr. Associate Application Development</div>
+                        <div class="company">Santander Bank US</div>
+                        <div class="date-location">Mar 2024 - Present | Quincy, MA</div>
+                        <ul>
+                            <li>Leading core banking initiatives for OpenBank's Certificate of Deposits MVP (analysis, design, development, maintenance).</li>
+                            <li>Managed Gravity Middleware Project: migrated backend (IBM Mainframe/DB2) to private cloud (Microfocus/Oracle), involving 500 WAS/WebSphere servers with zero critical incidents.</li>
+                             <li>Provide advanced technical expertise; oversee complex design implementation.</li>
+                        </ul>
+                    </div>
+                     <div class="job">
+                        <div class="job-title">Associate Application Development</div>
+                        <div class="company">Santander Bank US</div>
+                        <div class="date-location">Sep 2019 - Feb 2024 | Quincy, MA</div>
+                        <ul>
+                            <li>Maintained stable, incident-free production environments for core banking applications.</li>
+                            <li>Led development projects enhancing UX and efficiency (COVID-19 Relief, FDIC 370, Customer Address Management).</li>
+                        </ul>
+                    </div>
+                     <div class="job">
+                        <div class="job-title">Computer Systems Analyst</div>
+                        <div class="company">Vass IT US</div>
+                        <div class="date-location">Apr 2013 - Sep 2019 | Cambridge, MA</div>
+                        <ul>
+                            <li>Specialized in backend application development for loans.</li>
+                            <li>Managed IT project portfolios and PMO activities for retail/commercial mainframe projects.</li>
+                        </ul>
+                    </div>
+                    <div class="job">
+                        <div class="job-title">Spec Analytics Analyst 2</div>
+                        <div class="company">Citibank Banamex</div>
+                        <div class="date-location">Jun 2010 - Apr 2013 | Mexico City, Mexico</div>
+                        <ul>
+                            <li>Designed and optimized scalable, secure systems for global financial services.</li>
+                            <li>Developed SAS algorithms/database models, boosting marketing response rates by 20% and reducing delinquency by 10%.</li>
+                        </ul>
+                    </div>
+                     <div class="job">
+                        <div class="job-title">Sr. Programmer</div>
+                        <div class="company">Accenture</div>
+                        <div class="date-location">Aug 2007 - May 2010 | Mexico City, Mexico</div>
+                        <ul>
+                            <li>Maintained and optimized core financial routines (COBOL) for BBVA Bancomer and Santander México, ensuring production stability.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section education">
+                    <h2><i class="fas fa-graduation-cap"></i> Education</h2>
+                     <div class="education-entry">
+                        <div class="degree">Master in Applied Artificial Intelligence</div>
+                        <div class="institution">Monterrey Institute of Technology and Higher Education</div>
+                        <div class="date-location">Apr 2024 - Exp. 2026 | Mexico City, Mexico</div>
+                         <p>Relevant Coursework: Data Science, Machine Learning, AI, Data Visualization, Fintech, IoT. GPA: 3.96/4.0</p>
+                    </div>
+                     <div class="education-entry">
+                        <div class="degree">B.S. in Computer Science & Electronics Engineering</div>
+                        <div class="institution">The National Polytechnic Institute of Mexico, ESCOM IPN</div>
+                        <div class="date-location">Aug 2002 - Jul 2006 | Mexico City, Mexico</div>
+                         <p>Relevant Coursework: Programming, Software Engineering, AI, Networks, Electronics, Data Structures. GPA: 3.28/4.0</p>
+                    </div>
+                </div>
+
+                 <div class="section certifications">
+                     <h2><i class="fas fa-certificate"></i> Certifications & Training</h2>
+                     <div class="cert-list">
+                         <div class="cert-item">
+                             <a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/a5fb75c6a7b048749ffea4f5c9048ba0" target="_blank">
+                                 <i class="fab fa-aws"></i> AWS Certified Cloud Practitioner
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://learn.nvidia.com/certificates?id=8H6ITztORYyVW9WaG6GV9g" target="_blank">
+                                 <i class="fas fa-microchip"></i> NVIDIA Fundamentals of Deep Learning
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/9ba64ceb-9e8e-47f0-a779-167c55e750d5" target="_blank">
+                                 <i class="fas fa-robot"></i> Advanced Certification in AI and Machine Learning
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/f7ccabfc-4863-4602-981a-5cdc9ac9359b" target="_blank">
+                                 <i class="fas fa-database"></i> Advanced Certification in Data Science
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/8a3acde4-5575-42ee-874d-d7a9c6bfd829" target="_blank">
+                                 <i class="fas fa-chart-bar"></i> Advanced Certification in Data Visualization
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credly.com/badges/8a5d5bc9-0269-4235-a4bd-3e075941c08b" target="_blank">
+                                 <i class="fab fa-ibm"></i> IBM Getting Started with Enterprise Data Science
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://courses.cognitiveclass.ai/certificates/79a4f7d2ef67455585822464116b2551" target="_blank">
+                                 <i class="fab fa-python"></i> IBM Data Analysis with Python
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/29faef1e-419f-476c-bc5a-ac0ad7cecd55" target="_blank">
+                                 <i class="fas fa-microchip"></i> MIT: Introduction to Microfabrication Technology
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/27b3293a-680a-4411-acf5-306eb9f23a5a" target="_blank">
+                                 <i class="fas fa-network-wired"></i> Advanced Certification in IoT and Sensor Networks
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/ac15cfa0-7b20-45a2-b113-5c5196074871" target="_blank">
+                                 <i class="fas fa-laptop-code"></i> MIT: Application Developer Certification
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/cfbe0ef4-6306-4334-b255-46fe0982b3d5" target="_blank">
+                                 <i class="fas fa-language"></i> HSK (Level 2) - Chinese Proficiency
+                             </a>
+                         </div>
+                     </div>
+                </div>
+
+                <div class="section projects">
+                    <h2><i class="fas fa-flask"></i> Relevant Projects</h2>
+                     <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/AMLM_TC5033_Activity3b_Team03.ipynb" target="_blank">Text Classification using RNNs (PyTorch)</a></h3>
+                         Built and evaluated an RNN in PyTorch for AG_NEWS article classification (preprocessing, model design, training, evaluation).
+                    </div>
+                     <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/AMLM_Final_TC4033_Activity1b_Team03.ipynb" target="_blank">Multilayer Neural Network from Scratch (Numpy)</a></h3>
+                         Implemented a fully connected NN in Numpy for ASL letter recognition (data preprocessing, forward/backward propagation, gradient descent).
+                    </div>
+                    <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/Serie_de_Tiempo_Javier_Rebull_A01795838_Final.ipynb" target="_blank">Stock Price Prediction using Recurrent Models</a></h3>
+                         Developed and compared time series models (LSTM, ARIMA, Prophet) for Apple stock price forecasting.
+                    </div>
+                    <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/Actividad9RLog_Equipo37_Final.ipynb" target="_blank">Logistic Regression for Breast Cancer Diagnosis</a></h3>
+                         Built a predictive model using logistic regression on the Wisconsin dataset (preprocessing, feature selection, evaluation).
+                    </div>
+                     <div class="project">
+                         <h3><a href="https://github.com/jrebull/Liderazgo/blob/main/Caso%20IoT-Equipo%202_Final3.pdf" target="_blank">IoT for Sustainable Urban Development</a></h3>
+                         Analyzed the role of IoT in addressing urban sustainability challenges using case studies.
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div> 
+    
+    <div id="resume-es" style="display: none;">
+         <div class="resume-wrapper">
+            <!-- Data Science SVG decoration -->
+            <svg class="data-science-decoration" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <g fill="currentColor">
+                    <circle cx="100" cy="100" r="50" fill-opacity="0.2"/>
+                    <circle cx="100" cy="70" r="10"/>
+                    <circle cx="130" cy="100" r="10"/>
+                    <circle cx="70" cy="100" r="10"/>
+                    <circle cx="100" cy="130" r="10"/>
+                    <path d="M100 70 L130 100 L100 130 L70 100 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 70 L70 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 70 L130 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 130 L70 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 130 L130 100" stroke="currentColor" stroke-width="2"/>
+                </g>
+            </svg>
+            
+            <aside class="sidebar">
+                 <img src="Images/ProfilePic.JPG" alt="Foto de Perfil Javier Rebull" class="profile-pic">
+
+                 <h2><i class="fas fa-address-book"></i> Contacto</h2>
+                 <div class="contact-item"><i class="fas fa-map-marker-alt"></i> Abington, MA</div>
+                 <div class="contact-item"><i class="fas fa-phone"></i> <a href="tel:+18572429661">+1 857-242-9661</a></div>
+                 <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:rebull@outlook.com">rebull@outlook.com</a></div>
+                 <div class="contact-item"><i class="fab fa-github"></i> <a href="https://github.com/rebull" target="_blank">github.com/rebull</a></div>
+                 <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://linkedin.com/in/rebull" target="_blank">linkedin.com/in/rebull</a></div>
+                 <div class="contact-item"><i class="fas fa-award"></i> <a href="https://www.credly.com/users/rebull" target="_blank">credly.com/users/rebull</a></div>
+
+                 <h2><i class="fas fa-laptop-code"></i> Habilidades</h2>
+                 <h4>Programación y Ciencia de Datos</h4>
+                 <ul class="skills-list">
+                     <li class="highlight">Python</li>
+                     <li class="highlight">Pandas</li>
+                     <li class="highlight">PyTorch</li>
+                     <li class="highlight">NumPy</li>
+                     <li class="highlight">Scikit-learn</li>
+                     <li>SQL</li><li>SAS</li><li>R</li><li>COBOL</li><li>Java</li><li>C/C++</li><li>C#</li>
+                 </ul>
+                 <h4>Nube, IA y ML</h4>
+                 <ul class="skills-list">
+                     <li class="highlight">AWS</li>
+                     <li class="highlight">SageMaker</li>
+                     <li class="highlight">OpenAI API</li>
+                     <li class="highlight">ML</li>
+                     <li class="highlight">Deep Learning</li>
+                     <li class="highlight">Modelado Estadístico</li>
+                     <li class="highlight">PLN</li>
+                 </ul>
+                 <h4>Bases de Datos y Visualización</h4>
+                 <ul class="skills-list">
+                     <li>Oracle</li><li>DB2</li><li>MongoDB</li><li>MySQL</li>
+                     <li class="highlight">Tableau</li>
+                     <li class="highlight">Power BI</li>
+                     <li>Looker (Familiar)</li>
+                 </ul>
+                 <h4>Herramientas y Plataformas</h4>
+                 <ul class="skills-list">
+                     <li>Mainframe</li><li>WebSphere</li><li>Linux</li><li>Git/GitHub</li><li>API REST/SOAP</li><li>ServiceNow</li>
+                 </ul>
+
+                 <h2><i class="fas fa-language"></i> Idiomas</h2>
+                 <div class="languages">
+                    <p><strong>Español:</strong> Nativo</p>
+                    <p><strong>Inglés:</strong> Fluido</p>
+                    <p><strong>Chino (Mandarín):</strong> Conversacional (HSK 2)</p>
+                    <p><strong>Francés:</strong> Conversacional</p>
+                 </div>
+            </aside>
+
+            <main class="main-content">
+                <h1>Javier Rebull <span class="data-badge">Científico de Datos</span></h1>
+                <div class="subtitle">
+                    <span class="subtitle-item"><i class="fas fa-brain"></i> Ciencia de Datos</span>
+                    <span class="subtitle-item"><i class="fas fa-code"></i> Desarrollo de Aplicaciones</span>
+                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> FinTech</span>
+                    <span class="subtitle-item"><i class="fas fa-robot"></i> Machine Learning</span>
+                </div>
+
+                <div class="section summary">
+                    <h2><i class="fas fa-user-tie"></i> Resumen Profesional</h2>
+                    <p>
+                         Científico de Datos y Desarrollador de Aplicaciones orientado a resultados, con Maestría en Inteligencia Artificial Aplicada (en curso) y más de 5 años de experiencia aprovechando análisis, modelado estadístico, machine learning y codificación (Python, SQL, SAS) para resolver problemas empresariales complejos, principalmente en el sector financiero. Capacidad demostrada para gestionar proyectos, liderar implementaciones técnicas incluyendo migraciones a la nube, y desarrollar aplicaciones de software robustas. Busco aplicar sólidas habilidades cuantitativas, experiencia en IA/ML y tecnologías en la nube (<a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/a5fb75c6a7b048749ffea4f5c9048ba0" target="_blank">AWS Certified Cloud Practitioner</a>) para impulsar insights basados en datos y soluciones. Experiencia con herramientas de visualización de datos como Tableau y Power BI.
+                    </p>
+                </div>
+
+                <div class="section experience">
+                    <h2><i class="fas fa-briefcase"></i> Experiencia Laboral</h2>
+                     <div class="job">
+                        <div class="job-title">Sr. Associate Application Development</div>
+                        <div class="company">Santander Bank US</div>
+                        <div class="date-location">Mar 2024 - Actual | Quincy, MA</div>
+                        <ul>
+                            <li>Liderando iniciativas de core bancario para el MVP de Certificados de Depósito de OpenBank (análisis, diseño, desarrollo, mantenimiento).</li>
+                            <li>Gestioné Proyecto Gravity Middleware: migración de backend (IBM Mainframe/DB2) a nube privada (Microfocus/Oracle), 500 servidores WAS/WebSphere, cero incidentes críticos.</li>
+                             <li>Proporciono experiencia técnica avanzada; superviso implementación de diseños complejos.</li>
+                        </ul>
+                    </div>
+                     <div class="job">
+                        <div class="job-title">Associate Application Development</div>
+                        <div class="company">Santander Bank US</div>
+                        <div class="date-location">Sep 2019 - Feb 2024 | Quincy, MA</div>
+                        <ul>
+                            <li>Mantenimiento de entornos de producción estables y sin incidentes para aplicaciones bancarias centrales.</li>
+                            <li>Lideré proyectos de desarrollo mejorando UX y eficiencia (Ayuda COVID-19, FDIC 370, Gestión de Direcciones).</li>
+                        </ul>
+                    </div>
+                    <div class="job">
+                       <div class="job-title">Computer Systems Analyst</div>
+                       <div class="company">Vass IT US</div>
+                       <div class="date-location">Abr 2013 - Sep 2019 | Cambridge, MA</div>
+                       <ul>
+                           <li>Especializado en desarrollo backend de aplicaciones para préstamos.</li>
+                           <li>Gestión de portafolios de proyectos TI y actividades PMO para proyectos mainframe.</li>
+                       </ul>
+                   </div>
+                   <div class="job">
+                       <div class="job-title">Spec Analytics Analyst 2</div>
+                       <div class="company">Citibank Banamex</div>
+                       <div class="date-location">Jun 2010 - Abr 2013 | Ciudad de México, México</div>
+                       <ul>
+                           <li>Diseño y optimización de sistemas escalables y seguros para servicios financieros globales.</li>
+                           <li>Desarrollo de algoritmos SAS/modelos DB, aumentando respuesta marketing (+20%) y reduciendo morosidad (-10%).</li>
+                       </ul>
+                   </div>
+                   <div class="job">
+                       <div class="job-title">Sr. Programmer</div>
+                       <div class="company">Accenture</div>
+                       <div class="date-location">Ago 2007 - May 2010 | Ciudad de México, México</div>
+                       <ul>
+                           <li>Mantenimiento y optimización de rutinas financieras core (COBOL) para BBVA Bancomer y Santander México, asegurando estabilidad.</li>
+                       </ul>
+                   </div>
+                </div>
+
+                <div class="section education">
+                    <h2><i class="fas fa-graduation-cap"></i> Educación</h2>
+                     <div class="education-entry">
+                        <div class="degree">Maestría en Inteligencia Artificial Aplicada</div>
+                        <div class="institution">Instituto Tecnológico y de Estudios Superiores de Monterrey</div>
+                        <div class="date-location">Abr 2024 - Esp. 2026 | Ciudad de México, México</div>
+                         <p>Cursos Relevantes: Ciencia de Datos, Machine Learning, IA, Visualización de Datos, Fintech, IoT. GPA: 3.96/4.0</p>
+                    </div>
+                     <div class="education-entry">
+                        <div class="degree">Ingeniería en Sistemas Computacionales</div>
+                        <div class="institution">Instituto Politécnico Nacional, ESCOM IPN</div>
+                        <div class="date-location">Ago 2002 - Jul 2006 | Ciudad de México, México</div>
+                         <p>Cursos Relevantes: Programación, Ing. de Software, IA, Redes, Electrónica, Estructuras de Datos. GPA: 3.28/4.0</p>
+                    </div>
+                </div>
+
+                 <div class="section certifications">
+                     <h2><i class="fas fa-certificate"></i> Certificaciones y Formación</h2>
+                     <div class="cert-list">
+                         <div class="cert-item">
+                             <a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/a5fb75c6a7b048749ffea4f5c9048ba0" target="_blank">
+                                 <i class="fab fa-aws"></i> AWS Certified Cloud Practitioner
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://learn.nvidia.com/certificates?id=8H6ITztORYyVW9WaG6GV9g" target="_blank">
+                                 <i class="fas fa-microchip"></i> NVIDIA Fundamentos de Deep Learning
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/9ba64ceb-9e8e-47f0-a779-167c55e750d5" target="_blank">
+                                 <i class="fas fa-robot"></i> Certificación Avanzada en IA y Machine Learning
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/f7ccabfc-4863-4602-981a-5cdc9ac9359b" target="_blank">
+                                 <i class="fas fa-database"></i> Certificación Avanzada en Ciencia de Datos
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/8a3acde4-5575-42ee-874d-d7a9c6bfd829" target="_blank">
+                                 <i class="fas fa-chart-bar"></i> Certificación Avanzada en Visualización de Datos
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credly.com/badges/8a5d5bc9-0269-4235-a4bd-3e075941c08b" target="_blank">
+                                 <i class="fab fa-ibm"></i> IBM Introducción a Data Science Empresarial
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://courses.cognitiveclass.ai/certificates/79a4f7d2ef67455585822464116b2551" target="_blank">
+                                 <i class="fab fa-python"></i> IBM Análisis de Datos con Python
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/29faef1e-419f-476c-bc5a-ac0ad7cecd55" target="_blank">
+                                 <i class="fas fa-microchip"></i> MIT: Introducción a Tecnología de Microfabricación
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/27b3293a-680a-4411-acf5-306eb9f23a5a" target="_blank">
+                                 <i class="fas fa-network-wired"></i> Certificación Avanzada en IoT y Redes de Sensores
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/ac15cfa0-7b20-45a2-b113-5c5196074871" target="_blank">
+                                 <i class="fas fa-laptop-code"></i> MIT: Certificación de Desarrollador de Aplicaciones
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/cfbe0ef4-6306-4334-b255-46fe0982b3d5" target="_blank">
+                                 <i class="fas fa-language"></i> HSK (Nivel 2) - Competencia en Chino
+                             </a>
+                         </div>
+                     </div>
+                 </div>
+
+                <div class="section projects">
+                    <h2><i class="fas fa-flask"></i> Proyectos Relevantes</h2>
+                     <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/AMLM_TC5033_Activity3b_Team03.ipynb" target="_blank">Clasificación de Texto usando RNNs (PyTorch)</a></h3>
+                         Construcción y evaluación de RNN en PyTorch para clasificación de artículos AG_NEWS (preprocesamiento, modelo, entrenamiento, evaluación).
+                    </div>
+                     <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/AMLM_Final_TC4033_Activity1b_Team03.ipynb" target="_blank">Red Neuronal Multicapa desde Cero (Numpy)</a></h3>
+                         Implementación de NN totalmente conectada en Numpy para reconocimiento de letras ASL (preprocesamiento, propagación, gradiente).
+                    </div>
+                    <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/Serie_de_Tiempo_Javier_Rebull_A01795838_Final.ipynb" target="_blank">Predicción de Precio de Acciones (Modelos Recurrentes)</a></h3>
+                         Desarrollo y comparación de modelos de series temporales (LSTM, ARIMA, Prophet) para pronóstico de acciones de Apple.
+                    </div>
+                    <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/Actividad9RLog_Equipo37_Final.ipynb" target="_blank">Regresión Logística para Diagnóstico de Cáncer de Mama</a></h3>
+                         Construcción de modelo predictivo con regresión logística en dataset Wisconsin (preprocesamiento, selección, evaluación).
+                    </div>
+                    <div class="project">
+                         <h3><a href="https://github.com/jrebull/Liderazgo/blob/main/Caso%20IoT-Equipo%202_Final3.pdf" target="_blank">IoT para Desarrollo Urbano Sostenible</a></h3>
+                         Análisis del rol de IoT para abordar retos de sostenibilidad urbana mediante casos de estudio.
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <div id="resume-zh" style="display: none;">
+         <div class="resume-wrapper">
+            <!-- Data Science SVG decoration -->
+            <svg class="data-science-decoration" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <g fill="currentColor">
+                    <circle cx="100" cy="100" r="50" fill-opacity="0.2"/>
+                    <circle cx="100" cy="70" r="10"/>
+                    <circle cx="130" cy="100" r="10"/>
+                    <circle cx="70" cy="100" r="10"/>
+                    <circle cx="100" cy="130" r="10"/>
+                    <path d="M100 70 L130 100 L100 130 L70 100 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 70 L70 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 70 L130 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 130 L70 100" stroke="currentColor" stroke-width="2"/>
+                    <path d="M100 130 L130 100" stroke="currentColor" stroke-width="2"/>
+                </g>
+            </svg>
+            
+            <aside class="sidebar">
+                 <img src="Images/ProfilePic.JPG" alt="Javier Rebull 郝伟 头像" class="profile-pic">
+
+                 <h2><i class="fas fa-address-book"></i> 联系方式</h2>
+                 <div class="contact-item"><i class="fas fa-map-marker-alt"></i> 美国马萨诸塞州阿宾顿</div>
+                 <div class="contact-item"><i class="fas fa-phone"></i> <a href="tel:+18572429661">+1 857-242-9661</a></div>
+                 <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:rebull@outlook.com">rebull@outlook.com</a></div>
+                 <div class="contact-item"><i class="fab fa-github"></i> <a href="https://github.com/rebull" target="_blank">github.com/rebull</a></div>
+                 <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://linkedin.com/in/rebull" target="_blank">linkedin.com/in/rebull</a></div>
+                 <div class="contact-item"><i class="fas fa-award"></i> <a href="https://www.credly.com/users/rebull" target="_blank">credly.com/users/rebull</a></div>
+
+                 <h2><i class="fas fa-laptop-code"></i> 技能</h2>
+                 <h4>编程与数据科学</h4>
+                 <ul class="skills-list">
+                     <li class="highlight">Python</li>
+                     <li class="highlight">Pandas</li>
+                     <li class="highlight">PyTorch</li>
+                     <li class="highlight">NumPy</li>
+                     <li class="highlight">Scikit-learn</li>
+                     <li>SQL</li><li>SAS</li><li>R</li><li>COBOL</li><li>Java</li><li>C/C++</li><li>C#</li>
+                 </ul>
+                 <h4>云、人工智能与机器学习</h4>
+                 <ul class="skills-list">
+                     <li class="highlight">AWS</li>
+                     <li class="highlight">SageMaker</li>
+                     <li class="highlight">OpenAI API</li>
+                     <li class="highlight">机器学习</li>
+                     <li class="highlight">深度学习</li>
+                     <li class="highlight">统计建模</li>
+                     <li class="highlight">自然语言处理</li>
+                 </ul>
+                 <h4>数据库与可视化</h4>
+                 <ul class="skills-list">
+                     <li>Oracle</li><li>DB2</li><li>MongoDB</li><li>MySQL</li>
+                     <li class="highlight">Tableau</li>
+                     <li class="highlight">Power BI</li>
+                     <li>Looker (熟悉)</li>
+                 </ul>
+                 <h4>工具与平台</h4>
+                 <ul class="skills-list">
+                     <li>大型机</li><li>WebSphere</li><li>Linux</li><li>Git/GitHub</li><li>REST/SOAP API</li><li>ServiceNow</li>
+                 </ul>
+
+                 <h2><i class="fas fa-language"></i> 语言能力</h2>
+                 <div class="languages">
+                    <p><strong>西班牙语:</strong> 母语</p>
+                    <p><strong>英语:</strong> 流利</p>
+                    <p><strong>汉语（普通话）:</strong> 对话水平 (HSK 2级)</p>
+                    <p><strong>法语:</strong> 对话水平</p>
+                 </div>
+            </aside>
+
+            <main class="main-content">
+                <h1>Javier Rebull 郝伟 <span class="data-badge">数据科学家</span></h1>
+                <div class="subtitle">
+                    <span class="subtitle-item"><i class="fas fa-brain"></i> 数据科学</span>
+                    <span class="subtitle-item"><i class="fas fa-code"></i> 应用开发</span>
+                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> 金融科技</span>
+                    <span class="subtitle-item"><i class="fas fa-robot"></i> 机器学习</span>
+                </div>
+
+                <div class="section summary">
+                    <h2><i class="fas fa-user-tie"></i> 专业概要</h2>
+                     <p>
+                         成果导向的数据科学家和应用程序开发人员，拥有应用人工智能硕士学位（在读）和5年以上利用分析、统计建模、机器学习和编码（Python、SQL、SAS）解决复杂业务问题（主要在金融领域）的经验。具备管理项目、领导技术实施（包括云迁移）以及开发稳健软件应用程序的成熟能力。寻求运用强大的量化技能、人工智能/机器学习专业知识和云技术（<a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/a5fb75c6a7b048749ffea4f5c9048ba0" target="_blank">AWS认证云从业者</a>）来推动Cloud学习服务团队的数据驱动洞察和解决方案。熟悉Tableau和Power BI等数据可视化工具。
+                    </p>
+                </div>
+
+                <div class="section experience">
+                    <h2><i class="fas fa-briefcase"></i> 工作经历</h2>
+                     <div class="job">
+                        <div class="job-title">高级应用开发助理</div>
+                        <div class="company">桑坦德银行美国</div>
+                        <div class="date-location">2024年3月 - 至今 | 马萨诸塞州昆西</div>
+                        <ul>
+                            <li>领导OpenBank存款证MVP的核心银行业务计划（分析、设计、开发、维护）。</li>
+                            <li>管理Gravity中间件项目：迁移后端（IBM Mainframe/DB2）至私有云（Microfocus/Oracle），涉及500台WAS/WebSphere服务器，零重大事故。</li>
+                             <li>提供高级技术专业知识；监督复杂设计实施。</li>
+                        </ul>
+                    </div>
+                     <div class="job">
+                        <div class="job-title">应用开发助理</div>
+                        <div class="company">桑坦德银行美国</div>
+                        <div class="date-location">2019年9月 - 2024年2月 | 马萨诸塞州昆西</div>
+                        <ul>
+                            <li>为核心银行应用程序维护稳定、无事故的生产环境。</li>
+                            <li>领导开发项目以增强用户体验和效率（COVID-19救济、FDIC 370、客户地址管理）。</li>
+                        </ul>
+                    </div>
+                     <div class="job">
+                         <div class="job-title">计算机系统分析师</div>
+                         <div class="company">Vass IT US</div>
+                         <div class="date-location">2013年4月 - 2019年9月 | 马萨诸塞州剑桥</div>
+                         <ul>
+                             <li>专注于贷款后端应用程序开发。</li>
+                             <li>管理零售/商业大型机项目的IT项目组合和PMO活动。</li>
+                         </ul>
+                     </div>
+                     <div class="job">
+                         <div class="job-title">专业分析师2级</div>
+                         <div class="company">花旗银行 Banamex</div>
+                         <div class="date-location">2010年6月 - 2013年4月 | 墨西哥城</div>
+                         <ul>
+                             <li>为全球金融服务设计和优化可扩展、安全的系统。</li>
+                             <li>开发SAS算法/数据库模型，将营销响应率提高20%，并将拖欠率降低10%。</li>
+                         </ul>
+                     </div>
+                     <div class="job">
+                         <div class="job-title">高级程序员</div>
+                         <div class="company">埃森哲</div>
+                         <div class="date-location">2007年8月 - 2010年5月 | 墨西哥城</div>
+                         <ul>
+                             <li>为BBVA Bancomer和Santander México维护和优化核心金融程序（COBOL），确保生产稳定性。</li>
+                         </ul>
+                     </div>
+                </div>
+
+                <div class="section education">
+                    <h2><i class="fas fa-graduation-cap"></i> 教育背景</h2>
+                     <div class="education-entry">
+                        <div class="degree">应用人工智能硕士</div>
+                        <div class="institution">蒙特雷科技大学</div>
+                        <div class="date-location">2024年4月 - 预计2026年 | 墨西哥城</div>
+                         <p>相关课程：数据科学、机器学习、人工智能、数据可视化、金融科技、物联网。GPA: 3.96/4.0</p>
+                    </div>
+                     <div class="education-entry">
+                        <div class="degree">计算机科学与电子工程学士</div>
+                        <div class="institution">墨西哥国立理工学院, ESCOM IPN</div>
+                        <div class="date-location">2002年8月 - 2006年7月 | 墨西哥城</div>
+                         <p>相关课程：编程、软件工程、人工智能、网络、电子学、数据结构。GPA: 3.28/4.0</p>
+                    </div>
+                </div>
+
+                 <div class="section certifications">
+                     <h2><i class="fas fa-certificate"></i> 认证与培训</h2>
+                     <div class="cert-list">
+                         <div class="cert-item">
+                             <a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/a5fb75c6a7b048749ffea4f5c9048ba0" target="_blank">
+                                 <i class="fab fa-aws"></i> AWS认证云从业者
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://learn.nvidia.com/certificates?id=8H6ITztORYyVW9WaG6GV9g" target="_blank">
+                                 <i class="fas fa-microchip"></i> NVIDIA 深度学习基础
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/9ba64ceb-9e8e-47f0-a779-167c55e750d5" target="_blank">
+                                 <i class="fas fa-robot"></i> 人工智能与机器学习高级认证
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/f7ccabfc-4863-4602-981a-5cdc9ac9359b" target="_blank">
+                                 <i class="fas fa-database"></i> 数据科学高级认证
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/8a3acde4-5575-42ee-874d-d7a9c6bfd829" target="_blank">
+                                 <i class="fas fa-chart-bar"></i> 数据可视化高级认证
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credly.com/badges/8a5d5bc9-0269-4235-a4bd-3e075941c08b" target="_blank">
+                                 <i class="fab fa-ibm"></i> IBM 企业数据科学入门
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://courses.cognitiveclass.ai/certificates/79a4f7d2ef67455585822464116b2551" target="_blank">
+                                 <i class="fab fa-python"></i> IBM 使用Python进行数据分析
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/29faef1e-419f-476c-bc5a-ac0ad7cecd55" target="_blank">
+                                 <i class="fas fa-microchip"></i> MIT：微制造技术导论
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/27b3293a-680a-4411-acf5-306eb9f23a5a" target="_blank">
+                                 <i class="fas fa-network-wired"></i> 物联网与传感器网络高级认证
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/ac15cfa0-7b20-45a2-b113-5c5196074871" target="_blank">
+                                 <i class="fas fa-laptop-code"></i> MIT：应用程序开发者认证
+                             </a>
+                         </div>
+                         <div class="cert-item">
+                             <a href="https://www.credential.net/cfbe0ef4-6306-4334-b255-46fe0982b3d5" target="_blank">
+                                 <i class="fas fa-language"></i> HSK（2级）- 汉语水平考试
+                             </a>
+                         </div>
+                     </div>
+                 </div>
+
+                <div class="section projects">
+                    <h2><i class="fas fa-flask"></i> 相关项目</h2>
+                     <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/AMLM_TC5033_Activity3b_Team03.ipynb" target="_blank">使用RNN进行文本分类 (PyTorch)</a></h3>
+                         在PyTorch中构建和评估用于AG_NEWS文章分类的RNN（预处理、模型设计、训练、评估）。
+                    </div>
+                     <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/AMLM_Final_TC4033_Activity1b_Team03.ipynb" target="_blank">从零开始实现多层神经网络 (Numpy)</a></h3>
+                         使用Numpy实现用于ASL字母识别的全连接神经网络（数据预处理、前向/反向传播、梯度下降）。
+                    </div>
+                    <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/Serie_de_Tiempo_Javier_Rebull_A01795838_Final.ipynb" target="_blank">使用循环模型预测股票价格</a></h3>
+                         开发并比较用于苹果股票价格预测的时间序列模型（LSTM、ARIMA、Prophet）。
+                    </div>
+                    <div class="project ml-project">
+                         <h3><a href="https://github.com/jrebull/MNA/blob/main/Actividad9RLog_Equipo37_Final.ipynb" target="_blank">用于乳腺癌诊断的逻辑回归</a></h3>
+                         使用Wisconsin数据集构建逻辑回归预测模型（预处理、特征选择、评估）。
+                    </div>
+                     <div class="project">
+                         <h3><a href="https://github.com/jrebull/Liderazgo/blob/main/Caso%20IoT-Equipo%202_Final3.pdf" target="_blank">物联网促进可持续城市发展</a></h3>
+                         通过案例研究分析物联网在应对城市可持续发展挑战中的作用。
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            // Save preference in localStorage
+             if (document.body.classList.contains('dark-mode')) {
+                 localStorage.setItem('theme', 'dark');
+             } else {
+                 localStorage.setItem('theme', 'light');
+             }
+        }
+
+        // Check for saved theme preference on load
+        function applyInitialTheme() {
+             if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode'); // Ensure light mode if not dark
+            }
+        }
+
+
+        // Language Switcher
+        function switchLanguage(lang) {
+            // Hide all language sections first
+             const sections = document.querySelectorAll('#resume-en, #resume-es, #resume-zh');
+             sections.forEach(section => section.style.display = 'none');
+
+             // Deactivate all buttons
+            const buttons = document.querySelectorAll('.lang-menu button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Show the selected language section
+            const activeSection = document.getElementById(`resume-${lang}`);
+             if (activeSection) {
+                 activeSection.style.display = 'block'; // Use block to show the div containing the wrapper
+             }
+            // Activate the selected button
+             const activeButton = document.getElementById(`lang-${lang}`);
+             if (activeButton) {
+                 activeButton.classList.add('active');
+             }
+
+             // Update HTML lang attribute
+             document.documentElement.lang = lang;
+             // Save language preference
+             localStorage.setItem('language', lang);
+        }
+
+         // Initialize on load
+         document.addEventListener('DOMContentLoaded', () => {
+            applyInitialTheme(); // Apply theme first
+            const savedLang = localStorage.getItem('language') || 'en'; // Default to 'en'
+            switchLanguage(savedLang);
+        });
+    </script>
+
+</body>
+</html>
