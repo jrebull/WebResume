@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLOps - Mapa Conceptual Radial</title>
+    <title>MLOps - Mapa Mental Interactivo</title>
     <style>
         :root {
-            /* Professional Color Palette */
-            --primary-dark: #1a365d;
-            --primary: #2c5282;
-            --primary-light: #3182ce;
-            --secondary: #38a169;
-            --accent: #ed8936;
-            --warning: #d69e2e;
-            --danger: #e53e3e;
-            --info: #3182ce;
-            --success: #48bb78;
+            /* Paleta de colores profesional */
+            --prussian-blue: #012a4a;
+            --indigo-dye: #013a63;
+            --indigo-dye-2: #01497c;
+            --indigo-dye-3: #014f86;
+            --ucla-blue: #2a6f97;
+            --cerulean: #2c7da0;
+            --air-force-blue: #468faf;
+            --air-superiority-blue: #61a5c2;
+            --sky-blue: #89c2d9;
+            --light-blue: #a9d6e5;
             
-            /* Gradients */
-            --gradient-center: radial-gradient(circle, #667eea 0%, #764ba2 100%);
-            --gradient-role: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-task: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-cycle: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --gradient-challenge: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --gradient-comparison: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            /* Gradientes suaves */
+            --gradient-radial: radial-gradient(circle, #a9d6e5, #89c2d9, #61a5c2, #468faf, #2c7da0, #2a6f97, #014f86, #01497c, #013a63, #012a4a);
+            --gradient-node: linear-gradient(135deg, #2c7da0, #468faf);
+            --gradient-hover: linear-gradient(135deg, #468faf, #61a5c2);
         }
 
         * {
@@ -33,986 +31,1660 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(ellipse at center, #1e3c72 0%, #2a5298 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gradient-radial);
+            min-height: 100vh;
             overflow: hidden;
-            height: 100vh;
-            color: #333;
-        }
-
-        /* Header */
-        .header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1 {
-            text-align: center;
-            font-size: 24px;
-            color: var(--primary-dark);
-            font-weight: 600;
-        }
-
-        .subtitle {
-            text-align: center;
-            font-size: 14px;
-            color: var(--primary);
-            margin-top: 5px;
-        }
-
-        /* Controls */
-        .controls {
-            position: absolute;
-            top: 80px;
-            right: 20px;
-            z-index: 999;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .control-btn {
-            width: 40px;
-            height: 40px;
-            margin: 5px;
-            border: none;
-            background: var(--primary-light);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-
-        .control-btn:hover {
-            background: var(--primary);
-            transform: scale(1.1);
-        }
-
-        /* Canvas */
-        .canvas-container {
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            cursor: move;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: relative;
         }
 
-        .canvas {
-            position: absolute;
-            width: 10000px;
-            height: 10000px;
-            transform-origin: center center;
+        /* Canvas principal */
+        #mindmap-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            cursor: grab;
+            overflow: hidden;
         }
 
-        /* SVG for connections */
-        .connections-svg {
+        #mindmap-container:active {
+            cursor: grabbing;
+        }
+
+        #mindmap-canvas {
             position: absolute;
-            top: 0;
-            left: 0;
+            width: 300%;
+            height: 300%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease;
+        }
+
+        /* SVG para conexiones */
+        #connections-svg {
+            position: absolute;
             width: 100%;
             height: 100%;
+            top: 0;
+            left: 0;
             pointer-events: none;
-            z-index: 1;
+            z-index: 5;
         }
 
-        .connection {
+        .branch-path {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.3);
-            stroke-width: 2;
+            stroke: var(--light-blue);
+            stroke-width: 3;
+            stroke-linecap: round;
+            opacity: 0.6;
             transition: all 0.3s ease;
         }
 
-        .connection:hover {
-            stroke: rgba(255, 255, 255, 0.6);
-            stroke-width: 3;
+        .branch-path:hover {
+            stroke-width: 5;
+            opacity: 1;
         }
 
-        .connection-label {
-            fill: white;
+        /* Nodo central */
+        .central-node {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--gradient-radial);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 20px 60px rgba(1, 42, 74, 0.6);
+            z-index: 100;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 5px solid var(--light-blue);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                box-shadow: 0 20px 60px rgba(1, 42, 74, 0.6);
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                box-shadow: 0 25px 80px rgba(1, 42, 74, 0.8);
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        .central-node:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 30px 90px rgba(1, 42, 74, 0.8);
+        }
+
+        .central-node-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        /* Nodos principales (Nivel 1) */
+        .main-branch {
+            position: absolute;
+            width: 160px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--cerulean), var(--air-force-blue));
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(1, 58, 99, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 50;
+            padding: 15px;
+            text-align: center;
+            border: 3px solid var(--sky-blue);
+        }
+
+        .main-branch:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(1, 58, 99, 0.6);
+            background: linear-gradient(135deg, var(--air-force-blue), var(--air-superiority-blue));
+        }
+
+        .main-branch-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .main-branch-count {
             font-size: 12px;
-            text-anchor: middle;
-            font-weight: 500;
             opacity: 0.8;
         }
 
-        /* Nodes */
-        .node {
+        /* Sub-nodos (Nivel 2) */
+        .sub-branch {
             position: absolute;
-            background: white;
+            width: 140px;
+            min-height: 70px;
+            background: linear-gradient(135deg, var(--air-superiority-blue), var(--sky-blue));
             border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            text-align: center;
-            min-width: 120px;
-            max-width: 350px;
-        }
-
-        .node:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-        }
-
-        /* Node Types */
-        .node-center {
-            background: var(--gradient-center);
-            color: white;
-            width: 200px;
-            height: 200px;
-            font-size: 28px;
-            font-weight: bold;
-            border: 5px solid white;
-            box-shadow: 0 0 50px rgba(102, 126, 234, 0.5);
-            z-index: 50;
-        }
-
-        .node-role {
-            background: var(--gradient-role);
-            color: white;
-            width: 180px;
-            min-height: 120px;
-            font-size: 14px;
-        }
-
-        .node-task {
-            background: var(--gradient-task);
-            color: white;
-            width: 200px;
-            min-height: 100px;
-            font-size: 14px;
-        }
-
-        .node-cycle {
-            background: var(--gradient-cycle);
-            color: white;
-            width: 180px;
-            min-height: 100px;
-            font-size: 14px;
-            border: 3px solid white;
-        }
-
-        .node-challenge {
-            background: var(--gradient-challenge);
-            color: white;
-            width: 200px;
-            min-height: 90px;
-            font-size: 14px;
-        }
-
-        .node-comparison {
-            background: var(--gradient-comparison);
-            color: white;
-            width: 220px;
-            min-height: 110px;
-            font-size: 14px;
-        }
-
-        .node-detail {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: var(--primary-dark);
-            width: 160px;
-            min-height: 80px;
-            font-size: 13px;
-        }
-
-        .node-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 1.1em;
-        }
-
-        .node-description {
-            font-size: 0.9em;
-            line-height: 1.4;
-            opacity: 0.95;
-        }
-
-        .node-responsibilities {
-            font-size: 0.85em;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            text-align: left;
-            width: 100%;
-        }
-
-        .node-responsibilities li {
-            margin: 3px 0;
-            list-style: none;
-            position: relative;
-            padding-left: 15px;
-        }
-
-        .node-responsibilities li:before {
-            content: "▸";
-            position: absolute;
-            left: 0;
-        }
-
-        /* Info Panel */
-        .info-panel {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 300px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            z-index: 999;
-        }
-
-        .info-title {
-            font-weight: bold;
-            color: var(--primary-dark);
-            margin-bottom: 10px;
-        }
-
-        .info-content {
-            font-size: 13px;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        .concept-count {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        /* Legend */
-        .legend {
-            position: absolute;
-            top: 80px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            z-index: 999;
-            font-size: 12px;
-        }
-
-        .legend-item {
-            display: flex;
             align-items: center;
-            margin: 5px 0;
+            color: var(--prussian-blue);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 5px 20px rgba(42, 111, 151, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 30;
+            padding: 10px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInScale 0.5s forwards;
+            border: 2px solid var(--light-blue);
         }
 
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-
-        /* Animation */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 50px rgba(102, 126, 234, 0.5); }
-            50% { box-shadow: 0 0 80px rgba(102, 126, 234, 0.8); }
-            100% { box-shadow: 0 0 50px rgba(102, 126, 234, 0.5); }
-        }
-
-        .node-center {
-            animation: pulse 3s infinite;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
+        @keyframes fadeInScale {
             to {
                 opacity: 1;
                 transform: scale(1);
             }
         }
 
-        .node {
-            animation: fadeIn 0.5s ease-out;
+        .sub-branch:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(42, 111, 151, 0.5);
+            background: linear-gradient(135deg, var(--sky-blue), var(--light-blue));
+        }
+
+        /* Panel de información expandible */
+        .info-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(1, 42, 74, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 3px solid var(--cerulean);
+        }
+
+        .info-panel.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .info-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--sky-blue);
+        }
+
+        .info-panel-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--prussian-blue);
+        }
+
+        .close-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--gradient-node);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: var(--gradient-hover);
+            transform: rotate(90deg);
+        }
+
+        .info-panel-content {
+            color: var(--indigo-dye);
+            line-height: 1.8;
+        }
+
+        .info-panel-content h3 {
+            color: var(--indigo-dye-3);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-panel-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .info-panel-content li {
+            margin: 8px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .info-panel-content li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--cerulean);
+            font-weight: bold;
+        }
+
+        /* Panel de controles */
+        .controls-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(1, 42, 74, 0.2);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: var(--gradient-node);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: var(--gradient-hover);
+            transform: scale(1.1);
+        }
+
+        /* Panel de búsqueda */
+        .search-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(1, 42, 74, 0.2);
+            z-index: 500;
+        }
+
+        .search-input {
+            width: 250px;
+            padding: 12px 20px;
+            border: 2px solid var(--sky-blue);
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--cerulean);
+            box-shadow: 0 0 0 3px rgba(44, 125, 160, 0.1);
+        }
+
+        /* Leyenda */
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(1, 42, 74, 0.2);
+            z-index: 500;
+            max-width: 250px;
+        }
+
+        .legend-title {
+            font-weight: bold;
+            color: var(--prussian-blue);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 13px;
+            color: var(--indigo-dye);
+        }
+
+        .legend-color {
+            width: 25px;
+            height: 25px;
+            border-radius: 5px;
+            margin-right: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         /* Tooltip */
         .tooltip {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
+            position: fixed;
+            background: var(--prussian-blue);
             color: white;
             padding: 10px 15px;
             border-radius: 8px;
             font-size: 13px;
             pointer-events: none;
-            z-index: 1000;
+            z-index: 2000;
             opacity: 0;
             transition: opacity 0.3s ease;
-            max-width: 300px;
+            max-width: 200px;
+            text-align: center;
         }
 
-        .tooltip.show {
+        .tooltip.active {
             opacity: 1;
+        }
+
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--prussian-blue) transparent transparent transparent;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(1, 42, 74, 0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Animación de conexiones */
+        @keyframes dashAnimation {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .animated-path {
+            stroke-dasharray: 10 5;
+            stroke-dashoffset: 15;
+            animation: dashAnimation 20s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-panel {
+                top: auto;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .controls-panel {
+                flex-direction: row;
+                top: auto;
+                bottom: 20px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+
+            .legend {
+                display: none;
+            }
+        }
+
+        /* Header informativo */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 5px 20px rgba(1, 42, 74, 0.1);
+            z-index: 500;
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--prussian-blue);
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--ucla-blue);
+            margin-top: 5px;
+        }
+
+        /* Estilos para nodos destacados */
+        .highlighted {
+            animation: highlight 1s ease infinite;
+        }
+
+        @keyframes highlight {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(1, 58, 99, 0.4);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 15px 50px rgba(255, 200, 0, 0.6);
+            }
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>MLOps - Machine Learning Operations</h1>
-        <div class="subtitle">Mapa Conceptual: Conceptos Clave, Roles, Tareas y Ciclo de Vida</div>
+        <div class="header-title">MLOps - Machine Learning Operations</div>
+        <div class="header-subtitle">Mapa Mental Interactivo - Haz clic en cualquier nodo para explorar</div>
     </div>
 
-    <!-- Controls -->
-    <div class="controls">
-        <button class="control-btn" id="zoom-in" title="Acercar">+</button>
-        <button class="control-btn" id="zoom-out" title="Alejar">−</button>
-        <button class="control-btn" id="reset-view" title="Vista inicial">⟲</button>
-        <button class="control-btn" id="auto-arrange" title="Auto organizar">⚡</button>
+    <!-- Panel de búsqueda -->
+    <div class="search-panel">
+        <input type="text" class="search-input" placeholder="🔍 Buscar concepto..." id="searchInput">
     </div>
 
-    <!-- Legend -->
+    <!-- Panel de controles -->
+    <div class="controls-panel">
+        <button class="control-btn" id="zoomIn" title="Acercar">+</button>
+        <button class="control-btn" id="zoomOut" title="Alejar">−</button>
+        <button class="control-btn" id="resetView" title="Vista inicial">⟲</button>
+        <button class="control-btn" id="expandAll" title="Expandir todo">⤴</button>
+        <button class="control-btn" id="collapseAll" title="Colapsar todo">⤵</button>
+    </div>
+
+    <!-- Leyenda -->
     <div class="legend">
-        <div style="font-weight: bold; margin-bottom: 10px;">Leyenda</div>
+        <div class="legend-title">Leyenda del Mapa</div>
         <div class="legend-item">
-            <div class="legend-color" style="background: var(--gradient-center);"></div>
-            <span>Concepto Principal</span>
+            <div class="legend-color" style="background: var(--gradient-radial);"></div>
+            <span>Concepto Central</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background: var(--gradient-role);"></div>
-            <span>Roles y Responsabilidades</span>
+            <div class="legend-color" style="background: linear-gradient(135deg, var(--cerulean), var(--air-force-blue));"></div>
+            <span>Ramas Principales</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background: var(--gradient-task);"></div>
-            <span>Tareas Principales</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background: var(--gradient-cycle);"></div>
-            <span>Ciclo de Vida</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background: var(--gradient-challenge);"></div>
-            <span>Desafíos</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background: var(--gradient-comparison);"></div>
-            <span>Comparación DevOps</span>
+            <div class="legend-color" style="background: linear-gradient(135deg, var(--air-superiority-blue), var(--sky-blue));"></div>
+            <span>Sub-conceptos</span>
         </div>
     </div>
 
-    <!-- Info Panel -->
-    <div class="info-panel">
-        <div class="info-title">Información del Mapa</div>
-        <div class="info-content">
-            Este mapa conceptual presenta los elementos clave de MLOps, incluyendo roles, responsabilidades, tareas principales, ciclo de vida, desafíos y comparación con DevOps.
+    <!-- Canvas principal -->
+    <div id="mindmap-container">
+        <div id="mindmap-canvas">
+            <svg id="connections-svg"></svg>
+            
+            <!-- Nodo central -->
+            <div class="central-node" id="central-mlops">
+                <div>MLOps</div>
+                <div class="central-node-subtitle">Machine Learning Operations</div>
+            </div>
         </div>
-        <div class="concept-count">Total de conceptos: <span id="concept-count">0</span></div>
     </div>
 
-    <!-- Canvas -->
-    <div class="canvas-container" id="canvas-container">
-        <div class="canvas" id="canvas">
-            <svg class="connections-svg" id="connections"></svg>
+    <!-- Panel de información -->
+    <div class="info-panel" id="infoPanel">
+        <div class="info-panel-header">
+            <div class="info-panel-title" id="infoPanelTitle">Título</div>
+            <button class="close-btn" id="closeInfoPanel">×</button>
+        </div>
+        <div class="info-panel-content" id="infoPanelContent">
+            <!-- Contenido dinámico -->
         </div>
     </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
 
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip"></div>
 
     <script>
-        // MLOps concept map data with radial distribution
-        const conceptMap = {
-            center: {
+        // Estructura de datos del mapa mental MLOps
+        const mlopsData = {
+            central: {
                 id: 'mlops',
                 title: 'MLOps',
-                description: 'Machine Learning Operations',
-                details: 'Prácticas, herramientas y cultura para unificar el desarrollo (Dev) y las operaciones (Ops) de ML',
-                x: 5000,
-                y: 5000,
-                type: 'center'
+                subtitle: 'Machine Learning Operations',
+                description: `MLOps es un conjunto de prácticas que combina Machine Learning, DevOps e Ingeniería de Datos para implementar y mantener sistemas ML en producción de manera confiable y eficiente.`,
+                details: {
+                    definicion: 'MLOps (Machine Learning Operations) es una disciplina que se enfoca en la colaboración y comunicación entre científicos de datos y profesionales de operaciones.',
+                    objetivo: 'Facilitar el despliegue, monitoreo y mantenimiento de modelos de ML en producción.',
+                    beneficios: [
+                        'Reducción del tiempo de desarrollo',
+                        'Mejora en la calidad del modelo',
+                        'Mayor colaboración entre equipos',
+                        'Automatización de procesos repetitivos',
+                        'Mejor gobernanza y cumplimiento'
+                    ]
+                }
             },
-            
-            // ROLES (North) - 5 concepts
-            roles: [
+            branches: [
                 {
-                    id: 'data-engineer',
-                    title: 'Data Engineers',
-                    description: 'Ingenieros de Datos',
-                    responsibilities: [
-                        'Diseñar pipelines de datos',
-                        'Gestionar infraestructura de datos',
-                        'Optimizar almacenamiento y recuperación'
-                    ],
-                    x: 4700,
-                    y: 4200,
-                    type: 'role',
-                    parent: 'mlops',
-                    connectionLabel: 'construye infraestructura'
+                    id: 'roles',
+                    title: 'Roles y Equipos',
+                    angle: 0,
+                    color: 'linear-gradient(135deg, #014f86, #2a6f97)',
+                    description: 'Profesionales clave en MLOps',
+                    subBranches: [
+                        {
+                            id: 'data-scientist',
+                            title: 'Data Scientist',
+                            description: 'Desarrolla y experimenta con modelos ML',
+                            details: {
+                                responsabilidades: [
+                                    'Exploración y análisis de datos',
+                                    'Desarrollo de modelos ML',
+                                    'Experimentación y validación',
+                                    'Optimización de hiperparámetros',
+                                    'Documentación de modelos'
+                                ],
+                                habilidades: [
+                                    'Python/R',
+                                    'Estadística y matemáticas',
+                                    'Frameworks ML (TensorFlow, PyTorch)',
+                                    'Visualización de datos',
+                                    'Comunicación técnica'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'ml-engineer',
+                            title: 'ML Engineer',
+                            description: 'Productiza y optimiza modelos ML',
+                            details: {
+                                responsabilidades: [
+                                    'Productización de modelos',
+                                    'Optimización de rendimiento',
+                                    'Creación de pipelines ML',
+                                    'Integración con sistemas',
+                                    'Escalamiento de soluciones'
+                                ],
+                                habilidades: [
+                                    'Ingeniería de software',
+                                    'Cloud computing',
+                                    'Containerización (Docker)',
+                                    'Orquestación (Kubernetes)',
+                                    'CI/CD para ML'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'data-engineer',
+                            title: 'Data Engineer',
+                            description: 'Construye y mantiene infraestructura de datos',
+                            details: {
+                                responsabilidades: [
+                                    'Diseño de arquitectura de datos',
+                                    'ETL/ELT pipelines',
+                                    'Gestión de data warehouses',
+                                    'Calidad y gobernanza de datos',
+                                    'Optimización de consultas'
+                                ],
+                                habilidades: [
+                                    'SQL y NoSQL',
+                                    'Apache Spark',
+                                    'Airflow',
+                                    'Cloud data services',
+                                    'Streaming de datos'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'devops-engineer',
+                            title: 'DevOps Engineer',
+                            description: 'Automatiza y gestiona infraestructura',
+                            details: {
+                                responsabilidades: [
+                                    'CI/CD pipelines',
+                                    'Gestión de infraestructura',
+                                    'Monitoreo y logging',
+                                    'Seguridad y compliance',
+                                    'Automatización de procesos'
+                                ],
+                                habilidades: [
+                                    'Infrastructure as Code',
+                                    'Terraform/CloudFormation',
+                                    'Jenkins/GitLab CI',
+                                    'Monitoring tools',
+                                    'Scripting (Bash, Python)'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'ml-architect',
+                            title: 'ML Architect',
+                            description: 'Diseña la arquitectura general de ML',
+                            details: {
+                                responsabilidades: [
+                                    'Diseño de arquitectura end-to-end',
+                                    'Selección de tecnologías',
+                                    'Definición de estándares',
+                                    'Estrategia de escalamiento',
+                                    'Roadmap técnico'
+                                ],
+                                habilidades: [
+                                    'Arquitectura de sistemas',
+                                    'Evaluación tecnológica',
+                                    'Liderazgo técnico',
+                                    'Visión estratégica',
+                                    'Comunicación ejecutiva'
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
-                    id: 'data-scientist',
-                    title: 'Data Scientists',
-                    description: 'Científicos de Datos',
-                    responsibilities: [
-                        'Desarrollar modelos ML',
-                        'Experimentación y validación',
-                        'Análisis estadístico'
-                    ],
-                    x: 5000,
-                    y: 4100,
-                    type: 'role',
-                    parent: 'mlops',
-                    connectionLabel: 'crea modelos'
+                    id: 'lifecycle',
+                    title: 'Ciclo de Vida',
+                    angle: 72,
+                    color: 'linear-gradient(135deg, #2a6f97, #2c7da0)',
+                    description: 'Fases del desarrollo ML',
+                    subBranches: [
+                        {
+                            id: 'design',
+                            title: '1. Diseño',
+                            description: 'Definición del problema y requisitos',
+                            details: {
+                                actividades: [
+                                    'Comprensión del problema de negocio',
+                                    'Definición de métricas de éxito',
+                                    'Análisis de viabilidad',
+                                    'Diseño de arquitectura inicial',
+                                    'Planificación de recursos'
+                                ],
+                                entregables: [
+                                    'Documento de requisitos',
+                                    'Métricas de evaluación',
+                                    'Arquitectura propuesta',
+                                    'Plan de proyecto'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'data-prep',
+                            title: '2. Preparación de Datos',
+                            description: 'Recolección y procesamiento de datos',
+                            details: {
+                                actividades: [
+                                    'Identificación de fuentes de datos',
+                                    'Recolección de datos',
+                                    'Limpieza y transformación',
+                                    'Feature engineering',
+                                    'Versionado de datasets'
+                                ],
+                                herramientas: [
+                                    'Apache Spark',
+                                    'Pandas',
+                                    'DVC (Data Version Control)',
+                                    'Great Expectations',
+                                    'Apache Airflow'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'model-dev',
+                            title: '3. Desarrollo del Modelo',
+                            description: 'Experimentación y entrenamiento',
+                            details: {
+                                actividades: [
+                                    'Selección de algoritmos',
+                                    'Entrenamiento de modelos',
+                                    'Validación cruzada',
+                                    'Optimización de hiperparámetros',
+                                    'Comparación de modelos'
+                                ],
+                                herramientas: [
+                                    'MLflow',
+                                    'Weights & Biases',
+                                    'TensorBoard',
+                                    'Optuna',
+                                    'Ray Tune'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'validation',
+                            title: '4. Validación',
+                            description: 'Testing y aseguramiento de calidad',
+                            details: {
+                                tipos_validacion: [
+                                    'Validación offline',
+                                    'A/B testing',
+                                    'Shadow deployment',
+                                    'Canary releases',
+                                    'Blue-green deployment'
+                                ],
+                                metricas: [
+                                    'Accuracy, Precision, Recall',
+                                    'F1-Score, AUC-ROC',
+                                    'Business metrics',
+                                    'Latencia y throughput',
+                                    'Uso de recursos'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'deployment',
+                            title: '5. Despliegue',
+                            description: 'Puesta en producción',
+                            details: {
+                                estrategias: [
+                                    'Batch serving',
+                                    'Real-time serving',
+                                    'Edge deployment',
+                                    'Embedded models',
+                                    'API endpoints'
+                                ],
+                                tecnologias: [
+                                    'Docker/Kubernetes',
+                                    'TensorFlow Serving',
+                                    'TorchServe',
+                                    'Seldon Core',
+                                    'KServe'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'monitoring',
+                            title: '6. Monitoreo',
+                            description: 'Observabilidad y mantenimiento',
+                            details: {
+                                aspectos_monitoreo: [
+                                    'Model performance',
+                                    'Data drift detection',
+                                    'Concept drift',
+                                    'System metrics',
+                                    'Business KPIs'
+                                ],
+                                herramientas: [
+                                    'Prometheus/Grafana',
+                                    'Evidently AI',
+                                    'Alibi Detect',
+                                    'WhyLabs',
+                                    'Arize AI'
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
-                    id: 'ml-engineer',
-                    title: 'ML Engineers',
-                    description: 'Ingenieros de ML',
-                    responsibilities: [
-                        'Productificar modelos',
-                        'Optimizar rendimiento',
-                        'Automatizar pipelines ML'
-                    ],
-                    x: 5300,
-                    y: 4200,
-                    type: 'role',
-                    parent: 'mlops',
-                    connectionLabel: 'productifica'
+                    id: 'practices',
+                    title: 'Prácticas Clave',
+                    angle: 144,
+                    color: 'linear-gradient(135deg, #2c7da0, #468faf)',
+                    description: 'Mejores prácticas en MLOps',
+                    subBranches: [
+                        {
+                            id: 'version-control',
+                            title: 'Control de Versiones',
+                            description: 'Gestión de código, datos y modelos',
+                            details: {
+                                componentes: [
+                                    'Git para código',
+                                    'DVC para datos',
+                                    'MLflow para modelos',
+                                    'Registro de experimentos',
+                                    'Trazabilidad completa'
+                                ],
+                                beneficios: [
+                                    'Reproducibilidad',
+                                    'Colaboración efectiva',
+                                    'Rollback capability',
+                                    'Auditoría',
+                                    'Gestión de cambios'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'automation',
+                            title: 'Automatización',
+                            description: 'CI/CD para Machine Learning',
+                            details: {
+                                pipelines: [
+                                    'Data validation pipeline',
+                                    'Training pipeline',
+                                    'Model validation pipeline',
+                                    'Deployment pipeline',
+                                    'Monitoring pipeline'
+                                ],
+                                herramientas: [
+                                    'Jenkins',
+                                    'GitLab CI/CD',
+                                    'GitHub Actions',
+                                    'Kubeflow Pipelines',
+                                    'Apache Airflow'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'reproducibility',
+                            title: 'Reproducibilidad',
+                            description: 'Capacidad de recrear resultados',
+                            details: {
+                                elementos: [
+                                    'Seeds aleatorios fijos',
+                                    'Entornos containerizados',
+                                    'Versiones de dependencias',
+                                    'Configuración como código',
+                                    'Documentación detallada'
+                                ],
+                                herramientas: [
+                                    'Docker',
+                                    'Poetry/Pipenv',
+                                    'Conda environments',
+                                    'Requirements.txt',
+                                    'Make files'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'testing',
+                            title: 'Testing ML',
+                            description: 'Pruebas específicas para ML',
+                            details: {
+                                tipos_tests: [
+                                    'Unit tests para código',
+                                    'Data validation tests',
+                                    'Model quality tests',
+                                    'Integration tests',
+                                    'Performance tests'
+                                ],
+                                frameworks: [
+                                    'pytest',
+                                    'Great Expectations',
+                                    'Deepchecks',
+                                    'TensorFlow Data Validation',
+                                    'Locust (load testing)'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'governance',
+                            title: 'Gobernanza',
+                            description: 'Cumplimiento y ética en ML',
+                            details: {
+                                aspectos: [
+                                    'Model explainability',
+                                    'Fairness and bias detection',
+                                    'Privacy (GDPR, CCPA)',
+                                    'Model documentation',
+                                    'Access control and audit'
+                                ],
+                                herramientas: [
+                                    'SHAP',
+                                    'LIME',
+                                    'Fairlearn',
+                                    'Model cards',
+                                    'Differential privacy'
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
-                    id: 'devops',
-                    title: 'DevOps Engineers',
-                    description: 'Ingenieros DevOps',
-                    responsibilities: [
-                        'CI/CD pipelines',
-                        'Gestión de contenedores',
-                        'Monitoreo de infraestructura'
-                    ],
-                    x: 4500,
-                    y: 4400,
-                    type: 'role',
-                    parent: 'mlops',
-                    connectionLabel: 'automatiza despliegue'
+                    id: 'tools',
+                    title: 'Herramientas',
+                    angle: 216,
+                    color: 'linear-gradient(135deg, #468faf, #61a5c2)',
+                    description: 'Stack tecnológico de MLOps',
+                    subBranches: [
+                        {
+                            id: 'experiment-tracking',
+                            title: 'Tracking de Experimentos',
+                            description: 'Gestión de experimentos ML',
+                            details: {
+                                plataformas: [
+                                    'MLflow - Open source platform',
+                                    'Weights & Biases - SaaS solution',
+                                    'Neptune.ai - Metadata store',
+                                    'Comet ML - Experiment management',
+                                    'TensorBoard - Visualization'
+                                ],
+                                funcionalidades: [
+                                    'Logging de métricas',
+                                    'Versionado de modelos',
+                                    'Comparación de runs',
+                                    'Visualización de resultados',
+                                    'Colaboración en equipo'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'orchestration',
+                            title: 'Orquestación',
+                            description: 'Gestión de workflows ML',
+                            details: {
+                                herramientas: [
+                                    'Apache Airflow - DAG-based',
+                                    'Kubeflow - Kubernetes-native',
+                                    'Prefect - Modern dataflow',
+                                    'Dagster - Data orchestrator',
+                                    'Argo Workflows - K8s workflows'
+                                ],
+                                casos_uso: [
+                                    'ETL pipelines',
+                                    'Training pipelines',
+                                    'Batch predictions',
+                                    'Data validation',
+                                    'Model retraining'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'serving',
+                            title: 'Model Serving',
+                            description: 'Infraestructura de inferencia',
+                            details: {
+                                plataformas: [
+                                    'TensorFlow Serving',
+                                    'TorchServe',
+                                    'Seldon Core',
+                                    'KServe (KFServing)',
+                                    'BentoML'
+                                ],
+                                características: [
+                                    'REST/gRPC APIs',
+                                    'Batch processing',
+                                    'Model versioning',
+                                    'A/B testing',
+                                    'Auto-scaling'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'feature-store',
+                            title: 'Feature Store',
+                            description: 'Gestión centralizada de features',
+                            details: {
+                                soluciones: [
+                                    'Feast - Open source',
+                                    'Tecton - Enterprise',
+                                    'AWS SageMaker Feature Store',
+                                    'Databricks Feature Store',
+                                    'Hopsworks'
+                                ],
+                                beneficios: [
+                                    'Reutilización de features',
+                                    'Consistencia training-serving',
+                                    'Feature discovery',
+                                    'Time travel',
+                                    'Feature monitoring'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'monitoring-tools',
+                            title: 'Herramientas de Monitoreo',
+                            description: 'Observabilidad ML',
+                            details: {
+                                plataformas: [
+                                    'Evidently AI - Drift detection',
+                                    'WhyLabs - ML observability',
+                                    'Arize AI - Performance monitoring',
+                                    'Fiddler AI - Explainable monitoring',
+                                    'Superwise - Model assurance'
+                                ],
+                                métricas: [
+                                    'Model performance metrics',
+                                    'Data quality metrics',
+                                    'Drift metrics',
+                                    'Business metrics',
+                                    'System metrics'
+                                ]
+                            }
+                        }
+                    ]
                 },
                 {
-                    id: 'ml-architect',
-                    title: 'ML Architects',
-                    description: 'Arquitectos de ML',
-                    responsibilities: [
-                        'Diseñar arquitectura ML',
-                        'Definir estándares y mejores prácticas',
-                        'Estrategia tecnológica ML'
-                    ],
-                    x: 5500,
-                    y: 4400,
-                    type: 'role',
-                    parent: 'mlops',
-                    connectionLabel: 'diseña arquitectura'
-                }
-            ],
-            
-            // MAIN TASKS (East) - 4 concepts
-            tasks: [
-                {
-                    id: 'data-management',
-                    title: 'Gestión de Datos',
-                    description: 'Preparación, versionado y calidad de datos',
-                    x: 5900,
-                    y: 4800,
-                    type: 'task',
-                    parent: 'mlops',
-                    connectionLabel: 'prepara datos'
-                },
-                {
-                    id: 'model-training',
-                    title: 'Entrenamiento de Modelos',
-                    description: 'Experimentación, evaluación y selección',
-                    x: 5950,
-                    y: 5000,
-                    type: 'task',
-                    parent: 'mlops',
-                    connectionLabel: 'entrena'
-                },
-                {
-                    id: 'deployment',
-                    title: 'Despliegue',
-                    description: 'CI/CD, containerización, orquestación',
-                    x: 5900,
-                    y: 5200,
-                    type: 'task',
-                    parent: 'mlops',
-                    connectionLabel: 'despliega'
-                },
-                {
-                    id: 'monitoring',
-                    title: 'Monitoreo y Mantenimiento',
-                    description: 'Drift detection, performance, retraining',
-                    x: 5850,
-                    y: 5400,
-                    type: 'task',
-                    parent: 'mlops',
-                    connectionLabel: 'monitorea'
-                }
-            ],
-            
-            // LIFECYCLE (South) - 5 concepts
-            lifecycle: [
-                {
-                    id: 'cycle-design',
-                    title: '1. Diseño',
-                    description: 'Definición de requisitos y arquitectura',
-                    x: 4400,
-                    y: 5700,
-                    type: 'cycle',
-                    parent: 'mlops',
-                    connectionLabel: 'inicia con'
-                },
-                {
-                    id: 'cycle-develop',
-                    title: '2. Desarrollo',
-                    description: 'Creación y experimentación de modelos',
-                    x: 4700,
-                    y: 5800,
-                    type: 'cycle',
-                    parent: 'mlops',
-                    connectionLabel: 'desarrolla'
-                },
-                {
-                    id: 'cycle-validate',
-                    title: '3. Validación',
-                    description: 'Testing y aseguramiento de calidad',
-                    x: 5000,
-                    y: 5850,
-                    type: 'cycle',
-                    parent: 'mlops',
-                    connectionLabel: 'valida'
-                },
-                {
-                    id: 'cycle-deploy',
-                    title: '4. Despliegue',
-                    description: 'Puesta en producción automatizada',
-                    x: 5300,
-                    y: 5800,
-                    type: 'cycle',
-                    parent: 'mlops',
-                    connectionLabel: 'despliega'
-                },
-                {
-                    id: 'cycle-monitor',
-                    title: '5. Monitoreo',
-                    description: 'Observabilidad y retroalimentación',
-                    x: 5600,
-                    y: 5700,
-                    type: 'cycle',
-                    parent: 'mlops',
-                    connectionLabel: 'monitorea'
-                }
-            ],
-            
-            // CHALLENGES (West) - 4 concepts
-            challenges: [
-                {
-                    id: 'challenge-data',
-                    title: 'Drift de Datos',
-                    description: 'Cambios en distribución de datos con el tiempo',
-                    x: 3900,
-                    y: 4850,
-                    type: 'challenge',
-                    parent: 'mlops',
-                    connectionLabel: 'desafío'
-                },
-                {
-                    id: 'challenge-complexity',
-                    title: 'Complejidad Técnica',
-                    description: 'Múltiples tecnologías y herramientas',
-                    x: 3850,
-                    y: 5050,
-                    type: 'challenge',
-                    parent: 'mlops',
-                    connectionLabel: 'desafío'
-                },
-                {
-                    id: 'challenge-skills',
-                    title: 'Brecha de Habilidades',
-                    description: 'Diferencia entre científicos de datos y ops',
-                    x: 3900,
-                    y: 5250,
-                    type: 'challenge',
-                    parent: 'mlops',
-                    connectionLabel: 'desafío'
-                },
-                {
-                    id: 'challenge-governance',
-                    title: 'Gobernanza y Compliance',
-                    description: 'Regulaciones, ética y responsabilidad',
-                    x: 4000,
-                    y: 5450,
-                    type: 'challenge',
-                    parent: 'mlops',
-                    connectionLabel: 'desafío'
-                }
-            ],
-            
-            // DEVOPS COMPARISON (Northwest) - 3 concepts
-            comparison: [
-                {
-                    id: 'devops-concept',
-                    title: 'DevOps',
-                    description: 'Desarrollo + Operaciones de Software',
-                    x: 4200,
-                    y: 4600,
-                    type: 'comparison',
-                    parent: 'mlops',
-                    connectionLabel: 'se basa en'
-                },
-                {
-                    id: 'similarities',
-                    title: 'Similitudes MLOps-DevOps',
-                    description: 'CI/CD, Automatización, Colaboración, Monitoreo',
-                    x: 3900,
-                    y: 4400,
-                    type: 'comparison',
-                    parent: 'devops-concept',
-                    connectionLabel: 'comparte'
-                },
-                {
-                    id: 'differences',
-                    title: 'Diferencias MLOps-DevOps',
-                    description: 'Datos + Modelos, Experimentación, Drift, Reentrenamiento',
-                    x: 4100,
-                    y: 4200,
-                    type: 'comparison',
-                    parent: 'devops-concept',
-                    connectionLabel: 'difiere en'
+                    id: 'challenges',
+                    title: 'Desafíos',
+                    angle: 288,
+                    color: 'linear-gradient(135deg, #61a5c2, #89c2d9)',
+                    description: 'Retos principales en MLOps',
+                    subBranches: [
+                        {
+                            id: 'data-drift',
+                            title: 'Data & Concept Drift',
+                            description: 'Cambios en distribución de datos',
+                            details: {
+                                tipos: [
+                                    'Covariate shift',
+                                    'Prior probability shift',
+                                    'Concept drift',
+                                    'Seasonal patterns',
+                                    'Data quality degradation'
+                                ],
+                                soluciones: [
+                                    'Continuous monitoring',
+                                    'Automated retraining',
+                                    'Drift detection algorithms',
+                                    'Feature importance tracking',
+                                    'A/B testing strategies'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'technical-debt',
+                            title: 'Deuda Técnica ML',
+                            description: 'Complejidad acumulada en sistemas ML',
+                            details: {
+                                fuentes: [
+                                    'Código experimental en producción',
+                                    'Pipelines no documentados',
+                                    'Dependencias ocultas',
+                                    'Configuraciones mágicas',
+                                    'Modelos legacy'
+                                ],
+                                mitigación: [
+                                    'Refactoring regular',
+                                    'Documentación exhaustiva',
+                                    'Code reviews',
+                                    'Testing comprehensivo',
+                                    'Arquitectura modular'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'scalability',
+                            title: 'Escalabilidad',
+                            description: 'Crecimiento de sistemas ML',
+                            details: {
+                                dimensiones: [
+                                    'Volumen de datos',
+                                    'Número de modelos',
+                                    'Frecuencia de retraining',
+                                    'Throughput de inferencia',
+                                    'Número de usuarios'
+                                ],
+                                estrategias: [
+                                    'Arquitectura microservicios',
+                                    'Horizontal scaling',
+                                    'Caching strategies',
+                                    'Load balancing',
+                                    'Distributed training'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'team-collaboration',
+                            title: 'Colaboración entre Equipos',
+                            description: 'Alineación Data Science y Ops',
+                            details: {
+                                desafíos: [
+                                    'Diferentes skill sets',
+                                    'Objetivos divergentes',
+                                    'Herramientas incompatibles',
+                                    'Comunicación técnica',
+                                    'Ownership unclear'
+                                ],
+                                soluciones: [
+                                    'DevOps culture',
+                                    'Cross-functional teams',
+                                    'Shared KPIs',
+                                    'Common tooling',
+                                    'Regular sync meetings'
+                                ]
+                            }
+                        },
+                        {
+                            id: 'compliance',
+                            title: 'Cumplimiento Regulatorio',
+                            description: 'Regulaciones y ética en ML',
+                            details: {
+                                regulaciones: [
+                                    'GDPR (Europa)',
+                                    'CCPA (California)',
+                                    'AI Act (EU)',
+                                    'Sector-specific (HIPAA, PCI-DSS)',
+                                    'Fairness regulations'
+                                ],
+                                implementación: [
+                                    'Privacy by design',
+                                    'Model explainability',
+                                    'Audit trails',
+                                    'Data governance',
+                                    'Bias testing'
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         };
 
-        // Canvas and interaction variables
-        let canvas, canvasContainer, connectionsElement;
-        let scale = 0.8;
-        let translateX = 0;
-        let translateY = 0;
+        // Variables globales
+        let canvas, svg;
+        let scale = 1;
+        let translateX = 0, translateY = 0;
         let isDragging = false;
-        let startX, startY;
-        let nodes = [];
-        let connections = [];
-        let conceptCount = 0;
+        let dragStart = { x: 0, y: 0 };
+        let dragOffset = { x: 0, y: 0 };
+        let expandedBranches = new Set();
 
-        // Initialize
-        function init() {
-            canvas = document.getElementById('canvas');
-            canvasContainer = document.getElementById('canvas-container');
-            connectionsElement = document.getElementById('connections');
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            canvas = document.getElementById('mindmap-canvas');
+            svg = document.getElementById('connections-svg');
             
-            createNodes();
-            drawConnections();
-            centerView();
-            updateConceptCount();
-            
-            // Event listeners
+            initializeMindMap();
             setupEventListeners();
-        }
-
-        // Create all nodes
-        function createNodes() {
-            // Create center node
-            createNode(conceptMap.center);
+            drawConnections();
             
-            // Create role nodes
-            conceptMap.roles.forEach(role => createNode(role));
-            
-            // Create task nodes
-            conceptMap.tasks.forEach(task => createNode(task));
-            
-            // Create lifecycle nodes
-            conceptMap.lifecycle.forEach(cycle => createNode(cycle));
-            
-            // Create challenge nodes
-            conceptMap.challenges.forEach(challenge => createNode(challenge));
-            
-            // Create comparison nodes
-            conceptMap.comparison.forEach(comp => createNode(comp));
-        }
-
-        // Create individual node
-        function createNode(data) {
-            const node = document.createElement('div');
-            node.className = `node node-${data.type}`;
-            node.id = data.id;
-            node.style.left = `${data.x}px`;
-            node.style.top = `${data.y}px`;
-            node.style.animationDelay = `${Math.random() * 0.5}s`;
-            
-            // Build content
-            let content = `<div class="node-title">${data.title}</div>`;
-            if (data.description) {
-                content += `<div class="node-description">${data.description}</div>`;
-            }
-            if (data.responsibilities && data.responsibilities.length > 0) {
-                content += '<div class="node-responsibilities"><ul>';
-                data.responsibilities.forEach(resp => {
-                    content += `<li>${resp}</li>`;
+            // Expandir todas las ramas inicialmente
+            setTimeout(() => {
+                mlopsData.branches.forEach(branch => {
+                    expandBranch(branch.id);
                 });
-                content += '</ul></div>';
-            }
+            }, 500);
+        });
+
+        // Inicializar el mapa mental
+        function initializeMindMap() {
+            const container = document.getElementById('mindmap-container');
+            const centerX = container.offsetWidth / 2;
+            const centerY = container.offsetHeight / 2;
+
+            // Crear ramas principales
+            mlopsData.branches.forEach((branch, index) => {
+                const radius = 300;
+                const angleRad = (branch.angle * Math.PI) / 180;
+                const x = centerX + Math.cos(angleRad) * radius;
+                const y = centerY + Math.sin(angleRad) * radius;
+
+                createMainBranch(branch, x, y);
+            });
+        }
+
+        // Crear rama principal
+        function createMainBranch(branch, x, y) {
+            const node = document.createElement('div');
+            node.className = 'main-branch';
+            node.id = branch.id;
+            node.style.left = x - 80 + 'px';
+            node.style.top = y - 50 + 'px';
+            node.style.background = branch.color;
+            node.innerHTML = `
+                <div class="main-branch-title">${branch.title}</div>
+                <div class="main-branch-count">${branch.subBranches.length} conceptos</div>
+            `;
             
-            node.innerHTML = content;
+            node.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleBranch(branch.id);
+            });
             
-            // Add hover tooltip if details exist
-            if (data.details) {
-                node.addEventListener('mouseenter', (e) => showTooltip(e, data.details));
-                node.addEventListener('mouseleave', hideTooltip);
-            }
+            node.addEventListener('mouseenter', (e) => {
+                showTooltip(e, branch.description);
+            });
+            
+            node.addEventListener('mouseleave', hideTooltip);
             
             canvas.appendChild(node);
-            nodes.push({ element: node, data: data });
-            conceptCount++;
         }
 
-        // Draw connections between nodes
+        // Expandir/Colapsar rama
+        function toggleBranch(branchId) {
+            if (expandedBranches.has(branchId)) {
+                collapseBranch(branchId);
+            } else {
+                expandBranch(branchId);
+            }
+        }
+
+        // Expandir rama
+        function expandBranch(branchId) {
+            const branch = mlopsData.branches.find(b => b.id === branchId);
+            if (!branch) return;
+
+            expandedBranches.add(branchId);
+            const mainNode = document.getElementById(branchId);
+            const rect = mainNode.getBoundingClientRect();
+            const containerRect = canvas.getBoundingClientRect();
+            const centerX = rect.left - containerRect.left + rect.width / 2;
+            const centerY = rect.top - containerRect.top + rect.height / 2;
+
+            branch.subBranches.forEach((subBranch, index) => {
+                const subRadius = 150;
+                const startAngle = branch.angle - 30;
+                const angleStep = 60 / (branch.subBranches.length - 1 || 1);
+                const angle = startAngle + angleStep * index;
+                const angleRad = (angle * Math.PI) / 180;
+                
+                const x = centerX + Math.cos(angleRad) * subRadius;
+                const y = centerY + Math.sin(angleRad) * subRadius;
+
+                createSubBranch(subBranch, x, y, index * 100);
+            });
+
+            drawConnections();
+        }
+
+        // Colapsar rama
+        function collapseBranch(branchId) {
+            expandedBranches.delete(branchId);
+            const branch = mlopsData.branches.find(b => b.id === branchId);
+            if (!branch) return;
+
+            branch.subBranches.forEach(subBranch => {
+                const node = document.getElementById(subBranch.id);
+                if (node) {
+                    node.style.opacity = '0';
+                    setTimeout(() => node.remove(), 300);
+                }
+            });
+
+            drawConnections();
+        }
+
+        // Crear sub-rama
+        function createSubBranch(subBranch, x, y, delay) {
+            setTimeout(() => {
+                const node = document.createElement('div');
+                node.className = 'sub-branch';
+                node.id = subBranch.id;
+                node.style.left = x - 70 + 'px';
+                node.style.top = y - 35 + 'px';
+                node.innerHTML = subBranch.title;
+                node.style.animationDelay = delay + 'ms';
+                
+                node.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showInfoPanel(subBranch);
+                });
+                
+                node.addEventListener('mouseenter', (e) => {
+                    showTooltip(e, subBranch.description);
+                });
+                
+                node.addEventListener('mouseleave', hideTooltip);
+                
+                canvas.appendChild(node);
+            }, delay);
+        }
+
+        // Dibujar conexiones
         function drawConnections() {
-            const svg = connectionsElement;
             svg.innerHTML = '';
-            
-            // Set SVG viewBox
-            svg.setAttribute('viewBox', '0 0 10000 10000');
-            
-            // Create arrow marker
-            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-            defs.innerHTML = `
-                <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,0 L0,6 L9,3 z" fill="rgba(255,255,255,0.6)" />
-                </marker>
-            `;
-            svg.appendChild(defs);
-            
-            // Draw connections
-            nodes.forEach(node => {
-                if (node.data.parent) {
-                    const parentNode = nodes.find(n => n.data.id === node.data.parent);
-                    if (parentNode) {
-                        drawConnection(svg, parentNode, node, node.data.connectionLabel);
+            svg.setAttribute('viewBox', `0 0 ${canvas.offsetWidth} ${canvas.offsetHeight}`);
+
+            // Conexiones del centro a las ramas principales
+            const centralNode = document.getElementById('central-mlops');
+            const centralRect = centralNode.getBoundingClientRect();
+            const containerRect = canvas.getBoundingClientRect();
+            const centralX = centralRect.left - containerRect.left + centralRect.width / 2;
+            const centralY = centralRect.top - containerRect.top + centralRect.height / 2;
+
+            mlopsData.branches.forEach(branch => {
+                const branchNode = document.getElementById(branch.id);
+                if (branchNode) {
+                    const branchRect = branchNode.getBoundingClientRect();
+                    const branchX = branchRect.left - containerRect.left + branchRect.width / 2;
+                    const branchY = branchRect.top - containerRect.top + branchRect.height / 2;
+
+                    drawCurvedPath(centralX, centralY, branchX, branchY, 'main');
+
+                    // Conexiones a sub-ramas si están expandidas
+                    if (expandedBranches.has(branch.id)) {
+                        branch.subBranches.forEach(subBranch => {
+                            const subNode = document.getElementById(subBranch.id);
+                            if (subNode) {
+                                const subRect = subNode.getBoundingClientRect();
+                                const subX = subRect.left - containerRect.left + subRect.width / 2;
+                                const subY = subRect.top - containerRect.top + subRect.height / 2;
+
+                                drawCurvedPath(branchX, branchY, subX, subY, 'sub');
+                            }
+                        });
                     }
                 }
             });
-            
-            // Draw sequential connections for lifecycle
-            const cycleNodes = nodes.filter(n => n.data.type === 'cycle').sort((a, b) => {
-                return parseInt(a.data.title) - parseInt(b.data.title);
-            });
-            
-            for (let i = 0; i < cycleNodes.length - 1; i++) {
-                drawConnection(svg, cycleNodes[i], cycleNodes[i + 1], 'continúa con');
-            }
-            
-            // Draw feedback loop from last to first lifecycle
-            if (cycleNodes.length > 0) {
-                drawFeedbackConnection(svg, cycleNodes[cycleNodes.length - 1], cycleNodes[0]);
-            }
         }
 
-        // Draw single connection
-        function drawConnection(svg, fromNode, toNode, label) {
-            const from = getNodeCenter(fromNode.element);
-            const to = getNodeCenter(toNode.element);
-            
-            // Create path
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            const dx = to.x - from.x;
-            const dy = to.y - from.y;
-            
-            // Curved path
-            const midX = from.x + dx / 2;
-            const midY = from.y + dy / 2;
-            const controlX = midX + (Math.random() - 0.5) * 100;
-            const controlY = midY + (Math.random() - 0.5) * 100;
-            
-            path.setAttribute('d', `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`);
-            path.setAttribute('class', 'connection');
-            path.setAttribute('marker-end', 'url(#arrow)');
-            
-            svg.appendChild(path);
-            
-            // Add label if provided
-            if (label) {
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', midX);
-                text.setAttribute('y', midY - 5);
-                text.setAttribute('class', 'connection-label');
-                text.textContent = label;
-                svg.appendChild(text);
-            }
-        }
-
-        // Draw feedback connection
-        function drawFeedbackConnection(svg, fromNode, toNode) {
-            const from = getNodeCenter(fromNode.element);
-            const to = getNodeCenter(toNode.element);
-            
+        // Dibujar camino curvo
+        function drawCurvedPath(x1, y1, x2, y2, type) {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             
-            // Large arc for feedback
-            const pathData = `M ${from.x} ${from.y} 
-                             C ${from.x + 300} ${from.y + 200}
-                               ${to.x - 300} ${to.y + 200}
-                               ${to.x} ${to.y}`;
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const dr = Math.sqrt(dx * dx + dy * dy);
             
-            path.setAttribute('d', pathData);
-            path.setAttribute('class', 'connection');
-            path.setAttribute('stroke-dasharray', '10,5');
-            path.setAttribute('marker-end', 'url(#arrow)');
+            const sweep = 0; // 0 or 1
+            const largeArc = 0; // 0 or 1
+            
+            const controlX = (x1 + x2) / 2 + dy * 0.2;
+            const controlY = (y1 + y2) / 2 - dx * 0.2;
+            
+            const d = `M ${x1},${y1} Q ${controlX},${controlY} ${x2},${y2}`;
+            
+            path.setAttribute('d', d);
+            path.setAttribute('class', `branch-path ${type === 'main' ? 'animated-path' : ''}`);
+            if (type === 'main') {
+                path.style.strokeWidth = '4';
+                path.style.stroke = 'var(--sky-blue)';
+            } else {
+                path.style.strokeWidth = '2';
+                path.style.stroke = 'var(--light-blue)';
+                path.style.opacity = '0.5';
+            }
             
             svg.appendChild(path);
+        }
+
+        // Mostrar panel de información
+        function showInfoPanel(data) {
+            const panel = document.getElementById('infoPanel');
+            const overlay = document.getElementById('overlay');
+            const title = document.getElementById('infoPanelTitle');
+            const content = document.getElementById('infoPanelContent');
+
+            title.textContent = data.title;
             
-            // Add label
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', (from.x + to.x) / 2);
-            text.setAttribute('y', Math.max(from.y, to.y) + 150);
-            text.setAttribute('class', 'connection-label');
-            text.textContent = 'retroalimentación';
-            svg.appendChild(text);
+            let html = `<p>${data.description}</p>`;
+            
+            if (data.details) {
+                Object.entries(data.details).forEach(([key, value]) => {
+                    const formattedKey = key.replace(/_/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase());
+                    
+                    html += `<h3>${formattedKey}</h3>`;
+                    
+                    if (Array.isArray(value)) {
+                        html += '<ul>';
+                        value.forEach(item => {
+                            html += `<li>${item}</li>`;
+                        });
+                        html += '</ul>';
+                    } else {
+                        html += `<p>${value}</p>`;
+                    }
+                });
+            }
+            
+            content.innerHTML = html;
+            
+            panel.classList.add('active');
+            overlay.classList.add('active');
         }
 
-        // Get center of node
-        function getNodeCenter(element) {
-            const rect = element.getBoundingClientRect();
-            const x = parseInt(element.style.left) + element.offsetWidth / 2;
-            const y = parseInt(element.style.top) + element.offsetHeight / 2;
-            return { x, y };
+        // Ocultar panel de información
+        function hideInfoPanel() {
+            const panel = document.getElementById('infoPanel');
+            const overlay = document.getElementById('overlay');
+            
+            panel.classList.remove('active');
+            overlay.classList.remove('active');
         }
 
-        // Update concept count
-        function updateConceptCount() {
-            document.getElementById('concept-count').textContent = conceptCount;
-        }
-
-        // Show tooltip
-        function showTooltip(e, text) {
+        // Mostrar tooltip
+        function showTooltip(event, text) {
             const tooltip = document.getElementById('tooltip');
             tooltip.textContent = text;
-            tooltip.style.left = e.pageX + 10 + 'px';
-            tooltip.style.top = e.pageY + 10 + 'px';
-            tooltip.classList.add('show');
+            tooltip.style.left = event.pageX + 'px';
+            tooltip.style.top = (event.pageY - 40) + 'px';
+            tooltip.classList.add('active');
         }
 
-        // Hide tooltip
+        // Ocultar tooltip
         function hideTooltip() {
             const tooltip = document.getElementById('tooltip');
-            tooltip.classList.remove('show');
+            tooltip.classList.remove('active');
         }
 
-        // Center view on MLOps
-        function centerView() {
-            const containerWidth = canvasContainer.clientWidth;
-            const containerHeight = canvasContainer.clientHeight;
-            
-            translateX = -5000 * scale + containerWidth / 2;
-            translateY = -5000 * scale + containerHeight / 2;
-            
-            updateTransform();
-        }
-
-        // Update canvas transform
-        function updateTransform() {
-            canvas.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        }
-
-        // Setup event listeners
+        // Configurar event listeners
         function setupEventListeners() {
-            // Zoom controls
-            document.getElementById('zoom-in').addEventListener('click', () => {
-                scale = Math.min(scale * 1.2, 2);
+            // Botón cerrar panel
+            document.getElementById('closeInfoPanel').addEventListener('click', hideInfoPanel);
+            document.getElementById('overlay').addEventListener('click', hideInfoPanel);
+
+            // Nodo central
+            document.getElementById('central-mlops').addEventListener('click', () => {
+                const data = {
+                    title: mlopsData.central.title,
+                    description: mlopsData.central.description,
+                    details: mlopsData.central.details
+                };
+                showInfoPanel(data);
+            });
+
+            // Controles de zoom
+            document.getElementById('zoomIn').addEventListener('click', () => {
+                scale = Math.min(scale * 1.2, 3);
                 updateTransform();
             });
-            
-            document.getElementById('zoom-out').addEventListener('click', () => {
-                scale = Math.max(scale / 1.2, 0.3);
+
+            document.getElementById('zoomOut').addEventListener('click', () => {
+                scale = Math.max(scale / 1.2, 0.5);
                 updateTransform();
             });
-            
-            document.getElementById('reset-view').addEventListener('click', () => {
-                scale = 0.8;
-                centerView();
+
+            document.getElementById('resetView').addEventListener('click', () => {
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                updateTransform();
             });
-            
-            document.getElementById('auto-arrange').addEventListener('click', () => {
-                animateToOptimalView();
+
+            // Expandir/Colapsar todo
+            document.getElementById('expandAll').addEventListener('click', () => {
+                mlopsData.branches.forEach(branch => {
+                    if (!expandedBranches.has(branch.id)) {
+                        expandBranch(branch.id);
+                    }
+                });
             });
+
+            document.getElementById('collapseAll').addEventListener('click', () => {
+                mlopsData.branches.forEach(branch => {
+                    if (expandedBranches.has(branch.id)) {
+                        collapseBranch(branch.id);
+                    }
+                });
+            });
+
+            // Búsqueda
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                highlightSearchResults(searchTerm);
+            });
+
+            // Drag del canvas
+            const container = document.getElementById('mindmap-container');
             
-            // Mouse drag
-            canvasContainer.addEventListener('mousedown', startDrag);
-            canvasContainer.addEventListener('mousemove', drag);
-            canvasContainer.addEventListener('mouseup', endDrag);
-            canvasContainer.addEventListener('mouseleave', endDrag);
-            
-            // Touch drag
-            canvasContainer.addEventListener('touchstart', startDrag);
-            canvasContainer.addEventListener('touchmove', drag);
-            canvasContainer.addEventListener('touchend', endDrag);
-            
-            // Mouse wheel zoom
-            canvasContainer.addEventListener('wheel', (e) => {
+            container.addEventListener('mousedown', startDrag);
+            container.addEventListener('mousemove', drag);
+            container.addEventListener('mouseup', endDrag);
+            container.addEventListener('mouseleave', endDrag);
+
+            // Touch events
+            container.addEventListener('touchstart', startDrag);
+            container.addEventListener('touchmove', drag);
+            container.addEventListener('touchend', endDrag);
+
+            // Wheel zoom
+            container.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 const delta = e.deltaY > 0 ? 0.9 : 1.1;
-                scale = Math.min(Math.max(scale * delta, 0.3), 2);
+                scale = Math.min(Math.max(scale * delta, 0.5), 3);
                 updateTransform();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideInfoPanel();
+                }
+                if (e.ctrlKey || e.metaKey) {
+                    if (e.key === '=') {
+                        e.preventDefault();
+                        scale = Math.min(scale * 1.2, 3);
+                        updateTransform();
+                    }
+                    if (e.key === '-') {
+                        e.preventDefault();
+                        scale = Math.max(scale / 1.2, 0.5);
+                        updateTransform();
+                    }
+                    if (e.key === '0') {
+                        e.preventDefault();
+                        scale = 1;
+                        translateX = 0;
+                        translateY = 0;
+                        updateTransform();
+                    }
+                }
             });
         }
 
-        // Drag functions
+        // Funciones de arrastre
         function startDrag(e) {
+            if (e.target.classList.contains('main-branch') || 
+                e.target.classList.contains('sub-branch') ||
+                e.target.classList.contains('central-node')) {
+                return;
+            }
+
             isDragging = true;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            startX = clientX - translateX;
-            startY = clientY - translateY;
-            canvasContainer.style.cursor = 'grabbing';
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            dragStart = { x: clientX, y: clientY };
+            dragOffset = { x: translateX, y: translateY };
         }
 
         function drag(e) {
             if (!isDragging) return;
+            
             e.preventDefault();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            translateX = clientX - startX;
-            translateY = clientY - startY;
+            
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            translateX = dragOffset.x + (clientX - dragStart.x);
+            translateY = dragOffset.y + (clientY - dragStart.y);
+            
             updateTransform();
         }
 
         function endDrag() {
             isDragging = false;
-            canvasContainer.style.cursor = 'move';
         }
 
-        // Animate to optimal view
-        function animateToOptimalView() {
-            scale = 0.6;
-            centerView();
+        // Actualizar transformación
+        function updateTransform() {
+            canvas.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
             
-            // Add pulse animation to center
-            const centerNode = document.querySelector('.node-center');
-            centerNode.style.animation = 'none';
-            setTimeout(() => {
-                centerNode.style.animation = 'pulse 3s infinite';
-            }, 100);
+            // Redibujar conexiones después de la transformación
+            setTimeout(drawConnections, 100);
         }
 
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', init);
+        // Resaltar resultados de búsqueda
+        function highlightSearchResults(searchTerm) {
+            // Limpiar destacados anteriores
+            document.querySelectorAll('.highlighted').forEach(node => {
+                node.classList.remove('highlighted');
+            });
+
+            if (searchTerm.length < 2) return;
+
+            // Buscar en el nodo central
+            if (mlopsData.central.title.toLowerCase().includes(searchTerm) ||
+                mlopsData.central.subtitle.toLowerCase().includes(searchTerm)) {
+                document.getElementById('central-mlops').classList.add('highlighted');
+            }
+
+            // Buscar en ramas principales
+            mlopsData.branches.forEach(branch => {
+                if (branch.title.toLowerCase().includes(searchTerm) ||
+                    branch.description.toLowerCase().includes(searchTerm)) {
+                    document.getElementById(branch.id)?.classList.add('highlighted');
+                }
+
+                // Buscar en sub-ramas
+                branch.subBranches.forEach(subBranch => {
+                    if (subBranch.title.toLowerCase().includes(searchTerm) ||
+                        subBranch.description.toLowerCase().includes(searchTerm)) {
+                        // Expandir la rama si no está expandida
+                        if (!expandedBranches.has(branch.id)) {
+                            expandBranch(branch.id);
+                        }
+                        setTimeout(() => {
+                            document.getElementById(subBranch.id)?.classList.add('highlighted');
+                        }, 500);
+                    }
+                });
+            });
+        }
+
+        // Función para exportar el mapa mental (futura implementación)
+        function exportMindMap() {
+            // Implementación futura para exportar como imagen o JSON
+            console.log('Exportar mapa mental');
+        }
+
+        // Función para importar datos (futura implementación)
+        function importData() {
+            // Implementación futura para importar datos personalizados
+            console.log('Importar datos');
+        }
+
     </script>
 </body>
 </html>
