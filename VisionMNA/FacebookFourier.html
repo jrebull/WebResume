@@ -552,11 +552,11 @@
             
             <div class="feed-section" id="feedSection">
                 <h2>📱 Mi Feed de Procesamiento de Imágenes</h2>
-                <div style="background: #e7f3ff; border-left: 4px solid #4267b2; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
-                    <p style="margin: 0; color: #333; font-size: 14px;">
-                        <strong>💾 Persistencia de Datos:</strong> Tus publicaciones se guardan automáticamente en el navegador. 
-                        ¡Todos los visitantes verán los posts de ejemplo al entrar! Cuando publiques tu propio procesamiento, 
-                        los ejemplos se reemplazarán con tus resultados reales.
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <p style="margin: 0; color: #856404; font-size: 14px;">
+                        <strong>💾 Guardado Local:</strong> Tus publicaciones se guardan solo en TU navegador. 
+                        Si compartes la URL con amigos, ellos NO verán tus posts - cada uno tendrá su propio feed independiente.
+                        Para compartir resultados, usa screenshots.
                     </p>
                 </div>
                 <div id="feedContainer">
@@ -575,7 +575,7 @@
         let currentResults = {}; // Store current processing results
         let feedPosts = []; // Store all feed posts
         
-        // Initialize feed with saved posts or example data
+        // Initialize feed with saved posts
         function initializeFeed() {
             try {
                 // Try to load from localStorage
@@ -587,85 +587,10 @@
                         post.timestamp = new Date(post.timestamp);
                     });
                     renderFeed();
-                    return;
                 }
             } catch (e) {
-                console.log('LocalStorage no disponible, usando datos de ejemplo');
+                console.log('LocalStorage no disponible');
             }
-            
-            // If no saved posts, load example data
-            loadExampleData();
-        }
-        
-        function loadExampleData() {
-            // Create example posts to show how the app works
-            feedPosts = [
-                {
-                    id: Date.now() - 7200000, // 2 hours ago
-                    timestamp: new Date(Date.now() - 7200000),
-                    originalImage: createExampleImage('Ejemplo: Paisaje', '#4a90e2'),
-                    results: {
-                        lpIdeal: createExampleImage('Pasa-Bajas Ideal', '#e8f4f8'),
-                        lpButterworth: createExampleImage('Pasa-Bajas Butterworth', '#d4e9f4'),
-                        lpGaussian: createExampleImage('Pasa-Bajas Gaussian', '#c0ddf0'),
-                        hpIdeal: createExampleImage('Pasa-Altas Ideal', '#2c3e50'),
-                        hpButterworth: createExampleImage('Pasa-Altas Butterworth', '#34495e'),
-                        hpGaussian: createExampleImage('Pasa-Altas Gaussian', '#505d6b')
-                    },
-                    interpretation: generateInterpretation(),
-                    isExample: true
-                },
-                {
-                    id: Date.now() - 3600000, // 1 hour ago
-                    timestamp: new Date(Date.now() - 3600000),
-                    originalImage: createExampleImage('Ejemplo: Arquitectura', '#e74c3c'),
-                    results: {
-                        lpIdeal: createExampleImage('LP Ideal', '#fadbd8'),
-                        lpButterworth: createExampleImage('LP Butterworth', '#f5b7b1'),
-                        lpGaussian: createExampleImage('LP Gaussian', '#f1948a'),
-                        hpIdeal: createExampleImage('HP Ideal', '#641e16'),
-                        hpButterworth: createExampleImage('HP Butterworth', '#7b241c'),
-                        hpGaussian: createExampleImage('HP Gaussian', '#922b21')
-                    },
-                    interpretation: generateInterpretation(),
-                    isExample: true
-                }
-            ];
-            
-            renderFeed();
-        }
-        
-        function createExampleImage(text, color) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 200;
-            canvas.height = 150;
-            const ctx = canvas.getContext('2d');
-            
-            // Gradient background
-            const gradient = ctx.createLinearGradient(0, 0, 200, 150);
-            gradient.addColorStop(0, color);
-            gradient.addColorStop(1, adjustColor(color, -30));
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 200, 150);
-            
-            // Text
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 16px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 4;
-            ctx.fillText(text, 100, 75);
-            
-            return canvas.toDataURL();
-        }
-        
-        function adjustColor(color, amount) {
-            const num = parseInt(color.replace('#', ''), 16);
-            const r = Math.max(0, Math.min(255, (num >> 16) + amount));
-            const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
-            const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
-            return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
         }
         
         function saveFeedToStorage() {
@@ -1210,13 +1135,8 @@
                 id: Date.now(),
                 timestamp: new Date(),
                 originalImage: originalImage,
-                results: { ...currentResults },
-                interpretation: generateInterpretation(),
-                isExample: false
+                results: { ...currentResults }
             };
-            
-            // Remove example posts when user adds their first real post
-            feedPosts = feedPosts.filter(p => !p.isExample);
             
             // Add to feed (newest first)
             feedPosts.unshift(post);
@@ -1231,7 +1151,7 @@
             document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
             
             // Show confirmation
-            alert('¡Resultado publicado en tu feed! 🎉\n\nTus publicaciones se guardan automáticamente.');
+            alert('¡Resultado publicado en tu feed! 🎉\n\nTus publicaciones se guardan automáticamente en tu navegador.');
         }
         
         function generateInterpretation() {
@@ -1264,7 +1184,20 @@
             
             feedContainer.innerHTML = '';
             
-            // Add clear button at top
+            // Add interpretation section ONCE at the top
+            const interpretationDiv = document.createElement('div');
+            interpretationDiv.className = 'interpretation-text';
+            interpretationDiv.style.marginBottom = '25px';
+            const interpretation = generateInterpretation();
+            interpretationDiv.innerHTML = `
+                <h4>${interpretation.title}</h4>
+                ${interpretation.sections.map(section => `
+                    <p><strong>${section.title}:</strong> ${section.text}</p>
+                `).join('')}
+            `;
+            feedContainer.appendChild(interpretationDiv);
+            
+            // Add clear button
             const clearButton = document.createElement('div');
             clearButton.style.textAlign = 'right';
             clearButton.style.marginBottom = '15px';
@@ -1275,18 +1208,18 @@
             `;
             feedContainer.appendChild(clearButton);
             
+            // Render all posts
             feedPosts.forEach((post, index) => {
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post-item';
                 
                 const timeAgo = getTimeAgo(post.timestamp);
-                const exampleBadge = post.isExample ? '<span style="background: #ffc107; color: #000; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; margin-left: 10px;">EJEMPLO</span>' : '';
                 
                 postDiv.innerHTML = `
                     <div class="post-header">
                         <div class="post-avatar">👤</div>
                         <div class="post-info">
-                            <div class="post-author">Usuario de Visión Computacional ${exampleBadge}</div>
+                            <div class="post-author">Usuario de Visión Computacional</div>
                             <div class="post-time">${timeAgo}</div>
                         </div>
                     </div>
@@ -1337,13 +1270,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="interpretation-text">
-                        <h4>${post.interpretation.title}</h4>
-                        ${post.interpretation.sections.map(section => `
-                            <p><strong>${section.title}:</strong> ${section.text}</p>
-                        `).join('')}
-                    </div>
                 `;
                 
                 feedContainer.appendChild(postDiv);
@@ -1354,7 +1280,7 @@
             if (confirm('¿Estás seguro de que quieres eliminar todas las publicaciones del feed?')) {
                 feedPosts = [];
                 saveFeedToStorage();
-                loadExampleData(); // Reload example data
+                renderFeed();
             }
         }
         
