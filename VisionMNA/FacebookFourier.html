@@ -265,6 +265,21 @@
             font-size: 12px;
         }
         
+        .delete-post-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .delete-post-btn:hover {
+            background: #c0392b;
+        }
+        
         .post-content {
             margin-bottom: 15px;
         }
@@ -311,21 +326,23 @@
             font-style: italic;
         }
         
-        .feedback-section {
-            background: #f6f7f9;
+        .post-actions {
+            background: white;
             border-top: 1px solid #e5e5e5;
-            padding: 20px;
-            margin-top: 30px;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 0 8px 8px;
         }
         
-        .feedback-header {
+        .action-buttons {
             display: flex;
-            align-items: center;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e5e5;
         }
         
-        .like-button {
+        .action-btn {
             background: white;
             border: 1px solid #cbd0d8;
             padding: 8px 20px;
@@ -336,51 +353,57 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s;
+            flex: 1;
+            justify-content: center;
         }
         
-        .like-button:hover {
+        .action-btn:hover {
             background: #e7f3ff;
             border-color: #4267b2;
         }
         
-        .like-button.liked {
+        .action-btn.liked {
             background: #4267b2;
             color: white;
             border-color: #4267b2;
         }
         
-        .like-icon {
+        .action-icon {
             font-size: 18px;
         }
         
-        .comment-box {
-            background: white;
-            border: 1px solid #cbd0d8;
-            border-radius: 20px;
-            padding: 10px 15px;
+        .comment-form {
             display: flex;
             gap: 10px;
             align-items: center;
+            margin-bottom: 15px;
         }
         
-        .comment-box input {
+        .comment-input {
             flex: 1;
-            border: none;
-            outline: none;
+            border: 1px solid #cbd0d8;
+            border-radius: 20px;
+            padding: 10px 15px;
             font-size: 14px;
+            outline: none;
         }
         
-        .comment-btn {
+        .comment-input:focus {
+            border-color: #4267b2;
+        }
+        
+        .comment-submit-btn {
             background: #4267b2;
             color: white;
             border: none;
-            padding: 6px 15px;
-            border-radius: 15px;
+            padding: 10px 20px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 13px;
+            transition: background 0.3s;
         }
         
-        .comment-btn:hover {
+        .comment-submit-btn:hover {
             background: #365899;
         }
         
@@ -389,29 +412,49 @@
         }
         
         .comment {
-            background: white;
+            background: #f0f2f5;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 10px;
-            border-left: 3px solid #4267b2;
+            position: relative;
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
         }
         
         .comment-author {
             font-weight: bold;
             color: #3b5998;
             font-size: 13px;
-            margin-bottom: 5px;
+        }
+        
+        .delete-comment-btn {
+            background: transparent;
+            border: none;
+            color: #90949c;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 5px;
+            transition: color 0.3s;
+        }
+        
+        .delete-comment-btn:hover {
+            color: #e74c3c;
         }
         
         .comment-text {
             color: #333;
             font-size: 14px;
+            margin-bottom: 5px;
         }
         
         .comment-time {
             color: #90949c;
             font-size: 11px;
-            margin-top: 5px;
         }
         
         .loading {
@@ -452,6 +495,20 @@
             font-size: 14px;
             line-height: 1.6;
         }
+        
+        .format-support {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        
+        .format-support p {
+            color: #0c5460;
+            font-size: 13px;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -467,14 +524,17 @@
         
         <div class="content">
             <div class="info-box">
-                <p><strong>🌐 Feed Global con Firebase:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube y son visibles para cualquiera que visite esta página.</p>
+                <p><strong>🌍 Feed Global con Firebase:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube y son visibles para cualquiera que visite esta página. ¡Ahora puedes dar like, comentar y eliminar posts!</p>
             </div>
             
             <div class="upload-section">
                 <h3 style="margin-bottom: 15px;">📤 Subir Imagen</h3>
-                <input type="file" id="imageUpload" accept="image/*">
+                <input type="file" id="imageUpload" accept="image/*,.heic,.HEIC,.dng,.DNG">
                 <label for="imageUpload" class="upload-btn">Seleccionar Imagen</label>
                 <p id="fileName" style="margin-top: 10px; color: #666;"></p>
+                <div class="format-support">
+                    <p>✅ Formatos soportados: JPG, PNG, WEBP, HEIC (iPhone), DNG (RAW), y más</p>
+                </div>
                 <button id="processBtn" class="process-btn" onclick="processImage()" disabled>🔬 Procesar con Filtros de Fourier</button>
             </div>
             
@@ -485,7 +545,7 @@
             
             <div id="loadingSection" class="loading hidden">
                 <div class="spinner"></div>
-                <p>Procesando imagen con filtros de Fourier...</p>
+                <p id="loadingText">Procesando imagen con filtros de Fourier...</p>
             </div>
             
             <div id="resultsSection" class="results-section hidden">
@@ -548,26 +608,8 @@
                 <button id="postButton" class="post-button" onclick="publishToFeed()">📤 Publicar Resultado en Feed Global</button>
             </div>
             
-            <div class="feedback-section">
-                <h3 style="margin-bottom: 15px; color: #3b5998;">💬 Feedback (Estilo Facebook 2008)</h3>
-                <div class="feedback-header">
-                    <button id="likeButton" class="like-button" onclick="toggleLike()">
-                        <span class="like-icon">👍</span>
-                        <span id="likeText">Me gusta</span>
-                        <span id="likeCount"></span>
-                    </button>
-                </div>
-                
-                <div class="comment-box">
-                    <input type="text" id="commentInput" placeholder="Escribe un comentario...">
-                    <button class="comment-btn" onclick="addComment()">Publicar</button>
-                </div>
-                
-                <div class="comments-list" id="commentsList"></div>
-            </div>
-            
             <div class="feed-section" id="feedSection">
-                <h2>🌐 Feed Global de Procesamiento</h2>
+                <h2>🌍 Feed Global de Procesamiento</h2>
                 <div id="feedContainer">
                     <div class="no-posts">
                         <div class="spinner"></div>
@@ -581,28 +623,32 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <!-- HEIC support -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
     <script>
-				// Your web app's Firebase configuration
-				// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-				const firebaseConfig = {
-				  apiKey: "AIzaSyD3HXas_ZlSBHkcgqj58gtvOaDIE751skg",
-				  authDomain: "fourier-vision-9243d.firebaseapp.com",
-				  projectId: "fourier-vision-9243d",
-				  storageBucket: "fourier-vision-9243d.firebasestorage.app",
-				  messagingSenderId: "713813028117",
-				  appId: "1:713813028117:web:bb7e8bdf989a7966498d1c",
-				  measurementId: "G-24BGNP617J"
-				};
-
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyD3HXas_ZlSBHkcgqj58gtvOaDIE751skg",
+          authDomain: "fourier-vision-9243d.firebaseapp.com",
+          projectId: "fourier-vision-9243d",
+          storageBucket: "fourier-vision-9243d.firebasestorage.app",
+          messagingSenderId: "713813028117",
+          appId: "1:713813028117:web:bb7e8bdf989a7966498d1c",
+          measurementId: "G-24BGNP617J"
+        };
 
         // Inicializar Firebase
         let db;
+        let storage;
         let firebaseInitialized = false;
 
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
+            storage = firebase.storage();
             firebaseInitialized = true;
             updateFirebaseStatus(true);
             console.log('Firebase conectado correctamente');
@@ -625,17 +671,76 @@
         // ========================================
         // VARIABLES GLOBALES
         // ========================================
-        let likes = 0;
-        let isLiked = false;
         let uploadedImage = null;
         let currentResults = {};
         let feedPosts = [];
+        let userLikes = new Set(); // Guarda los IDs de posts con like
+        
+        // ========================================
+        // MANEJO DE ARCHIVOS HEIC Y DNG
+        // ========================================
+        
+        async function convertHEICtoJPEG(file) {
+            try {
+                const convertedBlob = await heic2any({
+                    blob: file,
+                    toType: "image/jpeg",
+                    quality: 0.9
+                });
+                return new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' });
+            } catch (error) {
+                console.error('Error converting HEIC:', error);
+                throw new Error('No se pudo convertir el archivo HEIC. Intenta con otro formato.');
+            }
+        }
+        
+        async function convertDNGtoJPEG(file) {
+            // DNG es más complejo, usamos un canvas para extraer lo que podamos
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        canvas.toBlob((blob) => {
+                            resolve(new File([blob], file.name.replace(/\.dng$/i, '.jpg'), { type: 'image/jpeg' }));
+                        }, 'image/jpeg', 0.9);
+                    };
+                    img.onerror = () => {
+                        reject(new Error('El archivo DNG no se pudo procesar. Intenta convertirlo a JPG primero.'));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
         
         // File upload handler
-        document.getElementById('imageUpload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('fileName').textContent = `📄 ${file.name}`;
+        document.getElementById('imageUpload').addEventListener('change', async function(e) {
+            let file = e.target.files[0];
+            if (!file) return;
+            
+            const fileName = file.name.toLowerCase();
+            
+            try {
+                // Mostrar mensaje de conversión si es necesario
+                if (fileName.endsWith('.heic')) {
+                    document.getElementById('fileName').textContent = `🔄 Convirtiendo HEIC: ${file.name}...`;
+                    file = await convertHEICtoJPEG(file);
+                    document.getElementById('fileName').textContent = `✅ Convertido: ${file.name}`;
+                } else if (fileName.endsWith('.dng')) {
+                    document.getElementById('fileName').textContent = `🔄 Procesando DNG: ${file.name}...`;
+                    file = await convertDNGtoJPEG(file);
+                    document.getElementById('fileName').textContent = `✅ Procesado: ${file.name}`;
+                } else {
+                    document.getElementById('fileName').textContent = `📄 ${file.name}`;
+                }
+                
                 document.getElementById('processBtn').disabled = false;
                 
                 const reader = new FileReader();
@@ -648,6 +753,11 @@
                     img.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
+                
+            } catch (error) {
+                alert(error.message);
+                document.getElementById('fileName').textContent = `❌ Error: ${error.message}`;
+                document.getElementById('processBtn').disabled = true;
             }
         });
         
@@ -673,54 +783,6 @@
             
             document.getElementById('originalSection').classList.remove('hidden');
         }
-        
-        function toggleLike() {
-            isLiked = !isLiked;
-            const button = document.getElementById('likeButton');
-            const likeText = document.getElementById('likeText');
-            const likeCount = document.getElementById('likeCount');
-            
-            if (isLiked) {
-                likes++;
-                button.classList.add('liked');
-                likeText.textContent = '¡Te gusta!';
-            } else {
-                likes--;
-                button.classList.remove('liked');
-                likeText.textContent = 'Me gusta';
-            }
-            
-            likeCount.textContent = likes > 0 ? `(${likes})` : '';
-        }
-        
-        function addComment() {
-            const input = document.getElementById('commentInput');
-            const text = input.value.trim();
-            
-            if (text) {
-                const commentsList = document.getElementById('commentsList');
-                const comment = document.createElement('div');
-                comment.className = 'comment';
-                
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-                
-                comment.innerHTML = `
-                    <div class="comment-author">Usuario Anónimo</div>
-                    <div class="comment-text">${text}</div>
-                    <div class="comment-time">Hace un momento · ${timeStr}</div>
-                `;
-                
-                commentsList.insertBefore(comment, commentsList.firstChild);
-                input.value = '';
-            }
-        }
-        
-        document.getElementById('commentInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addComment();
-            }
-        });
         
         function processImage() {
             if (!uploadedImage) {
@@ -1098,12 +1160,31 @@
         }
         
         // ========================================
-        // FUNCIONES DE FIREBASE
+        // FUNCIONES DE FIREBASE STORAGE
         // ========================================
+        
+        async function uploadImageToStorage(dataUrl, path) {
+            try {
+                // Convertir data URL a blob
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                
+                // Subir a Firebase Storage
+                const storageRef = storage.ref(path);
+                const snapshot = await storageRef.put(blob);
+                
+                // Obtener URL de descarga
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                return downloadURL;
+            } catch (error) {
+                console.error('Error uploading to storage:', error);
+                throw error;
+            }
+        }
         
         async function publishToFeed() {
             if (!firebaseInitialized) {
-                alert('Error: Firebase no está configurado. Por favor, configura tus credenciales de Firebase en el código.');
+                alert('Error: Firebase no está configurado.');
                 return;
             }
             
@@ -1113,34 +1194,163 @@
             }
             
             try {
-                const originalCanvas = document.getElementById('originalCanvas');
-                const originalImage = originalCanvas.toDataURL();
+                document.getElementById('loadingText').textContent = 'Subiendo imágenes a Firebase Storage...';
+                document.getElementById('loadingSection').classList.remove('hidden');
                 
+                const timestamp = Date.now();
+                const imageUrls = {};
+                
+                // Subir cada imagen a Storage
+                for (const [key, dataUrl] of Object.entries(currentResults)) {
+                    const path = `posts/${timestamp}/${key}.jpg`;
+                    imageUrls[key] = await uploadImageToStorage(dataUrl, path);
+                }
+                
+                // Guardar metadata en Firestore
                 const post = {
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    originalImage: originalImage,
-                    results: { ...currentResults },
-                    createdAt: new Date().toISOString()
+                    imageUrls: imageUrls,
+                    createdAt: new Date().toISOString(),
+                    likes: 0,
+                    comments: []
                 };
                 
                 await db.collection('posts').add(post);
                 
-                alert('¡Publicación guardada en Firebase! 🎉\n\nTodos los visitantes pueden ver tu post ahora.');
+                document.getElementById('loadingSection').classList.add('hidden');
+                alert('¡Publicación guardada exitosamente! 🎉');
                 
                 document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
                 
             } catch (error) {
                 console.error('Error al publicar:', error);
+                document.getElementById('loadingSection').classList.add('hidden');
                 alert('Error al publicar: ' + error.message);
             }
         }
+        
+        // ========================================
+        // SISTEMA DE LIKES
+        // ========================================
+        
+        async function toggleLike(postId) {
+            if (!firebaseInitialized) return;
+            
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                const post = await postRef.get();
+                const currentLikes = post.data().likes || 0;
+                
+                if (userLikes.has(postId)) {
+                    // Quitar like
+                    await postRef.update({
+                        likes: Math.max(0, currentLikes - 1)
+                    });
+                    userLikes.delete(postId);
+                } else {
+                    // Dar like
+                    await postRef.update({
+                        likes: currentLikes + 1
+                    });
+                    userLikes.add(postId);
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+            }
+        }
+        
+        // ========================================
+        // SISTEMA DE COMENTARIOS
+        // ========================================
+        
+        async function addComment(postId, commentText) {
+            if (!firebaseInitialized || !commentText.trim()) return;
+            
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                const comment = {
+                    id: Date.now().toString(),
+                    text: commentText.trim(),
+                    author: 'Usuario Anónimo',
+                    timestamp: new Date().toISOString()
+                };
+                
+                await postRef.update({
+                    comments: firebase.firestore.FieldValue.arrayUnion(comment)
+                });
+                
+            } catch (error) {
+                console.error('Error adding comment:', error);
+            }
+        }
+        
+        async function deleteComment(postId, commentId) {
+            if (!firebaseInitialized) return;
+            
+            if (!confirm('¿Eliminar este comentario?')) return;
+            
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                const post = await postRef.get();
+                const comments = post.data().comments || [];
+                
+                const updatedComments = comments.filter(c => c.id !== commentId);
+                
+                await postRef.update({
+                    comments: updatedComments
+                });
+                
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+            }
+        }
+        
+        // ========================================
+        // ELIMINAR POST
+        // ========================================
+        
+        async function deletePost(postId) {
+            if (!firebaseInitialized) return;
+            
+            if (!confirm('¿Estás seguro de eliminar esta publicación? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            try {
+                // Primero obtener las URLs de las imágenes
+                const postDoc = await db.collection('posts').doc(postId).get();
+                const imageUrls = postDoc.data().imageUrls || {};
+                
+                // Eliminar imágenes de Storage
+                for (const url of Object.values(imageUrls)) {
+                    try {
+                        const storageRef = storage.refFromURL(url);
+                        await storageRef.delete();
+                    } catch (err) {
+                        console.log('Error deleting image:', err);
+                    }
+                }
+                
+                // Eliminar documento de Firestore
+                await db.collection('posts').doc(postId).delete();
+                
+                alert('Publicación eliminada exitosamente');
+                
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                alert('Error al eliminar: ' + error.message);
+            }
+        }
+        
+        // ========================================
+        // CARGAR Y RENDERIZAR FEED
+        // ========================================
         
         function loadFeed() {
             if (!firebaseInitialized) {
                 document.getElementById('feedContainer').innerHTML = `
                     <div class="no-posts">
                         <p style="color: #e74c3c;">⚠️ Firebase no está configurado.</p>
-                        <p>Por favor, sigue la guía FIREBASE-SETUP.md para configurar tu proyecto.</p>
                     </div>
                 `;
                 return;
@@ -1163,26 +1373,6 @@
                         </div>
                     `;
                 });
-        }
-        
-        function generateInterpretation() {
-            return {
-                title: '📊 Análisis de Filtros de Fourier',
-                sections: [
-                    {
-                        title: '🔽 Filtros Pasa-Bajas (Low-Pass)',
-                        text: 'Estos filtros eliminan las altas frecuencias (detalles finos y ruido). El resultado es una imagen más suave. El filtro Ideal produce un corte abrupto pero puede generar "ringing". Butterworth ofrece una transición más suave, y Gaussian produce el suavizado más natural tipo "blur".'
-                    },
-                    {
-                        title: '🔼 Filtros Pasa-Altas (High-Pass)',
-                        text: 'Estos filtros eliminan las bajas frecuencias (información general) y resaltan los bordes y detalles. Son útiles para detección de contornos. El filtro Ideal es el más agresivo, Butterworth balancea detalle y suavidad, y Gaussian detecta bordes de forma más gradual.'
-                    },
-                    {
-                        title: '💡 Aplicaciones Prácticas',
-                        text: 'Los filtros pasa-bajas se usan para reducir ruido en imágenes médicas, suavizar fotos, y preprocesamiento. Los pasa-altas se usan en detección de bordes, realce de texturas, análisis de características, y reconocimiento de patrones.'
-                    }
-                ]
-            };
         }
         
         function renderFeed() {
@@ -1218,13 +1408,18 @@
                     timeAgo = getTimeAgo(postDate);
                 }
                 
+                const likes = post.likes || 0;
+                const comments = post.comments || [];
+                const isLiked = userLikes.has(post.id);
+                
                 postDiv.innerHTML = `
                     <div class="post-header">
-                        <div class="post-avatar">🌐</div>
+                        <div class="post-avatar">🌍</div>
                         <div class="post-info">
                             <div class="post-author">Usuario Global</div>
                             <div class="post-time">${timeAgo}</div>
                         </div>
+                        <button class="delete-post-btn" onclick="deletePost('${post.id}')">🗑️ Eliminar</button>
                     </div>
                     
                     <div class="post-content">
@@ -1234,7 +1429,7 @@
                     <div class="post-images">
                         <div style="text-align: center;">
                             <strong style="font-size: 14px; color: #4267b2; display: block; margin-bottom: 5px;">📷 Original</strong>
-                            <img src="${post.originalImage}" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
+                            <img src="${post.imageUrls.original}" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
                         </div>
                     </div>
                     
@@ -1243,15 +1438,15 @@
                         <div class="post-images">
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Ideal</small>
-                                <img src="${post.results.lpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.lpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Butterworth</small>
-                                <img src="${post.results.lpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.lpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Gaussian</small>
-                                <img src="${post.results.lpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.lpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                         </div>
                     </div>
@@ -1261,22 +1456,83 @@
                         <div class="post-images">
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Ideal</small>
-                                <img src="${post.results.hpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.hpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Butterworth</small>
-                                <img src="${post.results.hpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.hpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Gaussian</small>
-                                <img src="${post.results.hpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.hpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <div class="action-buttons">
+                            <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                                <span class="action-icon">👍</span>
+                                <span>Me gusta${likes > 0 ? ` (${likes})` : ''}</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">💬</span>
+                                <span>Comentar${comments.length > 0 ? ` (${comments.length})` : ''}</span>
+                            </button>
+                        </div>
+                        
+                        <div class="comment-form">
+                            <input type="text" class="comment-input" placeholder="Escribe un comentario..." id="commentInput_${post.id}">
+                            <button class="comment-submit-btn" onclick="submitComment('${post.id}')">Publicar</button>
+                        </div>
+                        
+                        <div class="comments-list" id="comments_${post.id}">
+                            ${comments.map(comment => `
+                                <div class="comment">
+                                    <div class="comment-header">
+                                        <span class="comment-author">${comment.author}</span>
+                                        <button class="delete-comment-btn" onclick="deleteComment('${post.id}', '${comment.id}')" title="Eliminar comentario">✕</button>
+                                    </div>
+                                    <div class="comment-text">${comment.text}</div>
+                                    <div class="comment-time">${getTimeAgo(new Date(comment.timestamp))}</div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `;
                 
                 feedContainer.appendChild(postDiv);
             });
+        }
+        
+        function submitComment(postId) {
+            const input = document.getElementById(`commentInput_${postId}`);
+            const text = input.value.trim();
+            
+            if (text) {
+                addComment(postId, text);
+                input.value = '';
+            }
+        }
+        
+        function generateInterpretation() {
+            return {
+                title: '📊 Análisis de Filtros de Fourier',
+                sections: [
+                    {
+                        title: '🔽 Filtros Pasa-Bajas (Low-Pass)',
+                        text: 'Estos filtros eliminan las altas frecuencias (detalles finos y ruido). El resultado es una imagen más suave. El filtro Ideal produce un corte abrupto pero puede generar "ringing". Butterworth ofrece una transición más suave, y Gaussian produce el suavizado más natural tipo "blur".'
+                    },
+                    {
+                        title: '🔼 Filtros Pasa-Altas (High-Pass)',
+                        text: 'Estos filtros eliminan las bajas frecuencias (información general) y resaltan los bordes y detalles. Son útiles para detección de contornos. El filtro Ideal es el más agresivo, Butterworth balancea detalle y suavidad, y Gaussian detecta bordes de forma más gradual.'
+                    },
+                    {
+                        title: '💡 Aplicaciones Prácticas',
+                        text: 'Los filtros pasa-bajas se usan para reducir ruido en imágenes médicas, suavizar fotos, y preprocesamiento. Los pasa-altas se usan en detección de bordes, realce de texturas, análisis de características, y reconocimiento de patrones.'
+                    }
+                ]
+            };
         }
         
         function getTimeAgo(date) {
