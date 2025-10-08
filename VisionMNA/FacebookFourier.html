@@ -327,6 +327,15 @@
             line-height: 1.4;
         }
         
+        .filter-description canvas {
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .filter-description strong {
+            color: #333;
+        }
+        
         .post-button {
             background: #42b72a;
             color: white;
@@ -764,7 +773,7 @@
             </div>
             
             <div id="originalSection" class="original-section hidden">
-                <h2>📷 Imagen Original</h2>
+                <h2>📷 Imagen Original (Escala de Grises)</h2>
                 <canvas id="originalCanvas"></canvas>
             </div>
             
@@ -783,6 +792,9 @@
                             <h4>Ideal</h4>
                             <canvas id="lpIdeal"></canvas>
                             <div class="filter-description">
+                                <strong>Parámetros:</strong> D0=<span id="param_lpIdeal_D0">50</span><br>
+                                <strong>Máscara:</strong><br>
+                                <canvas id="mask_lpIdeal" style="width: 100px; height: 100px; margin: 5px auto; display: block;"></canvas>
                                 <strong>Efecto:</strong> Corte abrupto en frecuencia. Suaviza pero puede crear efecto "ringing" (anillos).
                             </div>
                         </div>
@@ -790,6 +802,9 @@
                             <h4>Butterworth (n=2)</h4>
                             <canvas id="lpButterworth"></canvas>
                             <div class="filter-description">
+                                <strong>Parámetros:</strong> D0=<span id="param_lpButterworth_D0">50</span>, n=<span id="param_lpButterworth_n">2</span><br>
+                                <strong>Máscara:</strong><br>
+                                <canvas id="mask_lpButterworth" style="width: 100px; height: 100px; margin: 5px auto; display: block;"></canvas>
                                 <strong>Efecto:</strong> Transición suave. Reduce ruido sin ringing excesivo. Más natural.
                             </div>
                         </div>
@@ -797,6 +812,9 @@
                             <h4>Gaussian</h4>
                             <canvas id="lpGaussian"></canvas>
                             <div class="filter-description">
+                                <strong>Parámetros:</strong> D0=<span id="param_lpGaussian_D0">50</span><br>
+                                <strong>Máscara:</strong><br>
+                                <canvas id="mask_lpGaussian" style="width: 100px; height: 100px; margin: 5px auto; display: block;"></canvas>
                                 <strong>Efecto:</strong> Transición muy suave. El más natural. Tipo "blur" clásico.
                             </div>
                         </div>
@@ -805,11 +823,28 @@
                 
                 <div class="filter-category">
                     <h3>🔼 Filtros Pasa-Altas (Realce de bordes - Eliminan baja frecuencia)</h3>
+                    <div style="background: #e7f3ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #4267b2;">
+                        <strong style="color: #1F497D;">⚙️ Amplificación de Bordes:</strong>
+                        <input type="range" id="gainSlider" min="1" max="30" value="15" step="1" 
+                               style="width: 200px; vertical-align: middle; margin: 0 10px;"
+                               onchange="updateGainValue(this.value)">
+                        <span id="gainValue" style="font-weight: bold; color: #4267b2;">15×</span>
+                        <button onclick="reprocessWithNewGain()" 
+                                style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px;">
+                            🔄 Aplicar
+                        </button>
+                        <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
+                            Ajusta la intensidad de los bordes en los filtros pasa-altas. Valores más altos = bordes más visibles.
+                        </p>
+                    </div>
                     <div class="filters-grid">
                         <div class="filter-result">
                             <h4>Ideal</h4>
                             <canvas id="hpIdeal"></canvas>
                             <div class="filter-description">
+                                <strong>Parámetros:</strong> D0=<span id="param_hpIdeal_D0">50</span><br>
+                                <strong>Máscara:</strong><br>
+                                <canvas id="mask_hpIdeal" style="width: 100px; height: 100px; margin: 5px auto; display: block;"></canvas>
                                 <strong>Efecto:</strong> Resalta bordes abruptamente. Puede verse "artificial".
                             </div>
                         </div>
@@ -817,6 +852,9 @@
                             <h4>Butterworth (n=2)</h4>
                             <canvas id="hpButterworth"></canvas>
                             <div class="filter-description">
+                                <strong>Parámetros:</strong> D0=<span id="param_hpButterworth_D0">50</span>, n=<span id="param_hpButterworth_n">2</span><br>
+                                <strong>Máscara:</strong><br>
+                                <canvas id="mask_hpButterworth" style="width: 100px; height: 100px; margin: 5px auto; display: block;"></canvas>
                                 <strong>Efecto:</strong> Realza bordes suavemente. Buen balance entre detalle y naturalidad.
                             </div>
                         </div>
@@ -824,6 +862,9 @@
                             <h4>Gaussian</h4>
                             <canvas id="hpGaussian"></canvas>
                             <div class="filter-description">
+                                <strong>Parámetros:</strong> D0=<span id="param_hpGaussian_D0">50</span><br>
+                                <strong>Máscara:</strong><br>
+                                <canvas id="mask_hpGaussian" style="width: 100px; height: 100px; margin: 5px auto; display: block;"></canvas>
                                 <strong>Efecto:</strong> Realce de bordes muy gradual. Detecta contornos sutiles.
                             </div>
                         </div>
@@ -909,6 +950,8 @@
         // ========================================
         let uploadedImage = null;
         let currentResults = {};
+        let currentMasks = {};      // Para almacenar las máscaras de frecuencia
+        let currentParams = {};     // Para almacenar parámetros (D0, n)
         let feedPosts = [];
         let userLikes = new Set();
         
@@ -918,6 +961,31 @@
         const MAX_STORAGE_SIZE = 400;   // Para guardar en Storage
         const MAX_PROCESS_SIZE = 256;   // Para procesamiento FFT
         const JPEG_QUALITY = 0.85;      // Mejor calidad ahora que usamos Storage
+        
+        let CURRENT_GAIN = 15.0;  // Valor inicial de amplificación
+        let lastGrayData = null;  // Guardar datos en escala de grises para reprocesar
+        let lastWidth = 0;
+        let lastHeight = 0;
+        
+        function updateGainValue(value) {
+            document.getElementById('gainValue').textContent = value + '×';
+            CURRENT_GAIN = parseFloat(value);
+        }
+        
+        function reprocessWithNewGain() {
+            if (!lastGrayData || lastWidth === 0 || lastHeight === 0) {
+                alert('Primero procesa una imagen antes de ajustar la amplificación.');
+                return;
+            }
+            
+            // Reprocesar solo los filtros pasa-altas con el nuevo GAIN
+            const D0 = 50;
+            const n = 2;
+            
+            applyFilter(lastGrayData, lastWidth, lastHeight, 'ideal', false, D0, n, 'hpIdeal');
+            applyFilter(lastGrayData, lastWidth, lastHeight, 'butterworth', false, D0, n, 'hpButterworth');
+            applyFilter(lastGrayData, lastWidth, lastHeight, 'gaussian', false, D0, n, 'hpGaussian');
+        }
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1069,7 +1137,22 @@
             
             canvas.width = width;
             canvas.height = height;
+            
+            // Dibujar imagen en escala de grises
             ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convertir a escala de grises
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                data[i] = gray;
+                data[i + 1] = gray;
+                data[i + 2] = gray;
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
             
             // Guardar versión optimizada para storage
             currentResults['original'] = resizeImage(img, MAX_STORAGE_SIZE, JPEG_QUALITY);
@@ -1133,6 +1216,11 @@
                 }
             }
             
+            // Guardar para reprocesamiento con diferente GAIN
+            lastGrayData = new Float32Array(grayData);
+            lastWidth = width;
+            lastHeight = height;
+            
             const D0 = 50;  // Frecuencia de corte (igual que en Python)
             const n = 2;    // Orden del filtro Butterworth
             
@@ -1174,6 +1262,13 @@
                 
                 // 3. Crear y aplicar el filtro
                 const filter = createFrequencyFilter(actualWidth, actualHeight, filterType, isLowPass, D0, n);
+                
+                // Guardar la máscara para visualización
+                const maskCanvasId = canvasId.replace('lp', 'mask_lp').replace('hp', 'mask_hp');
+                displayMask(filter, actualWidth, actualHeight, maskCanvasId);
+                
+                // Guardar parámetros
+                currentParams[canvasId] = { D0, n, filterType, isLowPass };
                 
                 for (let i = 0; i < actualWidth * actualHeight; i++) {
                     fftShifted.real[i] *= filter[i];
@@ -1460,6 +1555,48 @@
             return result;
         }
         
+        function displayMask(filter, width, height, canvasId) {
+            try {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return; // Canvas de máscara opcional
+                
+                // Mostrar máscara a tamaño reducido
+                const maskSize = 150;
+                canvas.width = maskSize;
+                canvas.height = maskSize;
+                const ctx = canvas.getContext('2d');
+                
+                // Crear imagen de la máscara
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                const tempCtx = tempCanvas.getContext('2d');
+                const imageData = tempCtx.createImageData(width, height);
+                
+                for (let i = 0; i < width * height; i++) {
+                    const value = Math.round(filter[i] * 255);
+                    const idx = i * 4;
+                    imageData.data[idx] = value;
+                    imageData.data[idx + 1] = value;
+                    imageData.data[idx + 2] = value;
+                    imageData.data[idx + 3] = 255;
+                }
+                
+                tempCtx.putImageData(imageData, 0, 0);
+                
+                // Escalar al tamaño de visualización
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(tempCanvas, 0, 0, maskSize, maskSize);
+                
+                // Guardar máscara
+                currentMasks[canvasId] = tempCanvas.toDataURL('image/jpeg', 0.8);
+                
+            } catch (error) {
+                console.error(`Error displaying mask ${canvasId}:`, error);
+            }
+        }
+        
         function displayResult(data, width, height, canvasId) {
             try {
                 for (let i = 0; i < data.length; i++) {
@@ -1490,9 +1627,8 @@
                 const imageData = tempCtx.createImageData(width, height);
                 
                 if (isHighPass) {
-                    // Para filtros pasa-altas: necesitamos mayor amplificación
-                    // Multiplicar por un factor de ganancia para hacer visibles los bordes
-                    const GAIN = 3.0;  // Factor de amplificación
+                    // Para filtros pasa-altas: usar el GAIN actual ajustable
+                    const GAIN = CURRENT_GAIN;  // Usar valor del slider
                     
                     // Amplificar valores
                     const amplified = new Float32Array(data.length);
@@ -1559,6 +1695,15 @@
                 
                 // Guardar versión con mejor compresión
                 currentResults[canvasId] = tempCanvas.toDataURL('image/jpeg', JPEG_QUALITY);
+                
+                // Actualizar parámetros en el HTML
+                const params = currentParams[canvasId];
+                if (params) {
+                    const d0Elem = document.getElementById(`param_${canvasId}_D0`);
+                    const nElem = document.getElementById(`param_${canvasId}_n`);
+                    if (d0Elem) d0Elem.textContent = params.D0;
+                    if (nElem) nElem.textContent = params.n;
+                }
                 
             } catch (error) {
                 console.error(`Error displaying ${canvasId}:`, error);
@@ -1996,6 +2141,8 @@
         window.submitComment = submitComment;
         window.deleteComment = deleteComment;
         window.deletePost = deletePost;
+        window.updateGainValue = updateGainValue;
+        window.reprocessWithNewGain = reprocessWithNewGain;
     </script>
 </body>
 </html>
