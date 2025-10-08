@@ -855,26 +855,11 @@
                         <select id="displayModeSelect" onchange="changeDisplayMode()" 
                                 style="padding: 8px 12px; border-radius: 4px; margin-left: 10px; font-size: 13px; font-weight: bold; border: 2px solid #4267b2; cursor: pointer;">
                             <option value="matplotlib">📊 Estilo Matplotlib (Recomendado)</option>
-                            <option value="amplified">⚡ Con Amplificación Manual</option>
+                            <option value="grayscale">🌫️ Con Fondo Gris (Clásico)</option>
                         </select>
                         <p id="modeDescription" style="margin: 8px 0 0 0; font-size: 12px; color: #28a745; font-weight: bold;">
                             ✅ Normalización automática [min, max] → [0, 255] (igual que el profesor)
                         </p>
-                        
-                        <div id="amplificationControls" class="hidden" style="margin-top: 12px; padding-top: 12px; border-top: 2px solid #ddd;">
-                            <strong style="color: #1F497D;">⚙️ Factor de Amplificación:</strong>
-                            <input type="range" id="gainSlider" min="1" max="10" value="3" step="0.5" 
-                                   style="width: 200px; vertical-align: middle; margin: 0 10px;"
-                                   oninput="updateGainValue(this.value)">
-                            <span id="gainValue" style="font-weight: bold; color: #4267b2;">3×</span>
-                            <button onclick="reprocessWithNewGain()" 
-                                    style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px; font-weight: bold;">
-                                🔄 Aplicar
-                            </button>
-                            <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
-                                Amplifica antes de normalizar para mayor contraste en los bordes
-                            </p>
-                        </div>
                     </div>
                     <div class="filters-grid">
                         <div class="filter-result">
@@ -995,8 +980,7 @@
         let userLikes = new Set();
         
         // Sistema de visualización simplificado
-        window.DISPLAY_MODE = 'matplotlib';  // 'matplotlib' o 'amplified'
-        window.AMPLIFICATION_FACTOR = 3.0;   // Para modo amplified
+        window.DISPLAY_MODE = 'matplotlib';  // 'matplotlib' o 'grayscale'
         let lastGrayData = null;  
         let lastWidth = 0;
         let lastHeight = 0;
@@ -1010,26 +994,18 @@
         // ========================================
         // FUNCIONES DE CONTROL DE VISUALIZACIÓN
         // ========================================
-        function updateGainValue(value) {
-            window.AMPLIFICATION_FACTOR = parseFloat(value);
-            document.getElementById('gainValue').textContent = value + '×';
-        }
-        
         function changeDisplayMode() {
             const mode = document.getElementById('displayModeSelect').value;
             window.DISPLAY_MODE = mode;
             
             const description = document.getElementById('modeDescription');
-            const controls = document.getElementById('amplificationControls');
             
             if (mode === 'matplotlib') {
                 description.textContent = '✅ Normalización automática [min, max] → [0, 255] (igual que el profesor)';
                 description.style.color = '#28a745';
-                controls.classList.add('hidden');
             } else {
-                description.textContent = '⚡ Amplificación manual antes de normalizar (más control sobre contraste)';
-                description.style.color = '#4267b2';
-                controls.classList.remove('hidden');
+                description.textContent = '🌫️ Bordes sobre fondo gris (offset +128) - Visualización clásica';
+                description.style.color = '#6c757d';
             }
             
             // Reprocesar si hay imagen
@@ -1040,11 +1016,11 @@
         
         function reprocessWithNewGain() {
             if (!lastGrayData || lastWidth === 0 || lastHeight === 0) {
-                alert('⚠️ Primero procesa una imagen antes de ajustar la visualización.');
+                alert('⚠️ Primero procesa una imagen antes de cambiar el modo de visualización.');
                 return;
             }
             
-            document.getElementById('loadingText').textContent = '🔄 Actualizando visualización...';
+            document.getElementById('loadingText').textContent = '🔄 Cambiando modo de visualización...';
             document.getElementById('loadingSection').classList.remove('hidden');
             
             requestAnimationFrame(() => {
@@ -1074,7 +1050,7 @@
                             if (window.DISPLAY_MODE === 'matplotlib') {
                                 indicator.textContent = '(Normalizado)';
                             } else {
-                                indicator.textContent = `(${window.AMPLIFICATION_FACTOR}× → Normalizado)`;
+                                indicator.textContent = '(Fondo Gris)';
                             }
                         }
                     });
@@ -1090,7 +1066,6 @@
         }
         
         // Exportar inmediatamente a window
-        window.updateGainValue = updateGainValue;
         window.reprocessWithNewGain = reprocessWithNewGain;
         window.changeDisplayMode = changeDisplayMode;
         
@@ -1339,11 +1314,7 @@
             ['hpIdeal', 'hpButterworth', 'hpGaussian'].forEach(id => {
                 const indicator = document.getElementById(`gainIndicator_${id}`);
                 if (indicator) {
-                    if (window.DISPLAY_MODE === 'matplotlib') {
-                        indicator.textContent = '(Normalizado)';
-                    } else {
-                        indicator.textContent = `(${window.AMPLIFICATION_FACTOR}× → Normalizado)`;
-                    }
+                    indicator.textContent = '(Normalizado)';
                 }
             });
         }
@@ -1720,57 +1691,80 @@
                 
                 if (isHighPass) {
                     // === FILTROS PASA-ALTAS ===
-                    // Replicar exactamente el comportamiento de matplotlib/numpy del profesor
-                    
-                    let processedData;
                     
                     if (window.DISPLAY_MODE === 'matplotlib') {
-                        // Modo por defecto: igual que el profesor
-                        // 1. Tomar valor absoluto (como np.abs())
-                        processedData = new Float32Array(data.length);
+                        // MODO MATPLOTLIB: Normalización automática [min, max] → [0, 255]
+                        // Igual que plt.imshow() del profesor
+                        
+                        // 1. Tomar valor absoluto
+                        const processedData = new Float32Array(data.length);
                         for (let i = 0; i < data.length; i++) {
                             processedData[i] = Math.abs(data[i]);
                         }
-                    } else {
-                        // Modo amplificado: multiplicar antes de normalizar
-                        processedData = new Float32Array(data.length);
-                        for (let i = 0; i < data.length; i++) {
-                            processedData[i] = Math.abs(data[i]) * window.AMPLIFICATION_FACTOR;
-                        }
-                    }
-                    
-                    // 2. Normalizar [min, max] -> [0, 255] (como hace plt.imshow automáticamente)
-                    let minVal = Infinity;
-                    let maxVal = -Infinity;
-                    
-                    for (let i = 0; i < processedData.length; i++) {
-                        if (processedData[i] < minVal) minVal = processedData[i];
-                        if (processedData[i] > maxVal) maxVal = processedData[i];
-                    }
-                    
-                    const range = maxVal - minVal;
-                    
-                    for (let i = 0; i < width * height; i++) {
-                        let value;
-                        if (range === 0) {
-                            value = 0;
-                        } else {
-                            value = ((processedData[i] - minVal) / range) * 255;
-                            value = Math.max(0, Math.min(255, Math.round(value)));
+                        
+                        // 2. Normalizar [min, max] -> [0, 255]
+                        let minVal = Infinity;
+                        let maxVal = -Infinity;
+                        
+                        for (let i = 0; i < processedData.length; i++) {
+                            if (processedData[i] < minVal) minVal = processedData[i];
+                            if (processedData[i] > maxVal) maxVal = processedData[i];
                         }
                         
-                        const idx = i * 4;
-                        if (idx + 3 < imageData.data.length) {
-                            imageData.data[idx] = value;
-                            imageData.data[idx + 1] = value;
-                            imageData.data[idx + 2] = value;
-                            imageData.data[idx + 3] = 255;
+                        const range = maxVal - minVal;
+                        
+                        for (let i = 0; i < width * height; i++) {
+                            let value;
+                            if (range === 0) {
+                                value = 0;
+                            } else {
+                                value = ((processedData[i] - minVal) / range) * 255;
+                                value = Math.max(0, Math.min(255, Math.round(value)));
+                            }
+                            
+                            const idx = i * 4;
+                            if (idx + 3 < imageData.data.length) {
+                                imageData.data[idx] = value;
+                                imageData.data[idx + 1] = value;
+                                imageData.data[idx + 2] = value;
+                                imageData.data[idx + 3] = 255;
+                            }
+                        }
+                        
+                    } else {
+                        // MODO FONDO GRIS: Bordes sobre fondo gris medio
+                        // Los bordes se ven como cambios desde el gris (128)
+                        
+                        // Normalizar el rango de datos a [-1, 1]
+                        let minVal = Infinity;
+                        let maxVal = -Infinity;
+                        
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i] < minVal) minVal = data[i];
+                            if (data[i] > maxVal) maxVal = data[i];
+                        }
+                        
+                        const range = Math.max(Math.abs(minVal), Math.abs(maxVal));
+                        
+                        for (let i = 0; i < width * height; i++) {
+                            // Normalizar a [-1, 1] y luego mapear a [0, 255] con centro en 128
+                            let normalized = range === 0 ? 0 : data[i] / range;
+                            let value = 128 + (normalized * 127);
+                            value = Math.max(0, Math.min(255, Math.round(value)));
+                            
+                            const idx = i * 4;
+                            if (idx + 3 < imageData.data.length) {
+                                imageData.data[idx] = value;
+                                imageData.data[idx + 1] = value;
+                                imageData.data[idx + 2] = value;
+                                imageData.data[idx + 3] = 255;
+                            }
                         }
                     }
                     
                 } else {
                     // === FILTROS PASA-BAJAS ===
-                    // Normalización estándar [min, max] -> [0, 255]
+                    // Normalización estándar [min, max] → [0, 255]
                     let min = Infinity;
                     let max = -Infinity;
                     for (let i = 0; i < data.length; i++) {
@@ -2250,9 +2244,10 @@
         window.deletePost = deletePost;
         
         console.log('✅ Sistema de visualización de filtros de Fourier inicializado');
-        console.log('📊 Modo por defecto: Estilo Matplotlib (igual que el profesor)');
-        console.log('  - DISPLAY_MODE:', window.DISPLAY_MODE);
-        console.log('  - AMPLIFICATION_FACTOR:', window.AMPLIFICATION_FACTOR);
+        console.log('📊 Dos modos disponibles:');
+        console.log('  1. Matplotlib (recomendado) - Normalización automática [min,max]→[0,255]');
+        console.log('  2. Fondo Gris (clásico) - Bordes sobre fondo gris medio');
+        console.log('  - DISPLAY_MODE actual:', window.DISPLAY_MODE);
     </script>
 </body>
 </html>
