@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mejoramiento de Imágenes con Fourier - Visión Computacional</title>
+    <title>Mejoramiento de Imágenes con Fourier - Team 13 - Visión Computacional</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 8px;
@@ -28,15 +28,154 @@
         }
         
         .header {
-            background: #3b5998;
+            background: linear-gradient(135deg, #1F497D 0%, #3b5998 100%);
             color: white;
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
         }
         
         .header h1 {
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .institution-info {
+            background: white;
+            padding: 25px;
+            border-bottom: 3px solid #1F497D;
+        }
+        
+        .institution-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .institution-header h2 {
+            color: #1F497D;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .institution-header h3 {
+            color: #666;
+            font-size: 18px;
+            font-weight: normal;
+        }
+        
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .badge {
+            background: #1F497D;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        .badge.course {
+            background: #FF6B6B;
+        }
+        
+        .badge.activity {
+            background: #F9AB00;
+        }
+        
+        .professors {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .professors h4 {
+            color: #1F497D;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .professors ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .professors li {
+            color: #444;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        
+        .team-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 20px;
+            color: white;
+        }
+        
+        .team-section h3 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .team-member {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+        
+        .team-member img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 4px solid #667eea;
+            object-fit: cover;
+        }
+        
+        .team-member h4 {
+            color: #1F497D;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .team-member .matricula {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .team-member .role {
+            color: #666;
+            font-size: 13px;
         }
         
         .firebase-status {
@@ -148,7 +287,7 @@
         
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 25px;
         }
         
@@ -286,8 +425,8 @@
         
         .post-images {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
             margin-top: 15px;
         }
         
@@ -509,13 +648,89 @@
             font-size: 13px;
             margin: 0;
         }
+        
+        .optimization-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        
+        .optimization-info p {
+            color: #856404;
+            font-size: 13px;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🖼️ Mejoramiento de Imágenes con Transformada de Fourier</h1>
-            <p>Tarea de Visión Computacional - Filtros Pasa-Bajas y Pasa-Altas</p>
+            <p>Algoritmos de mejoramiento en el dominio de Fourier</p>
+        </div>
+        
+        <!-- Información Institucional -->
+        <div class="institution-info">
+            <div class="institution-header">
+                <h2>🎓 Maestría en Inteligencia Artificial Aplicada</h2>
+                <h3>Tecnológico de Monterrey</h3>
+            </div>
+            
+            <div class="badges">
+                <span class="badge">Tecnológico de Monterrey</span>
+                <span class="badge course">Computer Vision</span>
+                <span class="badge activity">Actividad 5.4 - Google Colab</span>
+            </div>
+            
+            <div class="professors">
+                <h4>👨‍🏫 Profesores</h4>
+                <ul>
+                    <li><strong>Profesor Titular:</strong> Dr. Gilberto Ochoa Ruiz</li>
+                    <li><strong>Profesor Asistente:</strong> MIP Ma. del Refugio Melendez Alfaro</li>
+                    <li><strong>Profesor Tutor:</strong> M. en C. Jose Angel Martinez Navarro</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <p><strong>📌 Título:</strong> Algoritmos de mejoramiento de imágenes en el dominio de Fourier</p>
+                <p><strong>📅 Fecha de entrega:</strong> Octubre 12, 2025 a las 23:59</p>
+            </div>
+        </div>
+        
+        <!-- Sección del Equipo -->
+        <div class="team-section">
+            <h3>👥 Team 13 - Nuestro Equipo</h3>
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="https://iili.io/KuvsGKx.png" alt="Javier Augusto Rebull Saucedo">
+                    <h4>Javier Augusto Rebull Saucedo</h4>
+                    <p class="matricula">A01795838</p>
+                    <p class="role">🎓 MNA Student</p>
+                </div>
+                
+                <div class="team-member">
+                    <img src="https://iili.io/KuvP4gp.png" alt="Juan Carlos Pérez Nava">
+                    <h4>Juan Carlos Pérez Nava</h4>
+                    <p class="matricula">A01795941</p>
+                    <p class="role">🎓 MNA Student</p>
+                </div>
+                
+                <div class="team-member">
+                    <img src="https://iili.io/KuvLaJp.png" alt="Luis Gerardo Sánchez Salazar">
+                    <h4>Luis Gerardo Sánchez Salazar</h4>
+                    <p class="matricula">A01232963</p>
+                    <p class="role">🎓 MNA Student</p>
+                </div>
+                
+                <div class="team-member">
+                    <img src="https://iili.io/KuvQx24.png" alt="Oscar Enrique García García">
+                    <h4>Oscar Enrique García García</h4>
+                    <p class="matricula">A01016093</p>
+                    <p class="role">🎓 MNA Student</p>
+                </div>
+            </div>
         </div>
         
         <div id="firebaseStatus" class="firebase-status">
@@ -534,6 +749,9 @@
                 <p id="fileName" style="margin-top: 10px; color: #666;"></p>
                 <div class="format-support">
                     <p>✅ Formatos soportados: JPG, PNG, WEBP, HEIC (iPhone), DNG (RAW), y más</p>
+                </div>
+                <div class="optimization-info">
+                    <p>⚡ Optimización automática: Las imágenes se comprimen a 512px máximo para carga rápida</p>
                 </div>
                 <button id="processBtn" class="process-btn" onclick="processImage()" disabled>🔬 Procesar con Filtros de Fourier</button>
             </div>
@@ -674,7 +892,13 @@
         let uploadedImage = null;
         let currentResults = {};
         let feedPosts = [];
-        let userLikes = new Set(); // Guarda los IDs de posts con like
+        let userLikes = new Set();
+        
+        // Tamaños optimizados
+        const MAX_DISPLAY_SIZE = 600;  // Tamaño para mostrar en pantalla (más grande)
+        const MAX_STORAGE_SIZE = 512;  // Tamaño para guardar en Firebase (optimizado)
+        const MAX_PROCESS_SIZE = 256;  // Tamaño para procesamiento FFT
+        const JPEG_QUALITY = 0.7;      // Calidad JPEG para compresión
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -695,7 +919,6 @@
         }
         
         async function convertDNGtoJPEG(file) {
-            // DNG es más complejo, usamos un canvas para extraer lo que podamos
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -720,6 +943,29 @@
             });
         }
         
+        // ========================================
+        // OPTIMIZACIÓN DE IMÁGENES
+        // ========================================
+        
+        function resizeImage(img, maxSize, quality = 0.9) {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > maxSize || height > maxSize) {
+                const ratio = Math.min(maxSize / width, maxSize / height);
+                width = Math.floor(width * ratio);
+                height = Math.floor(height * ratio);
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            return canvas.toDataURL('image/jpeg', quality);
+        }
+        
         // File upload handler
         document.getElementById('imageUpload').addEventListener('change', async function(e) {
             let file = e.target.files[0];
@@ -728,7 +974,6 @@
             const fileName = file.name.toLowerCase();
             
             try {
-                // Mostrar mensaje de conversión si es necesario
                 if (fileName.endsWith('.heic')) {
                     document.getElementById('fileName').textContent = `🔄 Convirtiendo HEIC: ${file.name}...`;
                     file = await convertHEICtoJPEG(file);
@@ -765,12 +1010,12 @@
             const canvas = document.getElementById('originalCanvas');
             const ctx = canvas.getContext('2d');
             
-            const maxSize = 400;
             let width = img.width;
             let height = img.height;
             
-            if (width > maxSize || height > maxSize) {
-                const ratio = Math.min(maxSize / width, maxSize / height);
+            // Tamaño para display (más grande)
+            if (width > MAX_DISPLAY_SIZE || height > MAX_DISPLAY_SIZE) {
+                const ratio = Math.min(MAX_DISPLAY_SIZE / width, MAX_DISPLAY_SIZE / height);
                 width = Math.floor(width * ratio);
                 height = Math.floor(height * ratio);
             }
@@ -779,7 +1024,8 @@
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
             
-            currentResults['original'] = canvas.toDataURL();
+            // Guardar versión optimizada para storage
+            currentResults['original'] = resizeImage(img, MAX_STORAGE_SIZE, JPEG_QUALITY);
             
             document.getElementById('originalSection').classList.remove('hidden');
         }
@@ -810,12 +1056,12 @@
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
-            const maxProcessSize = 128;
             let width = img.width;
             let height = img.height;
             
-            if (width > maxProcessSize || height > maxProcessSize) {
-                const ratio = Math.min(maxProcessSize / width, maxProcessSize / height);
+            // Reducir tamaño para procesamiento FFT
+            if (width > MAX_PROCESS_SIZE || height > MAX_PROCESS_SIZE) {
+                const ratio = Math.min(MAX_PROCESS_SIZE / width, MAX_PROCESS_SIZE / height);
                 width = Math.floor(width * ratio);
                 height = Math.floor(height * ratio);
             }
@@ -893,22 +1139,11 @@
                 displayResult(croppedResult, width, height, canvasId);
             } catch (error) {
                 console.error(`Error in ${canvasId}:`, error);
-                const canvas = document.getElementById(canvasId);
-                canvas.width = 200;
-                canvas.height = 50;
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#f0f0f0';
-                ctx.fillRect(0, 0, 200, 50);
-                ctx.fillStyle = '#ff0000';
-                ctx.font = '12px Arial';
-                ctx.fillText('Error procesando', 10, 25);
             }
         }
         
         function createFrequencyFilter(width, height, type, isLowPass, D0, n) {
             const filter = new Float32Array(width * height);
-            const centerX = width / 2;
-            const centerY = height / 2;
             
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
@@ -1134,10 +1369,22 @@
                 }
                 
                 const canvas = document.getElementById(canvasId);
-                canvas.width = width;
-                canvas.height = height;
+                
+                // Escalar para visualización más grande
+                const displayScale = 2;
+                const displayWidth = width * displayScale;
+                const displayHeight = height * displayScale;
+                
+                canvas.width = displayWidth;
+                canvas.height = displayHeight;
                 const ctx = canvas.getContext('2d');
-                const imageData = ctx.createImageData(width, height);
+                
+                // Crear imagen temporal en tamaño original
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                const tempCtx = tempCanvas.getContext('2d');
+                const imageData = tempCtx.createImageData(width, height);
                 
                 for (let i = 0; i < width * height; i++) {
                     const normalized = range === 0 ? 0 : ((data[i] - min) / range) * 255;
@@ -1151,8 +1398,15 @@
                     }
                 }
                 
-                ctx.putImageData(imageData, 0, 0);
-                currentResults[canvasId] = canvas.toDataURL();
+                tempCtx.putImageData(imageData, 0, 0);
+                
+                // Escalar al canvas de visualización
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(tempCanvas, 0, 0, displayWidth, displayHeight);
+                
+                // Guardar versión comprimida para storage
+                currentResults[canvasId] = tempCanvas.toDataURL('image/jpeg', JPEG_QUALITY);
                 
             } catch (error) {
                 console.error(`Error displaying ${canvasId}:`, error);
@@ -1165,15 +1419,15 @@
         
         async function uploadImageToStorage(dataUrl, path) {
             try {
-                // Convertir data URL a blob
                 const response = await fetch(dataUrl);
                 const blob = await response.blob();
                 
-                // Subir a Firebase Storage
                 const storageRef = storage.ref(path);
-                const snapshot = await storageRef.put(blob);
+                const snapshot = await storageRef.put(blob, {
+                    contentType: 'image/jpeg',
+                    cacheControl: 'public,max-age=31536000'
+                });
                 
-                // Obtener URL de descarga
                 const downloadURL = await snapshot.ref.getDownloadURL();
                 return downloadURL;
             } catch (error) {
@@ -1194,19 +1448,24 @@
             }
             
             try {
-                document.getElementById('loadingText').textContent = 'Subiendo imágenes a Firebase Storage...';
+                document.getElementById('loadingText').textContent = '⚡ Optimizando y subiendo imágenes...';
                 document.getElementById('loadingSection').classList.remove('hidden');
                 
                 const timestamp = Date.now();
                 const imageUrls = {};
                 
-                // Subir cada imagen a Storage
+                let uploadedCount = 0;
+                const totalImages = Object.keys(currentResults).length;
+                
                 for (const [key, dataUrl] of Object.entries(currentResults)) {
+                    uploadedCount++;
+                    document.getElementById('loadingText').textContent = 
+                        `⚡ Subiendo imagen ${uploadedCount}/${totalImages}...`;
+                    
                     const path = `posts/${timestamp}/${key}.jpg`;
                     imageUrls[key] = await uploadImageToStorage(dataUrl, path);
                 }
                 
-                // Guardar metadata en Firestore
                 const post = {
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     imageUrls: imageUrls,
@@ -1242,13 +1501,11 @@
                 const currentLikes = post.data().likes || 0;
                 
                 if (userLikes.has(postId)) {
-                    // Quitar like
                     await postRef.update({
                         likes: Math.max(0, currentLikes - 1)
                     });
                     userLikes.delete(postId);
                 } else {
-                    // Dar like
                     await postRef.update({
                         likes: currentLikes + 1
                     });
@@ -1317,11 +1574,9 @@
             }
             
             try {
-                // Primero obtener las URLs de las imágenes
                 const postDoc = await db.collection('posts').doc(postId).get();
                 const imageUrls = postDoc.data().imageUrls || {};
                 
-                // Eliminar imágenes de Storage
                 for (const url of Object.values(imageUrls)) {
                     try {
                         const storageRef = storage.refFromURL(url);
@@ -1331,7 +1586,6 @@
                     }
                 }
                 
-                // Eliminar documento de Firestore
                 await db.collection('posts').doc(postId).delete();
                 
                 alert('Publicación eliminada exitosamente');
@@ -1385,7 +1639,6 @@
             
             feedContainer.innerHTML = '';
             
-            // Interpretación una sola vez
             const interpretationDiv = document.createElement('div');
             interpretationDiv.className = 'interpretation-text';
             interpretationDiv.style.marginBottom = '25px';
@@ -1416,7 +1669,7 @@
                     <div class="post-header">
                         <div class="post-avatar">🌍</div>
                         <div class="post-info">
-                            <div class="post-author">Usuario Global</div>
+                            <div class="post-author">Team 13 - TEC</div>
                             <div class="post-time">${timeAgo}</div>
                         </div>
                         <button class="delete-post-btn" onclick="deletePost('${post.id}')">🗑️ Eliminar</button>
@@ -1429,7 +1682,7 @@
                     <div class="post-images">
                         <div style="text-align: center;">
                             <strong style="font-size: 14px; color: #4267b2; display: block; margin-bottom: 5px;">📷 Original</strong>
-                            <img src="${post.imageUrls.original}" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
+                            <img src="${post.imageUrls.original}" loading="lazy" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
                         </div>
                     </div>
                     
@@ -1438,15 +1691,15 @@
                         <div class="post-images">
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Ideal</small>
-                                <img src="${post.imageUrls.lpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.lpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Butterworth</small>
-                                <img src="${post.imageUrls.lpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.lpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Gaussian</small>
-                                <img src="${post.imageUrls.lpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.lpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                         </div>
                     </div>
@@ -1456,15 +1709,15 @@
                         <div class="post-images">
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Ideal</small>
-                                <img src="${post.imageUrls.hpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.hpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Butterworth</small>
-                                <img src="${post.imageUrls.hpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.hpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Gaussian</small>
-                                <img src="${post.imageUrls.hpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                                <img src="${post.imageUrls.hpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                         </div>
                     </div>
@@ -1517,7 +1770,7 @@
         
         function generateInterpretation() {
             return {
-                title: '📊 Análisis de Filtros de Fourier',
+                title: '📊 Análisis de Filtros de Fourier - Team 13',
                 sections: [
                     {
                         title: '🔽 Filtros Pasa-Bajas (Low-Pass)',
@@ -1544,7 +1797,6 @@
             return `Hace ${Math.floor(seconds / 86400)} días`;
         }
         
-        // Cargar feed al iniciar
         window.addEventListener('DOMContentLoaded', () => {
             loadFeed();
         });
