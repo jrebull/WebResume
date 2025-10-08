@@ -293,8 +293,8 @@
         
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
         }
         
         .filter-result {
@@ -432,8 +432,8 @@
         
         .post-images {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
             margin-top: 12px;
         }
         
@@ -910,11 +910,11 @@
         let userLikes = new Set();
         
         // Tamaños optimizados para Firestore (límite 1MB por documento)
-        // Con 7 imágenes, cada una debe ser ~120KB máximo
-        const MAX_DISPLAY_SIZE = 350;   // Para mostrar en pantalla
-        const MAX_STORAGE_SIZE = 300;   // Para guardar en Firestore
+        // Con 7 imágenes, cada una debe ser ~100KB máximo para posts pequeños
+        const MAX_DISPLAY_SIZE = 320;   // Para mostrar en pantalla
+        const MAX_STORAGE_SIZE = 250;   // Para guardar en Firestore (más pequeño)
         const MAX_PROCESS_SIZE = 256;   // Para procesamiento FFT
-        const JPEG_QUALITY = 0.75;      // Calidad para balance tamaño/calidad
+        const JPEG_QUALITY = 0.72;      // Calidad para balance tamaño/calidad
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1130,8 +1130,8 @@
                 }
             }
             
-            const D0 = 30;
-            const n = 2;
+            const D0 = 50;  // Frecuencia de corte (igual que en Python)
+            const n = 2;    // Orden del filtro Butterworth
             
             applyFilter(grayData, width, height, 'ideal', true, D0, n, 'lpIdeal');
             applyFilter(grayData, width, height, 'butterworth', true, D0, n, 'lpButterworth');
@@ -1163,16 +1163,27 @@
                     actualHeight = newHeight;
                 }
                 
+                // 1. Aplicar FFT 2D
                 const fftResult = fft2d(paddedData, actualWidth, actualHeight);
+                
+                // 2. Aplicar fftshift (centrar el espectro)
+                const fftShifted = fftshift2d(fftResult, actualWidth, actualHeight);
+                
+                // 3. Crear y aplicar el filtro
                 const filter = createFrequencyFilter(actualWidth, actualHeight, filterType, isLowPass, D0, n);
                 
                 for (let i = 0; i < actualWidth * actualHeight; i++) {
-                    fftResult.real[i] *= filter[i];
-                    fftResult.imag[i] *= filter[i];
+                    fftShifted.real[i] *= filter[i];
+                    fftShifted.imag[i] *= filter[i];
                 }
                 
-                const result = ifft2d(fftResult, actualWidth, actualHeight);
+                // 4. Aplicar ifftshift (descentrar antes de IFFT)
+                const fftUnshifted = ifftshift2d(fftShifted, actualWidth, actualHeight);
                 
+                // 5. Aplicar IFFT 2D
+                const result = ifft2d(fftUnshifted, actualWidth, actualHeight);
+                
+                // 6. Recortar al tamaño original
                 const croppedResult = new Float32Array(width * height);
                 for (let y = 0; y < height; y++) {
                     for (let x = 0; x < width; x++) {
@@ -1186,29 +1197,84 @@
             }
         }
         
-        function createFrequencyFilter(width, height, type, isLowPass, D0, n) {
-            const filter = new Float32Array(width * height);
+        function fftshift2d(fftData, width, height) {
+            // Centrar el espectro de frecuencias (como np.fft.fftshift)
+            const shifted = {
+                real: new Float32Array(width * height),
+                imag: new Float32Array(width * height)
+            };
+            
+            const halfWidth = Math.floor(width / 2);
+            const halfHeight = Math.floor(height / 2);
             
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
-                    const u = x < width / 2 ? x : x - width;
-                    const v = y < height / 2 ? y : y - height;
-                    const D = Math.sqrt(u * u + v * v);
+                    const newY = (y + halfHeight) % height;
+                    const newX = (x + halfWidth) % width;
+                    const oldIdx = y * width + x;
+                    const newIdx = newY * width + newX;
+                    shifted.real[newIdx] = fftData.real[oldIdx];
+                    shifted.imag[newIdx] = fftData.imag[oldIdx];
+                }
+            }
+            
+            return shifted;
+        }
+        
+        function ifftshift2d(fftData, width, height) {
+            // Descentrar el espectro de frecuencias (como np.fft.ifftshift)
+            const unshifted = {
+                real: new Float32Array(width * height),
+                imag: new Float32Array(width * height)
+            };
+            
+            const halfWidth = Math.ceil(width / 2);
+            const halfHeight = Math.ceil(height / 2);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const newY = (y + halfHeight) % height;
+                    const newX = (x + halfWidth) % width;
+                    const oldIdx = y * width + x;
+                    const newIdx = newY * width + newX;
+                    unshifted.real[newIdx] = fftData.real[oldIdx];
+                    unshifted.imag[newIdx] = fftData.imag[oldIdx];
+                }
+            }
+            
+            return unshifted;
+        }
+        
+        function createFrequencyFilter(width, height, type, isLowPass, D0, n) {
+            const filter = new Float32Array(width * height);
+            
+            // Centro del espectro (como en el código Python)
+            const crow = Math.floor(height / 2);
+            const ccol = Math.floor(width / 2);
+            
+            for (let u = 0; u < height; u++) {
+                for (let v = 0; v < width; v++) {
+                    // Calcular distancia desde el centro del espectro
+                    const D = Math.sqrt((v - ccol) ** 2 + (u - crow) ** 2);
                     
                     let H;
                     if (type === 'ideal') {
+                        // Filtro Ideal: 1 si D <= D0, sino 0
                         H = D <= D0 ? 1 : 0;
                     } else if (type === 'butterworth') {
+                        // Filtro Butterworth
                         H = 1 / (1 + Math.pow(D / D0, 2 * n));
                     } else if (type === 'gaussian') {
+                        // Filtro Gaussiano
                         H = Math.exp(-(D * D) / (2 * D0 * D0));
                     }
                     
+                    // Para filtros pasa-altas: H_highpass = 1 - H_lowpass
                     if (!isLowPass) {
                         H = 1 - H;
                     }
                     
-                    filter[y * width + x] = H;
+                    filter[u * width + v] = H;
                 }
             }
             
@@ -1414,8 +1480,8 @@
                 
                 const canvas = document.getElementById(canvasId);
                 
-                // Escalar más pequeño para visualización
-                const displayScale = 1.5;
+                // Escalar más pequeño para visualización compacta
+                const displayScale = 1.3;
                 const displayWidth = width * displayScale;
                 const displayHeight = height * displayScale;
                 
@@ -1700,45 +1766,45 @@
                         <p><strong>Procesamiento #${feedPosts.length - index}</strong> - Aplicación de 6 filtros de Fourier</p>
                     </div>
                     
-                    <div class="post-images">
+                    <div class="post-images" style="max-width: 300px; margin: 0 auto;">
                         <div style="text-align: center;">
-                            <strong style="font-size: 13px; color: #4267b2; display: block; margin-bottom: 5px;">📷 Original</strong>
-                            <img src="${post.imageUrls.original}" loading="lazy" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
+                            <strong style="font-size: 12px; color: #4267b2; display: block; margin-bottom: 4px;">📷 Original</strong>
+                            <img src="${post.imageUrls.original}" loading="lazy" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 4px;">
                         </div>
                     </div>
                     
-                    <div style="margin-top: 15px;">
-                        <strong style="color: #4267b2; margin-bottom: 8px; display: block; font-size: 14px;">🔽 Filtros Pasa-Bajas:</strong>
+                    <div style="margin-top: 12px;">
+                        <strong style="color: #4267b2; margin-bottom: 6px; display: block; font-size: 13px;">🔽 Filtros Pasa-Bajas:</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Ideal</small>
-                                <img src="${post.imageUrls.lpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold; font-size: 10px;">Ideal</small>
+                                <img src="${post.imageUrls.lpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Butterworth</small>
-                                <img src="${post.imageUrls.lpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold; font-size: 10px;">Butterworth</small>
+                                <img src="${post.imageUrls.lpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Gaussian</small>
-                                <img src="${post.imageUrls.lpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold; font-size: 10px;">Gaussian</small>
+                                <img src="${post.imageUrls.lpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
                             </div>
                         </div>
                     </div>
                     
-                    <div style="margin-top: 15px;">
-                        <strong style="color: #4267b2; margin-bottom: 8px; display: block; font-size: 14px;">🔼 Filtros Pasa-Altas:</strong>
+                    <div style="margin-top: 12px;">
+                        <strong style="color: #4267b2; margin-bottom: 6px; display: block; font-size: 13px;">🔼 Filtros Pasa-Altas:</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Ideal</small>
-                                <img src="${post.imageUrls.hpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold; font-size: 10px;">Ideal</small>
+                                <img src="${post.imageUrls.hpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Butterworth</small>
-                                <img src="${post.imageUrls.hpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold; font-size: 10px;">Butterworth</small>
+                                <img src="${post.imageUrls.hpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Gaussian</small>
-                                <img src="${post.imageUrls.hpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold; font-size: 10px;">Gaussian</small>
+                                <img src="${post.imageUrls.hpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
                             </div>
                         </div>
                     </div>
