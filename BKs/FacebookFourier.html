@@ -1490,34 +1490,28 @@
                 const imageData = tempCtx.createImageData(width, height);
                 
                 if (isHighPass) {
-                    // Para filtros pasa-altas: necesitamos mayor amplificación
-                    // Multiplicar por un factor de ganancia para hacer visibles los bordes
-                    const GAIN = 3.0;  // Factor de amplificación
-                    
-                    // Amplificar valores
-                    const amplified = new Float32Array(data.length);
+                    // Para filtros pasa-altas: normalizar y agregar offset de 128 (gris medio)
+                    // Esto hace que el fondo sea gris y los bordes resalten
+                    let min = Infinity;
+                    let max = -Infinity;
                     for (let i = 0; i < data.length; i++) {
-                        amplified[i] = data[i] * GAIN;
+                        if (data[i] < min) min = data[i];
+                        if (data[i] > max) max = data[i];
                     }
                     
-                    // Encontrar percentiles para mejor contraste (ignorar outliers)
-                    const sorted = Array.from(amplified).sort((a, b) => a - b);
-                    const p2 = sorted[Math.floor(sorted.length * 0.02)];  // Percentil 2%
-                    const p98 = sorted[Math.floor(sorted.length * 0.98)]; // Percentil 98%
-                    
-                    const range = p98 - p2;
+                    const range = max - min;
                     
                     for (let i = 0; i < width * height; i++) {
-                        let value;
+                        // Normalizar a rango [0, 255] y luego centrar en 128
+                        let normalized;
                         if (range === 0) {
-                            value = 128;
+                            normalized = 128;
                         } else {
-                            // Normalizar usando percentiles para mejor contraste
-                            value = ((amplified[i] - p2) / range) * 255;
-                            // Clip a rango válido
-                            value = Math.max(0, Math.min(255, Math.round(value)));
+                            // Escalar a [-127, 127] y sumar 128 para centrar
+                            normalized = ((data[i] - min) / range - 0.5) * 254 + 128;
                         }
                         
+                        const value = Math.max(0, Math.min(255, Math.round(normalized)));
                         const idx = i * 4;
                         if (idx + 3 < imageData.data.length) {
                             imageData.data[idx] = value;
