@@ -39,18 +39,6 @@
             margin-bottom: 10px;
         }
         
-        .firebase-status {
-            background: #2ecc71;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .firebase-status.disconnected {
-            background: #e74c3c;
-        }
-        
         .content {
             padding: 20px;
         }
@@ -276,7 +264,7 @@
             margin-top: 15px;
         }
         
-        .post-images canvas, .post-images img {
+        .post-images canvas {
             width: 100%;
             height: auto;
             border-radius: 4px;
@@ -440,15 +428,15 @@
         }
         
         .info-box {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
+            background: #e7f3ff;
+            border-left: 4px solid #4267b2;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 4px;
         }
         
         .info-box p {
-            color: #155724;
+            color: #333;
             font-size: 14px;
             line-height: 1.6;
         }
@@ -461,13 +449,9 @@
             <p>Tarea de Visión Computacional - Filtros Pasa-Bajas y Pasa-Altas</p>
         </div>
         
-        <div id="firebaseStatus" class="firebase-status">
-            🔄 Conectando a Firebase...
-        </div>
-        
         <div class="content">
             <div class="info-box">
-                <p><strong>🌐 Feed Global con Firebase:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube y son visibles para cualquiera que visite esta página.</p>
+                <p><strong>📚 Instrucciones:</strong> Suba una imagen para aplicar filtros de mejoramiento en el dominio de frecuencia usando la Transformada de Fourier. Se procesarán 6 filtros diferentes (3 pasa-bajas y 3 pasa-altas).</p>
             </div>
             
             <div class="upload-section">
@@ -545,7 +529,7 @@
                     </div>
                 </div>
                 
-                <button id="postButton" class="post-button" onclick="publishToFeed()">📤 Publicar Resultado en Feed Global</button>
+                <button id="postButton" class="post-button" onclick="publishToFeed()">📤 Publicar Resultado en mi Feed</button>
             </div>
             
             <div class="feedback-section">
@@ -567,69 +551,58 @@
             </div>
             
             <div class="feed-section" id="feedSection">
-                <h2>🌐 Feed Global de Procesamiento</h2>
+                <h2>📱 Mi Feed de Procesamiento de Imágenes</h2>
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <p style="margin: 0; color: #856404; font-size: 14px;">
+                        <strong>💾 Guardado Local:</strong> Tus publicaciones se guardan solo en TU navegador. 
+                        Si compartes la URL con amigos, ellos NO verán tus posts - cada uno tendrá su propio feed independiente.
+                        Para compartir resultados, usa screenshots.
+                    </p>
+                </div>
                 <div id="feedContainer">
                     <div class="no-posts">
-                        <div class="spinner"></div>
-                        <p>Cargando publicaciones...</p>
+                        Aún no has publicado ningún resultado. Procesa una imagen y haz clic en "Publicar Resultado" para crear tu primera publicación.
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
     <script>
-				// Your web app's Firebase configuration
-				// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-				const firebaseConfig = {
-				  apiKey: "AIzaSyD3HXas_ZlSBHkcgqj58gtvOaDIE751skg",
-				  authDomain: "fourier-vision-9243d.firebaseapp.com",
-				  projectId: "fourier-vision-9243d",
-				  storageBucket: "fourier-vision-9243d.firebasestorage.app",
-				  messagingSenderId: "713813028117",
-				  appId: "1:713813028117:web:bb7e8bdf989a7966498d1c",
-				  measurementId: "G-24BGNP617J"
-				};
-
-
-        // Inicializar Firebase
-        let db;
-        let firebaseInitialized = false;
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            firebaseInitialized = true;
-            updateFirebaseStatus(true);
-            console.log('Firebase conectado correctamente');
-        } catch (error) {
-            console.error('Error al conectar Firebase:', error);
-            updateFirebaseStatus(false);
-        }
-
-        function updateFirebaseStatus(connected) {
-            const statusDiv = document.getElementById('firebaseStatus');
-            if (connected) {
-                statusDiv.textContent = '✅ Conectado a Firebase - Feed Global Activo';
-                statusDiv.className = 'firebase-status';
-            } else {
-                statusDiv.textContent = '❌ Error de conexión - Verifica tu configuración de Firebase';
-                statusDiv.className = 'firebase-status disconnected';
-            }
-        }
-
-        // ========================================
-        // VARIABLES GLOBALES
-        // ========================================
         let likes = 0;
         let isLiked = false;
         let uploadedImage = null;
-        let currentResults = {};
-        let feedPosts = [];
+        let currentResults = {}; // Store current processing results
+        let feedPosts = []; // Store all feed posts
+        
+        // Initialize feed with saved posts
+        function initializeFeed() {
+            try {
+                // Try to load from localStorage
+                const savedPosts = localStorage.getItem('fourierFeedPosts');
+                if (savedPosts) {
+                    feedPosts = JSON.parse(savedPosts);
+                    // Convert timestamp strings back to Date objects
+                    feedPosts.forEach(post => {
+                        post.timestamp = new Date(post.timestamp);
+                    });
+                    renderFeed();
+                }
+            } catch (e) {
+                console.log('LocalStorage no disponible');
+            }
+        }
+        
+        function saveFeedToStorage() {
+            try {
+                localStorage.setItem('fourierFeedPosts', JSON.stringify(feedPosts));
+            } catch (e) {
+                console.log('No se pudo guardar en localStorage:', e);
+            }
+        }
+        
+        // Initialize feed on page load
+        window.addEventListener('DOMContentLoaded', initializeFeed);
         
         // File upload handler
         document.getElementById('imageUpload').addEventListener('change', function(e) {
@@ -638,6 +611,7 @@
                 document.getElementById('fileName').textContent = `📄 ${file.name}`;
                 document.getElementById('processBtn').disabled = false;
                 
+                // Load and display original image
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const img = new Image();
@@ -655,6 +629,7 @@
             const canvas = document.getElementById('originalCanvas');
             const ctx = canvas.getContext('2d');
             
+            // Resize for display
             const maxSize = 400;
             let width = img.width;
             let height = img.height;
@@ -669,6 +644,7 @@
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
             
+            // Store original for feed
             currentResults['original'] = canvas.toDataURL();
             
             document.getElementById('originalSection').classList.remove('hidden');
@@ -716,6 +692,7 @@
             }
         }
         
+        // Allow Enter key to submit comment
         document.getElementById('commentInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 addComment();
@@ -731,6 +708,7 @@
             document.getElementById('loadingSection').classList.remove('hidden');
             document.getElementById('resultsSection').classList.add('hidden');
             
+            // Process in next tick to show loading animation
             setTimeout(() => {
                 try {
                     applyFourierFilters(uploadedImage);
@@ -745,9 +723,11 @@
         }
         
         function applyFourierFilters(img) {
+            // Create processing canvas
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
+            // Resize for processing (max 128 for better stability, can go up to 256)
             const maxProcessSize = 128;
             let width = img.width;
             let height = img.height;
@@ -758,6 +738,7 @@
                 height = Math.floor(height * ratio);
             }
             
+            // Ensure minimum size
             width = Math.max(32, width);
             height = Math.max(32, height);
             
@@ -765,9 +746,11 @@
             tempCanvas.height = height;
             tempCtx.drawImage(img, 0, 0, width, height);
             
+            // Get image data
             const imageData = tempCtx.getImageData(0, 0, width, height);
             const data = imageData.data;
             
+            // Convert to grayscale
             const grayData = new Float32Array(width * height);
             for (let i = 0; i < width * height; i++) {
                 if (i * 4 + 2 < data.length) {
@@ -778,13 +761,16 @@
                 }
             }
             
-            const D0 = 30;
-            const n = 2;
+            // Apply filters
+            const D0 = 30; // Cutoff frequency
+            const n = 2;   // Butterworth order
             
+            // Low-pass filters
             applyFilter(grayData, width, height, 'ideal', true, D0, n, 'lpIdeal');
             applyFilter(grayData, width, height, 'butterworth', true, D0, n, 'lpButterworth');
             applyFilter(grayData, width, height, 'gaussian', true, D0, n, 'lpGaussian');
             
+            // High-pass filters
             applyFilter(grayData, width, height, 'ideal', false, D0, n, 'hpIdeal');
             applyFilter(grayData, width, height, 'butterworth', false, D0, n, 'hpButterworth');
             applyFilter(grayData, width, height, 'gaussian', false, D0, n, 'hpGaussian');
@@ -792,9 +778,11 @@
         
         function applyFilter(grayData, width, height, filterType, isLowPass, D0, n, canvasId) {
             try {
+                // Ensure dimensions are power of 2 for FFT
                 const newWidth = Math.pow(2, Math.ceil(Math.log2(width)));
                 const newHeight = Math.pow(2, Math.ceil(Math.log2(height)));
                 
+                // Pad the data if necessary
                 let paddedData = grayData;
                 let actualWidth = width;
                 let actualHeight = height;
@@ -811,16 +799,22 @@
                     actualHeight = newHeight;
                 }
                 
+                // Apply 2D FFT
                 const fftResult = fft2d(paddedData, actualWidth, actualHeight);
+                
+                // Create filter
                 const filter = createFrequencyFilter(actualWidth, actualHeight, filterType, isLowPass, D0, n);
                 
+                // Apply filter in frequency domain
                 for (let i = 0; i < actualWidth * actualHeight; i++) {
                     fftResult.real[i] *= filter[i];
                     fftResult.imag[i] *= filter[i];
                 }
                 
+                // Inverse FFT
                 const result = ifft2d(fftResult, actualWidth, actualHeight);
                 
+                // Crop back to original size
                 const croppedResult = new Float32Array(width * height);
                 for (let y = 0; y < height; y++) {
                     for (let x = 0; x < width; x++) {
@@ -828,9 +822,11 @@
                     }
                 }
                 
+                // Normalize and display
                 displayResult(croppedResult, width, height, canvasId);
             } catch (error) {
                 console.error(`Error in ${canvasId}:`, error);
+                // Display error on canvas
                 const canvas = document.getElementById(canvasId);
                 canvas.width = 200;
                 canvas.height = 50;
@@ -850,6 +846,7 @@
             
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
+                    // Shift coordinates for FFT
                     const u = x < width / 2 ? x : x - width;
                     const v = y < height / 2 ? y : y - height;
                     const D = Math.sqrt(u * u + v * v);
@@ -863,6 +860,7 @@
                         H = Math.exp(-(D * D) / (2 * D0 * D0));
                     }
                     
+                    // Invert for high-pass
                     if (!isLowPass) {
                         H = 1 - H;
                     }
@@ -878,6 +876,7 @@
             const real = new Float32Array(data);
             const imag = new Float32Array(width * height);
             
+            // FFT on rows
             for (let y = 0; y < height; y++) {
                 const rowReal = new Float32Array(width);
                 const rowImag = new Float32Array(width);
@@ -901,6 +900,7 @@
                 }
             }
             
+            // FFT on columns
             for (let x = 0; x < width; x++) {
                 const colReal = new Float32Array(height);
                 const colImag = new Float32Array(height);
@@ -931,6 +931,7 @@
             const real = new Float32Array(fftData.real);
             const imag = new Float32Array(fftData.imag);
             
+            // IFFT on rows
             for (let y = 0; y < height; y++) {
                 const rowReal = new Float32Array(width);
                 const rowImag = new Float32Array(width);
@@ -954,6 +955,7 @@
                 }
             }
             
+            // IFFT on columns
             for (let x = 0; x < width; x++) {
                 const colReal = new Float32Array(height);
                 const colImag = new Float32Array(height);
@@ -979,10 +981,12 @@
             return real;
         }
         
+        // Cooley-Tukey FFT algorithm
         function fft(real, imag) {
             const n = real.length;
             if (n <= 1) return { real, imag };
             
+            // Pad to power of 2
             const n2 = Math.pow(2, Math.ceil(Math.log2(n)));
             if (n !== n2) {
                 const paddedReal = new Float32Array(n2);
@@ -992,6 +996,7 @@
                 return fft(paddedReal, paddedImag);
             }
             
+            // Bit reversal
             const outReal = new Float32Array(n);
             const outImag = new Float32Array(n);
             for (let i = 0; i < n; i++) {
@@ -1000,6 +1005,7 @@
                 outImag[i] = imag[rev];
             }
             
+            // Cooley-Tukey
             for (let size = 2; size <= n; size *= 2) {
                 const halfSize = size / 2;
                 const step = 2 * Math.PI / size;
@@ -1026,13 +1032,16 @@
         function ifft(real, imag) {
             const n = real.length;
             
+            // Conjugate
             const conjImag = new Float32Array(n);
             for (let i = 0; i < n; i++) {
                 conjImag[i] = -imag[i];
             }
             
+            // Apply FFT
             const result = fft(real, conjImag);
             
+            // Conjugate and scale
             for (let i = 0; i < n; i++) {
                 result.real[i] /= n;
                 result.imag[i] = -result.imag[i] / n;
@@ -1052,12 +1061,14 @@
         
         function displayResult(data, width, height, canvasId) {
             try {
+                // Remove NaN and Infinity values
                 for (let i = 0; i < data.length; i++) {
                     if (!isFinite(data[i])) {
                         data[i] = 0;
                     }
                 }
                 
+                // Normalize
                 let min = Infinity;
                 let max = -Infinity;
                 for (let i = 0; i < data.length; i++) {
@@ -1065,6 +1076,7 @@
                     if (data[i] > max) max = data[i];
                 }
                 
+                // Avoid division by zero
                 const range = max - min;
                 if (range === 0) {
                     min = 0;
@@ -1090,79 +1102,56 @@
                 }
                 
                 ctx.putImageData(imageData, 0, 0);
+                
+                // Store result for later use
                 currentResults[canvasId] = canvas.toDataURL();
                 
             } catch (error) {
                 console.error(`Error displaying ${canvasId}:`, error);
+                const canvas = document.getElementById(canvasId);
+                canvas.width = 200;
+                canvas.height = 50;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, 200, 50);
+                ctx.fillStyle = '#ff0000';
+                ctx.font = '12px Arial';
+                ctx.fillText('Error en visualización', 10, 25);
             }
         }
         
-        // ========================================
-        // FUNCIONES DE FIREBASE
-        // ========================================
-        
-        async function publishToFeed() {
-            if (!firebaseInitialized) {
-                alert('Error: Firebase no está configurado. Por favor, configura tus credenciales de Firebase en el código.');
-                return;
-            }
-            
+        function publishToFeed() {
             if (Object.keys(currentResults).length === 0) {
                 alert('Primero procesa una imagen antes de publicar.');
                 return;
             }
             
-            try {
-                const originalCanvas = document.getElementById('originalCanvas');
-                const originalImage = originalCanvas.toDataURL();
-                
-                const post = {
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    originalImage: originalImage,
-                    results: { ...currentResults },
-                    createdAt: new Date().toISOString()
-                };
-                
-                await db.collection('posts').add(post);
-                
-                alert('¡Publicación guardada en Firebase! 🎉\n\nTodos los visitantes pueden ver tu post ahora.');
-                
-                document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
-                
-            } catch (error) {
-                console.error('Error al publicar:', error);
-                alert('Error al publicar: ' + error.message);
-            }
-        }
-        
-        function loadFeed() {
-            if (!firebaseInitialized) {
-                document.getElementById('feedContainer').innerHTML = `
-                    <div class="no-posts">
-                        <p style="color: #e74c3c;">⚠️ Firebase no está configurado.</p>
-                        <p>Por favor, sigue la guía FIREBASE-SETUP.md para configurar tu proyecto.</p>
-                    </div>
-                `;
-                return;
-            }
+            // Get original image
+            const originalCanvas = document.getElementById('originalCanvas');
+            const originalImage = originalCanvas.toDataURL();
             
-            db.collection('posts')
-                .orderBy('timestamp', 'desc')
-                .limit(20)
-                .onSnapshot((snapshot) => {
-                    feedPosts = [];
-                    snapshot.forEach((doc) => {
-                        feedPosts.push({ id: doc.id, ...doc.data() });
-                    });
-                    renderFeed();
-                }, (error) => {
-                    console.error('Error al cargar feed:', error);
-                    document.getElementById('feedContainer').innerHTML = `
-                        <div class="no-posts">
-                            <p style="color: #e74c3c;">Error al cargar publicaciones: ${error.message}</p>
-                        </div>
-                    `;
-                });
+            // Create post object
+            const post = {
+                id: Date.now(),
+                timestamp: new Date(),
+                originalImage: originalImage,
+                results: { ...currentResults }
+            };
+            
+            // Add to feed (newest first)
+            feedPosts.unshift(post);
+            
+            // Save to localStorage
+            saveFeedToStorage();
+            
+            // Render feed
+            renderFeed();
+            
+            // Scroll to feed
+            document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
+            
+            // Show confirmation
+            alert('¡Resultado publicado en tu feed! 🎉\n\nTus publicaciones se guardan automáticamente en tu navegador.');
         }
         
         function generateInterpretation() {
@@ -1189,13 +1178,13 @@
             const feedContainer = document.getElementById('feedContainer');
             
             if (feedPosts.length === 0) {
-                feedContainer.innerHTML = '<div class="no-posts">No hay publicaciones aún. ¡Sé el primero en publicar!</div>';
+                feedContainer.innerHTML = '<div class="no-posts">Aún no has publicado ningún resultado. Procesa una imagen y haz clic en "Publicar Resultado" para crear tu primera publicación.</div>';
                 return;
             }
             
             feedContainer.innerHTML = '';
             
-            // Interpretación una sola vez
+            // Add interpretation section ONCE at the top
             const interpretationDiv = document.createElement('div');
             interpretationDiv.className = 'interpretation-text';
             interpretationDiv.style.marginBottom = '25px';
@@ -1208,21 +1197,29 @@
             `;
             feedContainer.appendChild(interpretationDiv);
             
+            // Add clear button
+            const clearButton = document.createElement('div');
+            clearButton.style.textAlign = 'right';
+            clearButton.style.marginBottom = '15px';
+            clearButton.innerHTML = `
+                <button onclick="clearFeed()" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                    🗑️ Limpiar Feed
+                </button>
+            `;
+            feedContainer.appendChild(clearButton);
+            
+            // Render all posts
             feedPosts.forEach((post, index) => {
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post-item';
                 
-                let timeAgo = 'Hace un momento';
-                if (post.timestamp) {
-                    const postDate = post.timestamp.toDate ? post.timestamp.toDate() : new Date(post.createdAt);
-                    timeAgo = getTimeAgo(postDate);
-                }
+                const timeAgo = getTimeAgo(post.timestamp);
                 
                 postDiv.innerHTML = `
                     <div class="post-header">
-                        <div class="post-avatar">🌐</div>
+                        <div class="post-avatar">👤</div>
                         <div class="post-info">
-                            <div class="post-author">Usuario Global</div>
+                            <div class="post-author">Usuario de Visión Computacional</div>
                             <div class="post-time">${timeAgo}</div>
                         </div>
                     </div>
@@ -1239,7 +1236,7 @@
                     </div>
                     
                     <div style="margin-top: 20px;">
-                        <strong style="color: #4267b2; margin-bottom: 10px; display: block; font-size: 15px;">🔽 Filtros Pasa-Bajas:</strong>
+                        <strong style="color: #4267b2; margin-bottom: 10px; display: block; font-size: 15px;">🔽 Filtros Pasa-Bajas (Suavizado):</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Ideal</small>
@@ -1257,7 +1254,7 @@
                     </div>
                     
                     <div style="margin-top: 20px;">
-                        <strong style="color: #4267b2; margin-bottom: 10px; display: block; font-size: 15px;">🔼 Filtros Pasa-Altas:</strong>
+                        <strong style="color: #4267b2; margin-bottom: 10px; display: block; font-size: 15px;">🔼 Filtros Pasa-Altas (Realce de Bordes):</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
                                 <small style="color: #666; font-weight: bold;">Ideal</small>
@@ -1279,6 +1276,14 @@
             });
         }
         
+        function clearFeed() {
+            if (confirm('¿Estás seguro de que quieres eliminar todas las publicaciones del feed?')) {
+                feedPosts = [];
+                saveFeedToStorage();
+                renderFeed();
+            }
+        }
+        
         function getTimeAgo(date) {
             const seconds = Math.floor((new Date() - date) / 1000);
             
@@ -1287,11 +1292,6 @@
             if (seconds < 86400) return `Hace ${Math.floor(seconds / 3600)} horas`;
             return `Hace ${Math.floor(seconds / 86400)} días`;
         }
-        
-        // Cargar feed al iniciar
-        window.addEventListener('DOMContentLoaded', () => {
-            loadFeed();
-        });
     </script>
 </body>
 </html>
