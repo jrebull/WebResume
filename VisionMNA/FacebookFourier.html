@@ -678,6 +678,23 @@
             font-size: 12px;
             margin: 0;
         }
+        
+        .gain-success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -833,13 +850,16 @@
                                 style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px; font-weight: bold;">
                             🔄 Aplicar Cambio
                         </button>
+                        <div id="gainSuccessMessage" class="gain-success-message">
+                            ✅ Amplificación actualizada exitosamente
+                        </div>
                         <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
                             Ajusta la intensidad de los bordes en los filtros pasa-altas. Valores más altos = bordes más visibles. <strong>Mueve el slider y haz clic en "Aplicar Cambio".</strong>
                         </p>
                     </div>
                     <div class="filters-grid">
                         <div class="filter-result">
-                            <h4>Ideal</h4>
+                            <h4>Ideal <span id="gainIndicator_hpIdeal" style="color: #28a745; font-size: 11px;"></span></h4>
                             <canvas id="hpIdeal"></canvas>
                             <div class="filter-description">
                                 <strong>Parámetros:</strong> D0=<span id="param_hpIdeal_D0">50</span><br>
@@ -849,7 +869,7 @@
                             </div>
                         </div>
                         <div class="filter-result">
-                            <h4>Butterworth (n=2)</h4>
+                            <h4>Butterworth (n=2) <span id="gainIndicator_hpButterworth" style="color: #28a745; font-size: 11px;"></span></h4>
                             <canvas id="hpButterworth"></canvas>
                             <div class="filter-description">
                                 <strong>Parámetros:</strong> D0=<span id="param_hpButterworth_D0">50</span>, n=<span id="param_hpButterworth_n">2</span><br>
@@ -859,7 +879,7 @@
                             </div>
                         </div>
                         <div class="filter-result">
-                            <h4>Gaussian</h4>
+                            <h4>Gaussian <span id="gainIndicator_hpGaussian" style="color: #28a745; font-size: 11px;"></span></h4>
                             <canvas id="hpGaussian"></canvas>
                             <div class="filter-description">
                                 <strong>Parámetros:</strong> D0=<span id="param_hpGaussian_D0">50</span><br>
@@ -950,64 +970,90 @@
         // ========================================
         let uploadedImage = null;
         let currentResults = {};
-        let currentMasks = {};      // Para almacenar las máscaras de frecuencia
-        let currentParams = {};     // Para almacenar parámetros (D0, n)
+        let currentMasks = {};      
+        let currentParams = {};     
         let feedPosts = [];
         let userLikes = new Set();
         
-        // Variables para reprocesamiento con GAIN dinámico
-        let CURRENT_GAIN = 15.0;  // Valor inicial de amplificación
-        let lastGrayData = null;  // Guardar datos en escala de grises para reprocesar
+        // CRITICAL: Hacer CURRENT_GAIN explícitamente global usando window
+        window.CURRENT_GAIN = 15.0;  // Valor inicial de amplificación
+        let lastGrayData = null;  
         let lastWidth = 0;
         let lastHeight = 0;
         
         // Tamaños optimizados para Firebase Storage (Plan Blaze)
-        // Storage puede manejar archivos más grandes sin problema
-        const MAX_DISPLAY_SIZE = 500;   // Para mostrar en pantalla
-        const MAX_STORAGE_SIZE = 400;   // Para guardar en Storage
-        const MAX_PROCESS_SIZE = 256;   // Para procesamiento FFT
-        const JPEG_QUALITY = 0.85;      // Mejor calidad ahora que usamos Storage
+        const MAX_DISPLAY_SIZE = 500;   
+        const MAX_STORAGE_SIZE = 400;   
+        const MAX_PROCESS_SIZE = 256;   
+        const JPEG_QUALITY = 0.85;      
         
         // ========================================
-        // FUNCIONES DE CONTROL DE GAIN (Declaradas temprano para onclick)
+        // FUNCIONES DE CONTROL DE GAIN
         // ========================================
         function updateGainValue(value) {
+            window.CURRENT_GAIN = parseFloat(value);
             document.getElementById('gainValue').textContent = value + '×';
-            CURRENT_GAIN = parseFloat(value);
-            console.log('GAIN actualizado a:', CURRENT_GAIN);
+            console.log('🎚️ GAIN ajustado a:', window.CURRENT_GAIN);
         }
         
         function reprocessWithNewGain() {
-            console.log('🔄 Botón clickeado. GAIN actual:', CURRENT_GAIN);
-            console.log('lastGrayData:', lastGrayData ? 'disponible' : 'NO disponible');
-            console.log('lastWidth:', lastWidth, 'lastHeight:', lastHeight);
+            console.log('🔄 Botón "Aplicar Cambio" clickeado');
+            console.log('📊 Estado actual:');
+            console.log('  - GAIN actual:', window.CURRENT_GAIN);
+            console.log('  - lastGrayData:', lastGrayData ? 'disponible' : 'NO disponible');
+            console.log('  - Dimensiones:', lastWidth, 'x', lastHeight);
             
             if (!lastGrayData || lastWidth === 0 || lastHeight === 0) {
                 alert('⚠️ Primero procesa una imagen antes de ajustar la amplificación.');
                 return;
             }
             
+            // Ocultar mensaje de éxito si existe
+            const successMsg = document.getElementById('gainSuccessMessage');
+            if (successMsg) {
+                successMsg.style.display = 'none';
+            }
+            
             // Mostrar indicador de carga
-            document.getElementById('loadingText').textContent = '🔄 Ajustando amplificación de bordes a ' + CURRENT_GAIN + '×...';
+            document.getElementById('loadingText').textContent = `🔄 Ajustando amplificación de bordes a ${window.CURRENT_GAIN}×...`;
             document.getElementById('loadingSection').classList.remove('hidden');
             
             setTimeout(() => {
                 try {
-                    // Reprocesar solo los filtros pasa-altas con el nuevo GAIN
+                    console.log('🚀 Iniciando reprocesamiento con GAIN=' + window.CURRENT_GAIN);
+                    
                     const D0 = 50;
                     const n = 2;
                     
-                    console.log('Aplicando filtro Ideal HP con GAIN=' + CURRENT_GAIN);
+                    console.log('  Procesando Ideal HP...');
                     applyFilter(lastGrayData, lastWidth, lastHeight, 'ideal', false, D0, n, 'hpIdeal');
                     
-                    console.log('Aplicando filtro Butterworth HP con GAIN=' + CURRENT_GAIN);
+                    console.log('  Procesando Butterworth HP...');
                     applyFilter(lastGrayData, lastWidth, lastHeight, 'butterworth', false, D0, n, 'hpButterworth');
                     
-                    console.log('Aplicando filtro Gaussian HP con GAIN=' + CURRENT_GAIN);
+                    console.log('  Procesando Gaussian HP...');
                     applyFilter(lastGrayData, lastWidth, lastHeight, 'gaussian', false, D0, n, 'hpGaussian');
                     
+                    // Actualizar indicadores de GAIN en cada filtro
+                    ['hpIdeal', 'hpButterworth', 'hpGaussian'].forEach(id => {
+                        const indicator = document.getElementById(`gainIndicator_${id}`);
+                        if (indicator) {
+                            indicator.textContent = `(GAIN: ${window.CURRENT_GAIN}×)`;
+                        }
+                    });
+                    
                     document.getElementById('loadingSection').classList.add('hidden');
-                    console.log('✅ Reprocesamiento completado con GAIN=' + CURRENT_GAIN);
+                    
+                    // Mostrar mensaje de éxito
+                    if (successMsg) {
+                        successMsg.textContent = `✅ Amplificación actualizada exitosamente a ${window.CURRENT_GAIN}×`;
+                        successMsg.style.display = 'block';
+                        setTimeout(() => {
+                            successMsg.style.display = 'none';
+                        }, 3000);
+                    }
+                    
+                    console.log('✅ Reprocesamiento completado con GAIN=' + window.CURRENT_GAIN);
                 } catch (error) {
                     console.error('❌ Error al reprocesar:', error);
                     document.getElementById('loadingSection').classList.add('hidden');
@@ -1016,9 +1062,14 @@
             }, 100);
         }
         
-        // Exportar inmediatamente a window para que onclick funcione
+        // Exportar inmediatamente a window
         window.updateGainValue = updateGainValue;
         window.reprocessWithNewGain = reprocessWithNewGain;
+        
+        console.log('✅ Funciones de GAIN exportadas');
+        console.log('  - updateGainValue:', typeof window.updateGainValue);
+        console.log('  - reprocessWithNewGain:', typeof window.reprocessWithNewGain);
+        console.log('  - CURRENT_GAIN inicial:', window.CURRENT_GAIN);
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1028,7 +1079,6 @@
             try {
                 console.log('🔄 Convirtiendo archivo HEIC...');
                 
-                // Verificar que heic2any esté disponible
                 if (typeof heic2any === 'undefined') {
                     throw new Error('La librería heic2any no está cargada. Recarga la página.');
                 }
@@ -1161,7 +1211,6 @@
             let width = img.width;
             let height = img.height;
             
-            // Tamaño para display
             if (width > MAX_DISPLAY_SIZE || height > MAX_DISPLAY_SIZE) {
                 const ratio = Math.min(MAX_DISPLAY_SIZE / width, MAX_DISPLAY_SIZE / height);
                 width = Math.floor(width * ratio);
@@ -1171,10 +1220,8 @@
             canvas.width = width;
             canvas.height = height;
             
-            // Dibujar imagen en escala de grises
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Convertir a escala de grises
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
             
@@ -1187,7 +1234,6 @@
             
             ctx.putImageData(imageData, 0, 0);
             
-            // Guardar versión optimizada para storage
             currentResults['original'] = resizeImage(img, MAX_STORAGE_SIZE, JPEG_QUALITY);
             
             document.getElementById('originalSection').classList.remove('hidden');
@@ -1222,7 +1268,6 @@
             let width = img.width;
             let height = img.height;
             
-            // Reducir tamaño para procesamiento FFT
             if (width > MAX_PROCESS_SIZE || height > MAX_PROCESS_SIZE) {
                 const ratio = Math.min(MAX_PROCESS_SIZE / width, MAX_PROCESS_SIZE / height);
                 width = Math.floor(width * ratio);
@@ -1249,15 +1294,16 @@
                 }
             }
             
-            // Guardar para reprocesamiento con diferente GAIN
+            // Guardar para reprocesamiento
             lastGrayData = new Float32Array(grayData);
             lastWidth = width;
             lastHeight = height;
             
             console.log(`✅ Datos guardados para reprocesamiento: ${width}×${height} pixels`);
+            console.log('📊 GAIN actual para procesamiento inicial:', window.CURRENT_GAIN);
             
-            const D0 = 50;  // Frecuencia de corte (igual que en Python)
-            const n = 2;    // Orden del filtro Butterworth
+            const D0 = 50;  
+            const n = 2;    
             
             applyFilter(grayData, width, height, 'ideal', true, D0, n, 'lpIdeal');
             applyFilter(grayData, width, height, 'butterworth', true, D0, n, 'lpButterworth');
@@ -1266,6 +1312,14 @@
             applyFilter(grayData, width, height, 'ideal', false, D0, n, 'hpIdeal');
             applyFilter(grayData, width, height, 'butterworth', false, D0, n, 'hpButterworth');
             applyFilter(grayData, width, height, 'gaussian', false, D0, n, 'hpGaussian');
+            
+            // Actualizar indicadores de GAIN
+            ['hpIdeal', 'hpButterworth', 'hpGaussian'].forEach(id => {
+                const indicator = document.getElementById(`gainIndicator_${id}`);
+                if (indicator) {
+                    indicator.textContent = `(GAIN: ${window.CURRENT_GAIN}×)`;
+                }
+            });
         }
         
         function applyFilter(grayData, width, height, filterType, isLowPass, D0, n, canvasId) {
@@ -1289,20 +1343,13 @@
                     actualHeight = newHeight;
                 }
                 
-                // 1. Aplicar FFT 2D
                 const fftResult = fft2d(paddedData, actualWidth, actualHeight);
-                
-                // 2. Aplicar fftshift (centrar el espectro)
                 const fftShifted = fftshift2d(fftResult, actualWidth, actualHeight);
-                
-                // 3. Crear y aplicar el filtro
                 const filter = createFrequencyFilter(actualWidth, actualHeight, filterType, isLowPass, D0, n);
                 
-                // Guardar la máscara para visualización
                 const maskCanvasId = canvasId.replace('lp', 'mask_lp').replace('hp', 'mask_hp');
                 displayMask(filter, actualWidth, actualHeight, maskCanvasId);
                 
-                // Guardar parámetros
                 currentParams[canvasId] = { D0, n, filterType, isLowPass };
                 
                 for (let i = 0; i < actualWidth * actualHeight; i++) {
@@ -1310,13 +1357,9 @@
                     fftShifted.imag[i] *= filter[i];
                 }
                 
-                // 4. Aplicar ifftshift (descentrar antes de IFFT)
                 const fftUnshifted = ifftshift2d(fftShifted, actualWidth, actualHeight);
-                
-                // 5. Aplicar IFFT 2D
                 const result = ifft2d(fftUnshifted, actualWidth, actualHeight);
                 
-                // 6. Recortar al tamaño original
                 const croppedResult = new Float32Array(width * height);
                 for (let y = 0; y < height; y++) {
                     for (let x = 0; x < width; x++) {
@@ -1331,7 +1374,6 @@
         }
         
         function fftshift2d(fftData, width, height) {
-            // Centrar el espectro de frecuencias (como np.fft.fftshift)
             const shifted = {
                 real: new Float32Array(width * height),
                 imag: new Float32Array(width * height)
@@ -1355,7 +1397,6 @@
         }
         
         function ifftshift2d(fftData, width, height) {
-            // Descentrar el espectro de frecuencias (como np.fft.ifftshift)
             const unshifted = {
                 real: new Float32Array(width * height),
                 imag: new Float32Array(width * height)
@@ -1381,28 +1422,22 @@
         function createFrequencyFilter(width, height, type, isLowPass, D0, n) {
             const filter = new Float32Array(width * height);
             
-            // Centro del espectro (como en el código Python)
             const crow = Math.floor(height / 2);
             const ccol = Math.floor(width / 2);
             
             for (let u = 0; u < height; u++) {
                 for (let v = 0; v < width; v++) {
-                    // Calcular distancia desde el centro del espectro
                     const D = Math.sqrt((v - ccol) ** 2 + (u - crow) ** 2);
                     
                     let H;
                     if (type === 'ideal') {
-                        // Filtro Ideal: 1 si D <= D0, sino 0
                         H = D <= D0 ? 1 : 0;
                     } else if (type === 'butterworth') {
-                        // Filtro Butterworth
                         H = 1 / (1 + Math.pow(D / D0, 2 * n));
                     } else if (type === 'gaussian') {
-                        // Filtro Gaussiano
                         H = Math.exp(-(D * D) / (2 * D0 * D0));
                     }
                     
-                    // Para filtros pasa-altas: H_highpass = 1 - H_lowpass
                     if (!isLowPass) {
                         H = 1 - H;
                     }
@@ -1593,15 +1628,13 @@
         function displayMask(filter, width, height, canvasId) {
             try {
                 const canvas = document.getElementById(canvasId);
-                if (!canvas) return; // Canvas de máscara opcional
+                if (!canvas) return;
                 
-                // Mostrar máscara a tamaño reducido
                 const maskSize = 150;
                 canvas.width = maskSize;
                 canvas.height = maskSize;
                 const ctx = canvas.getContext('2d');
                 
-                // Crear imagen de la máscara
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = width;
                 tempCanvas.height = height;
@@ -1619,12 +1652,10 @@
                 
                 tempCtx.putImageData(imageData, 0, 0);
                 
-                // Escalar al tamaño de visualización
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(tempCanvas, 0, 0, maskSize, maskSize);
                 
-                // Guardar máscara
                 currentMasks[canvasId] = tempCanvas.toDataURL('image/jpeg', 0.8);
                 
             } catch (error) {
@@ -1640,12 +1671,14 @@
                     }
                 }
                 
-                // Detectar si es un filtro pasa-altas (por el nombre del canvas)
                 const isHighPass = canvasId.startsWith('hp');
+                
+                console.log(`📊 displayResult llamado para ${canvasId}`);
+                console.log(`  - isHighPass: ${isHighPass}`);
+                console.log(`  - window.CURRENT_GAIN: ${window.CURRENT_GAIN}`);
                 
                 const canvas = document.getElementById(canvasId);
                 
-                // Escalar para mejor visualización (Storage permite mejor calidad)
                 const displayScale = 1.6;
                 const displayWidth = width * displayScale;
                 const displayHeight = height * displayScale;
@@ -1654,7 +1687,6 @@
                 canvas.height = displayHeight;
                 const ctx = canvas.getContext('2d');
                 
-                // Crear imagen temporal en tamaño original
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = width;
                 tempCanvas.height = height;
@@ -1662,19 +1694,17 @@
                 const imageData = tempCtx.createImageData(width, height);
                 
                 if (isHighPass) {
-                    // Para filtros pasa-altas: usar el GAIN actual ajustable
-                    const GAIN = CURRENT_GAIN;  // Usar valor del slider
+                    const GAIN = window.CURRENT_GAIN;
+                    console.log(`  🎯 Usando GAIN=${GAIN} para filtro pasa-altas`);
                     
-                    // Amplificar valores
                     const amplified = new Float32Array(data.length);
                     for (let i = 0; i < data.length; i++) {
                         amplified[i] = data[i] * GAIN;
                     }
                     
-                    // Encontrar percentiles para mejor contraste (ignorar outliers)
                     const sorted = Array.from(amplified).sort((a, b) => a - b);
-                    const p2 = sorted[Math.floor(sorted.length * 0.02)];  // Percentil 2%
-                    const p98 = sorted[Math.floor(sorted.length * 0.98)]; // Percentil 98%
+                    const p2 = sorted[Math.floor(sorted.length * 0.02)];
+                    const p98 = sorted[Math.floor(sorted.length * 0.98)];
                     
                     const range = p98 - p2;
                     
@@ -1683,9 +1713,7 @@
                         if (range === 0) {
                             value = 128;
                         } else {
-                            // Normalizar usando percentiles para mejor contraste
                             value = ((amplified[i] - p2) / range) * 255;
-                            // Clip a rango válido
                             value = Math.max(0, Math.min(255, Math.round(value)));
                         }
                         
@@ -1698,7 +1726,6 @@
                         }
                     }
                 } else {
-                    // Para filtros pasa-bajas: normalización estándar [0, 255]
                     let min = Infinity;
                     let max = -Infinity;
                     for (let i = 0; i < data.length; i++) {
@@ -1723,15 +1750,12 @@
                 
                 tempCtx.putImageData(imageData, 0, 0);
                 
-                // Escalar al canvas de visualización
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(tempCanvas, 0, 0, displayWidth, displayHeight);
                 
-                // Guardar versión con mejor compresión
                 currentResults[canvasId] = tempCanvas.toDataURL('image/jpeg', JPEG_QUALITY);
                 
-                // Actualizar parámetros en el HTML
                 const params = currentParams[canvasId];
                 if (params) {
                     const d0Elem = document.getElementById(`param_${canvasId}_D0`);
@@ -1739,6 +1763,8 @@
                     if (d0Elem) d0Elem.textContent = params.D0;
                     if (nElem) nElem.textContent = params.n;
                 }
+                
+                console.log(`  ✅ Imagen renderizada exitosamente`);
                 
             } catch (error) {
                 console.error(`Error displaying ${canvasId}:`, error);
@@ -1751,13 +1777,11 @@
         
         async function uploadImageToStorage(dataUrl, path) {
             try {
-                // Usar uploadString para subir data URLs directamente (evita problemas de CORS)
                 const { ref, uploadString, getDownloadURL } = window.firebaseModules;
                 const storageRef = ref(window.storage, path);
                 
                 console.log(`📤 Subiendo: ${path}`);
                 
-                // Subir como data_url directamente
                 const snapshot = await uploadString(storageRef, dataUrl, 'data_url', {
                     contentType: 'image/jpeg',
                     cacheControl: 'public,max-age=31536000'
@@ -1793,7 +1817,6 @@
                 let uploadedCount = 0;
                 const totalImages = Object.keys(currentResults).length;
                 
-                // Subir cada imagen a Firebase Storage
                 for (const [key, dataUrl] of Object.entries(currentResults)) {
                     uploadedCount++;
                     document.getElementById('loadingText').textContent = 
@@ -1807,7 +1830,6 @@
                 
                 const { collection, addDoc, serverTimestamp } = window.firebaseModules;
                 
-                // Guardar solo las URLs en Firestore (mucho más eficiente)
                 const post = {
                     timestamp: serverTimestamp(),
                     imageUrls: imageUrls,
@@ -1933,10 +1955,8 @@
                 
                 console.log('🗑️ Eliminando imágenes de Storage...');
                 
-                // Eliminar cada imagen de Storage
                 for (const [key, url] of Object.entries(imageUrls)) {
                     try {
-                        // Extraer el path de la URL de Storage
                         const urlParts = url.split('/o/')[1].split('?')[0];
                         const path = decodeURIComponent(urlParts);
                         const storageRef = ref(window.storage, path);
@@ -1947,7 +1967,6 @@
                     }
                 }
                 
-                // Eliminar el documento de Firestore
                 await deleteDoc(doc(window.db, 'posts', postId));
                 
                 console.log('✅ Post eliminado completamente');
@@ -2176,14 +2195,12 @@
         window.submitComment = submitComment;
         window.deleteComment = deleteComment;
         window.deletePost = deletePost;
-        window.updateGainValue = updateGainValue;
-        window.reprocessWithNewGain = reprocessWithNewGain;
         
-        console.log('✅ Funciones globales exportadas:', {
-            processImage: typeof window.processImage,
-            updateGainValue: typeof window.updateGainValue,
-            reprocessWithNewGain: typeof window.reprocessWithNewGain
-        });
+        console.log('✅ Todas las funciones globales exportadas correctamente');
+        console.log('📊 Estado final de GAIN:');
+        console.log('  - window.CURRENT_GAIN:', window.CURRENT_GAIN);
+        console.log('  - updateGainValue:', typeof window.updateGainValue);
+        console.log('  - reprocessWithNewGain:', typeof window.reprocessWithNewGain);
     </script>
 </body>
 </html>
