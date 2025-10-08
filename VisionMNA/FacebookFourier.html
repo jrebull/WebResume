@@ -746,7 +746,7 @@
         
         <div class="content">
             <div class="info-box">
-                <p><strong>🌐 Feed Global con Firebase:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube y son visibles para cualquiera que visite esta página. ¡Ahora puedes dar like, comentar y eliminar posts!</p>
+                <p><strong>🌐 Feed Global con Firebase Firestore:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube (solo Firestore, sin Storage) y son visibles para cualquiera que visite esta página. ¡Ahora puedes dar like, comentar y eliminar posts!</p>
             </div>
             
             <div class="upload-section">
@@ -758,7 +758,7 @@
                     <p>✅ Formatos soportados: JPG, PNG, WEBP, HEIC (iPhone), DNG (RAW), y más</p>
                 </div>
                 <div class="optimization-info">
-                    <p>⚡ Optimización automática: Las imágenes se procesan eficientemente</p>
+                    <p>⚡ Las imágenes se guardan directamente en la base de datos (sin Storage)</p>
                 </div>
                 <button id="processBtn" class="process-btn" onclick="processImage()" disabled>🔬 Procesar con Filtros de Fourier</button>
             </div>
@@ -849,7 +849,6 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -863,21 +862,19 @@
         };
 
         // Inicializar Firebase
-        let db, storage, firebaseInitialized = false;
+        let db, firebaseInitialized = false;
 
         try {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
-            storage = getStorage(app);
             firebaseInitialized = true;
             updateFirebaseStatus(true);
             console.log('✅ Firebase conectado correctamente');
             
             // Hacer disponibles globalmente
             window.db = db;
-            window.storage = storage;
             window.firebaseInitialized = firebaseInitialized;
-            window.firebaseModules = { collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp, ref, uploadBytes, getDownloadURL, deleteObject };
+            window.firebaseModules = { collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp };
             
             // Cargar feed después de inicializar
             loadFeed();
@@ -912,11 +909,12 @@
         let feedPosts = [];
         let userLikes = new Set();
         
-        // Tamaños más pequeños y mejor compresión
-        const MAX_DISPLAY_SIZE = 400;   // Reducido de 600
-        const MAX_STORAGE_SIZE = 400;   // Reducido de 512
-        const MAX_PROCESS_SIZE = 256;   // Igual
-        const JPEG_QUALITY = 0.88;      // Aumentado de 0.7 para mejor calidad
+        // Tamaños optimizados para Firestore (límite 1MB por documento)
+        // Con 7 imágenes, cada una debe ser ~120KB máximo
+        const MAX_DISPLAY_SIZE = 350;   // Para mostrar en pantalla
+        const MAX_STORAGE_SIZE = 300;   // Para guardar en Firestore
+        const MAX_PROCESS_SIZE = 256;   // Para procesamiento FFT
+        const JPEG_QUALITY = 0.75;      // Calidad para balance tamaño/calidad
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1460,28 +1458,8 @@
         }
         
         // ========================================
-        // FUNCIONES DE FIREBASE STORAGE
+        // PUBLICAR EN FEED (SIN STORAGE - DIRECTO A FIRESTORE)
         // ========================================
-        
-        async function uploadImageToStorage(dataUrl, path) {
-            try {
-                const response = await fetch(dataUrl);
-                const blob = await response.blob();
-                
-                const { ref, uploadBytes, getDownloadURL } = window.firebaseModules;
-                const storageRef = ref(window.storage, path);
-                const snapshot = await uploadBytes(storageRef, blob, {
-                    contentType: 'image/jpeg',
-                    cacheControl: 'public,max-age=31536000'
-                });
-                
-                const downloadURL = await getDownloadURL(snapshot.ref);
-                return downloadURL;
-            } catch (error) {
-                console.error('Error uploading to storage:', error);
-                throw error;
-            }
-        }
         
         async function publishToFeed() {
             if (!window.firebaseInitialized) {
@@ -1495,29 +1473,15 @@
             }
             
             try {
-                document.getElementById('loadingText').textContent = '⚡ Optimizando y subiendo imágenes...';
+                document.getElementById('loadingText').textContent = '📤 Guardando publicación...';
                 document.getElementById('loadingSection').classList.remove('hidden');
-                
-                const timestamp = Date.now();
-                const imageUrls = {};
-                
-                let uploadedCount = 0;
-                const totalImages = Object.keys(currentResults).length;
-                
-                for (const [key, dataUrl] of Object.entries(currentResults)) {
-                    uploadedCount++;
-                    document.getElementById('loadingText').textContent = 
-                        `⚡ Subiendo imagen ${uploadedCount}/${totalImages}...`;
-                    
-                    const path = `posts/${timestamp}/${key}.jpg`;
-                    imageUrls[key] = await uploadImageToStorage(dataUrl, path);
-                }
                 
                 const { collection, addDoc, serverTimestamp } = window.firebaseModules;
                 
+                // Guardar los data URLs directamente en Firestore (sin Storage)
                 const post = {
                     timestamp: serverTimestamp(),
-                    imageUrls: imageUrls,
+                    imageUrls: currentResults, // Data URLs directamente
                     createdAt: new Date().toISOString(),
                     likes: 0,
                     comments: []
@@ -1631,24 +1595,9 @@
             }
             
             try {
-                const { doc, deleteDoc, ref, deleteObject } = window.firebaseModules;
+                const { doc, deleteDoc } = window.firebaseModules;
                 
-                const post = feedPosts.find(p => p.id === postId);
-                if (!post) return;
-                
-                const imageUrls = post.imageUrls || {};
-                
-                for (const url of Object.values(imageUrls)) {
-                    try {
-                        const urlParts = url.split('/o/')[1].split('?')[0];
-                        const path = decodeURIComponent(urlParts);
-                        const storageRef = ref(window.storage, path);
-                        await deleteObject(storageRef);
-                    } catch (err) {
-                        console.log('Error deleting image:', err);
-                    }
-                }
-                
+                // Solo eliminar el documento de Firestore (las imágenes están como data URLs en el documento)
                 await deleteDoc(doc(window.db, 'posts', postId));
                 
                 alert('Publicación eliminada exitosamente');
