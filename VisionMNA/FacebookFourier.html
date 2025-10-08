@@ -432,8 +432,8 @@
         
         .post-images {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
             margin-top: 12px;
         }
         
@@ -746,7 +746,7 @@
         
         <div class="content">
             <div class="info-box">
-                <p><strong>🌐 Feed Global con Firebase Firestore:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube (solo Firestore, sin Storage) y son visibles para cualquiera que visite esta página. ¡Ahora puedes dar like, comentar y eliminar posts!</p>
+                <p><strong>🌐 Feed Global con Firebase Storage:</strong> ¡Todos los visitantes ven las mismas publicaciones! Las imágenes se almacenan en Firebase Storage (5GB gratis + Plan Blaze) y los metadatos en Firestore. ¡Puedes dar like, comentar y eliminar posts!</p>
             </div>
             
             <div class="upload-section">
@@ -758,7 +758,7 @@
                     <p>✅ Formatos soportados: JPG, PNG, WEBP, HEIC (iPhone), DNG (RAW), y más</p>
                 </div>
                 <div class="optimization-info">
-                    <p>⚡ Las imágenes se guardan directamente en la base de datos (sin Storage)</p>
+                    <p>⚡ Las imágenes se suben a Firebase Storage con compresión inteligente</p>
                 </div>
                 <button id="processBtn" class="process-btn" onclick="processImage()" disabled>🔬 Procesar con Filtros de Fourier</button>
             </div>
@@ -849,6 +849,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -862,19 +863,21 @@
         };
 
         // Inicializar Firebase
-        let db, firebaseInitialized = false;
+        let db, storage, firebaseInitialized = false;
 
         try {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
+            storage = getStorage(app);
             firebaseInitialized = true;
             updateFirebaseStatus(true);
-            console.log('✅ Firebase conectado correctamente');
+            console.log('✅ Firebase conectado correctamente (Firestore + Storage)');
             
             // Hacer disponibles globalmente
             window.db = db;
+            window.storage = storage;
             window.firebaseInitialized = firebaseInitialized;
-            window.firebaseModules = { collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp };
+            window.firebaseModules = { collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp, ref, uploadString, getDownloadURL, deleteObject };
             
             // Cargar feed después de inicializar
             loadFeed();
@@ -886,7 +889,7 @@
         function updateFirebaseStatus(connected) {
             const statusDiv = document.getElementById('firebaseStatus');
             if (connected) {
-                statusDiv.textContent = '✅ Conectado a Firebase - Feed Global Activo';
+                statusDiv.textContent = '✅ Conectado a Firebase - Firestore + Storage (Plan Blaze) Activo';
                 statusDiv.className = 'firebase-status';
             } else {
                 statusDiv.textContent = '❌ Error de conexión - Verifica tu configuración de Firebase';
@@ -909,12 +912,12 @@
         let feedPosts = [];
         let userLikes = new Set();
         
-        // Tamaños optimizados para Firestore (límite 1MB por documento)
-        // Con 7 imágenes, cada una debe ser ~100KB máximo para posts pequeños
-        const MAX_DISPLAY_SIZE = 320;   // Para mostrar en pantalla
-        const MAX_STORAGE_SIZE = 250;   // Para guardar en Firestore (más pequeño)
+        // Tamaños optimizados para Firebase Storage (Plan Blaze)
+        // Storage puede manejar archivos más grandes sin problema
+        const MAX_DISPLAY_SIZE = 500;   // Para mostrar en pantalla
+        const MAX_STORAGE_SIZE = 400;   // Para guardar en Storage
         const MAX_PROCESS_SIZE = 256;   // Para procesamiento FFT
-        const JPEG_QUALITY = 0.72;      // Calidad para balance tamaño/calidad
+        const JPEG_QUALITY = 0.85;      // Mejor calidad ahora que usamos Storage
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1480,8 +1483,8 @@
                 
                 const canvas = document.getElementById(canvasId);
                 
-                // Escalar más pequeño para visualización compacta
-                const displayScale = 1.3;
+                // Escalar para mejor visualización (Storage permite mejor calidad)
+                const displayScale = 1.6;
                 const displayWidth = width * displayScale;
                 const displayHeight = height * displayScale;
                 
@@ -1524,8 +1527,31 @@
         }
         
         // ========================================
-        // PUBLICAR EN FEED (SIN STORAGE - DIRECTO A FIRESTORE)
+        // FIREBASE STORAGE - SUBIDA DE IMÁGENES
         // ========================================
+        
+        async function uploadImageToStorage(dataUrl, path) {
+            try {
+                // Usar uploadString para subir data URLs directamente (evita problemas de CORS)
+                const { ref, uploadString, getDownloadURL } = window.firebaseModules;
+                const storageRef = ref(window.storage, path);
+                
+                console.log(`📤 Subiendo: ${path}`);
+                
+                // Subir como data_url directamente
+                const snapshot = await uploadString(storageRef, dataUrl, 'data_url', {
+                    contentType: 'image/jpeg',
+                    cacheControl: 'public,max-age=31536000'
+                });
+                
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                console.log(`✅ Subido: ${path}`);
+                return downloadURL;
+            } catch (error) {
+                console.error('❌ Error uploading to storage:', error);
+                throw error;
+            }
+        }
         
         async function publishToFeed() {
             if (!window.firebaseInitialized) {
@@ -1539,15 +1565,33 @@
             }
             
             try {
-                document.getElementById('loadingText').textContent = '📤 Guardando publicación...';
+                document.getElementById('loadingText').textContent = '⚡ Subiendo imágenes a Storage...';
                 document.getElementById('loadingSection').classList.remove('hidden');
+                
+                const timestamp = Date.now();
+                const imageUrls = {};
+                
+                let uploadedCount = 0;
+                const totalImages = Object.keys(currentResults).length;
+                
+                // Subir cada imagen a Firebase Storage
+                for (const [key, dataUrl] of Object.entries(currentResults)) {
+                    uploadedCount++;
+                    document.getElementById('loadingText').textContent = 
+                        `⚡ Subiendo imagen ${uploadedCount}/${totalImages} a Storage...`;
+                    
+                    const path = `posts/${timestamp}/${key}.jpg`;
+                    imageUrls[key] = await uploadImageToStorage(dataUrl, path);
+                }
+                
+                document.getElementById('loadingText').textContent = '💾 Guardando post en Firestore...';
                 
                 const { collection, addDoc, serverTimestamp } = window.firebaseModules;
                 
-                // Guardar los data URLs directamente en Firestore (sin Storage)
+                // Guardar solo las URLs en Firestore (mucho más eficiente)
                 const post = {
                     timestamp: serverTimestamp(),
-                    imageUrls: currentResults, // Data URLs directamente
+                    imageUrls: imageUrls,
                     createdAt: new Date().toISOString(),
                     likes: 0,
                     comments: []
@@ -1556,7 +1600,7 @@
                 await addDoc(collection(window.db, 'posts'), post);
                 
                 document.getElementById('loadingSection').classList.add('hidden');
-                alert('¡Publicación guardada exitosamente! 🎉');
+                alert('¡Publicación guardada exitosamente en Storage! 🎉');
                 
                 document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
                 
@@ -1650,7 +1694,7 @@
         }
         
         // ========================================
-        // ELIMINAR POST
+        // ELIMINAR POST Y SUS IMÁGENES DE STORAGE
         // ========================================
         
         async function deletePost(postId) {
@@ -1661,11 +1705,33 @@
             }
             
             try {
-                const { doc, deleteDoc } = window.firebaseModules;
+                const { doc, deleteDoc, ref, deleteObject } = window.firebaseModules;
                 
-                // Solo eliminar el documento de Firestore (las imágenes están como data URLs en el documento)
+                const post = feedPosts.find(p => p.id === postId);
+                if (!post) return;
+                
+                const imageUrls = post.imageUrls || {};
+                
+                console.log('🗑️ Eliminando imágenes de Storage...');
+                
+                // Eliminar cada imagen de Storage
+                for (const [key, url] of Object.entries(imageUrls)) {
+                    try {
+                        // Extraer el path de la URL de Storage
+                        const urlParts = url.split('/o/')[1].split('?')[0];
+                        const path = decodeURIComponent(urlParts);
+                        const storageRef = ref(window.storage, path);
+                        await deleteObject(storageRef);
+                        console.log(`✅ Eliminada imagen: ${key}`);
+                    } catch (err) {
+                        console.log(`⚠️ Error al eliminar imagen ${key}:`, err);
+                    }
+                }
+                
+                // Eliminar el documento de Firestore
                 await deleteDoc(doc(window.db, 'posts', postId));
                 
+                console.log('✅ Post eliminado completamente');
                 alert('Publicación eliminada exitosamente');
                 
             } catch (error) {
@@ -1766,45 +1832,45 @@
                         <p><strong>Procesamiento #${feedPosts.length - index}</strong> - Aplicación de 6 filtros de Fourier</p>
                     </div>
                     
-                    <div class="post-images" style="max-width: 300px; margin: 0 auto;">
+                    <div class="post-images" style="max-width: 400px; margin: 0 auto;">
                         <div style="text-align: center;">
-                            <strong style="font-size: 12px; color: #4267b2; display: block; margin-bottom: 4px;">📷 Original</strong>
-                            <img src="${post.imageUrls.original}" loading="lazy" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 4px;">
+                            <strong style="font-size: 13px; color: #4267b2; display: block; margin-bottom: 5px;">📷 Original</strong>
+                            <img src="${post.imageUrls.original}" loading="lazy" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
                         </div>
                     </div>
                     
-                    <div style="margin-top: 12px;">
-                        <strong style="color: #4267b2; margin-bottom: 6px; display: block; font-size: 13px;">🔽 Filtros Pasa-Bajas:</strong>
+                    <div style="margin-top: 15px;">
+                        <strong style="color: #4267b2; margin-bottom: 8px; display: block; font-size: 14px;">🔽 Filtros Pasa-Bajas:</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 10px;">Ideal</small>
-                                <img src="${post.imageUrls.lpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
+                                <small style="color: #666; font-weight: bold; font-size: 11px;">Ideal</small>
+                                <img src="${post.imageUrls.lpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 10px;">Butterworth</small>
-                                <img src="${post.imageUrls.lpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
+                                <small style="color: #666; font-weight: bold; font-size: 11px;">Butterworth</small>
+                                <img src="${post.imageUrls.lpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 10px;">Gaussian</small>
-                                <img src="${post.imageUrls.lpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
+                                <small style="color: #666; font-weight: bold; font-size: 11px;">Gaussian</small>
+                                <img src="${post.imageUrls.lpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
                             </div>
                         </div>
                     </div>
                     
-                    <div style="margin-top: 12px;">
-                        <strong style="color: #4267b2; margin-bottom: 6px; display: block; font-size: 13px;">🔼 Filtros Pasa-Altas:</strong>
+                    <div style="margin-top: 15px;">
+                        <strong style="color: #4267b2; margin-bottom: 8px; display: block; font-size: 14px;">🔼 Filtros Pasa-Altas:</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 10px;">Ideal</small>
-                                <img src="${post.imageUrls.hpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
+                                <small style="color: #666; font-weight: bold; font-size: 11px;">Ideal</small>
+                                <img src="${post.imageUrls.hpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 10px;">Butterworth</small>
-                                <img src="${post.imageUrls.hpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
+                                <small style="color: #666; font-weight: bold; font-size: 11px;">Butterworth</small>
+                                <img src="${post.imageUrls.hpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 10px;">Gaussian</small>
-                                <img src="${post.imageUrls.hpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 3px;">
+                                <small style="color: #666; font-weight: bold; font-size: 11px;">Gaussian</small>
+                                <img src="${post.imageUrls.hpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
                             </div>
                         </div>
                     </div>
