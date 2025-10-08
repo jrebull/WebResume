@@ -695,6 +695,16 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        @keyframes pulseGreen {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+            50% { box-shadow: 0 0 20px 5px rgba(40, 167, 69, 0.8); }
+        }
+        
+        .canvas-updating {
+            animation: pulseGreen 1s ease-in-out;
+            border: 3px solid #28a745 !important;
+        }
     </style>
 </head>
 <body>
@@ -854,7 +864,13 @@
                             ✅ Amplificación actualizada exitosamente
                         </div>
                         <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
-                            Ajusta la intensidad de los bordes en los filtros pasa-altas. Valores más altos = bordes más visibles. <strong>Mueve el slider y haz clic en "Aplicar Cambio".</strong>
+                            <strong>📌 Instrucciones:</strong> 
+                            1️⃣ Mueve el slider al valor deseado (1× a 30×) 
+                            2️⃣ Haz clic en "🔄 Aplicar Cambio"
+                            3️⃣ Los 3 filtros pasa-altas se actualizarán con borde verde brillante
+                        </p>
+                        <p style="margin: 4px 0 0 0; font-size: 11px; color: #28a745;">
+                            💡 <strong>Tip:</strong> Valores bajos (1-5×) = bordes sutiles | Valores altos (20-30×) = bordes muy marcados
                         </p>
                     </div>
                     <div class="filters-grid">
@@ -1018,48 +1034,69 @@
             document.getElementById('loadingText').textContent = `🔄 Ajustando amplificación de bordes a ${window.CURRENT_GAIN}×...`;
             document.getElementById('loadingSection').classList.remove('hidden');
             
-            setTimeout(() => {
+            // Usar requestAnimationFrame para asegurar que el DOM se actualice
+            requestAnimationFrame(() => {
                 try {
                     console.log('🚀 Iniciando reprocesamiento con GAIN=' + window.CURRENT_GAIN);
                     
                     const D0 = 50;
                     const n = 2;
                     
-                    console.log('  Procesando Ideal HP...');
-                    applyFilter(lastGrayData, lastWidth, lastHeight, 'ideal', false, D0, n, 'hpIdeal');
-                    
-                    console.log('  Procesando Butterworth HP...');
-                    applyFilter(lastGrayData, lastWidth, lastHeight, 'butterworth', false, D0, n, 'hpButterworth');
-                    
-                    console.log('  Procesando Gaussian HP...');
-                    applyFilter(lastGrayData, lastWidth, lastHeight, 'gaussian', false, D0, n, 'hpGaussian');
-                    
-                    // Actualizar indicadores de GAIN en cada filtro
-                    ['hpIdeal', 'hpButterworth', 'hpGaussian'].forEach(id => {
-                        const indicator = document.getElementById(`gainIndicator_${id}`);
-                        if (indicator) {
-                            indicator.textContent = `(GAIN: ${window.CURRENT_GAIN}×)`;
+                    // Limpiar los canvas antes de redibujar
+                    const canvasIds = ['hpIdeal', 'hpButterworth', 'hpGaussian'];
+                    canvasIds.forEach(id => {
+                        const canvas = document.getElementById(id);
+                        if (canvas) {
+                            const ctx = canvas.getContext('2d');
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            console.log(`  🧹 Canvas ${id} limpiado`);
                         }
                     });
                     
-                    document.getElementById('loadingSection').classList.add('hidden');
+                    console.log('  📐 Procesando Ideal HP con GAIN=' + window.CURRENT_GAIN);
+                    applyFilter(lastGrayData, lastWidth, lastHeight, 'ideal', false, D0, n, 'hpIdeal');
                     
-                    // Mostrar mensaje de éxito
-                    if (successMsg) {
-                        successMsg.textContent = `✅ Amplificación actualizada exitosamente a ${window.CURRENT_GAIN}×`;
-                        successMsg.style.display = 'block';
-                        setTimeout(() => {
-                            successMsg.style.display = 'none';
-                        }, 3000);
-                    }
+                    console.log('  📐 Procesando Butterworth HP con GAIN=' + window.CURRENT_GAIN);
+                    applyFilter(lastGrayData, lastWidth, lastHeight, 'butterworth', false, D0, n, 'hpButterworth');
                     
-                    console.log('✅ Reprocesamiento completado con GAIN=' + window.CURRENT_GAIN);
+                    console.log('  📐 Procesando Gaussian HP con GAIN=' + window.CURRENT_GAIN);
+                    applyFilter(lastGrayData, lastWidth, lastHeight, 'gaussian', false, D0, n, 'hpGaussian');
+                    
+                    // Actualizar indicadores de GAIN en cada filtro
+                    canvasIds.forEach(id => {
+                        const indicator = document.getElementById(`gainIndicator_${id}`);
+                        if (indicator) {
+                            indicator.textContent = `(GAIN: ${window.CURRENT_GAIN}×)`;
+                            console.log(`  ✅ Indicador ${id} actualizado`);
+                        }
+                    });
+                    
+                    // Forzar repaint del navegador
+                    document.getElementById('resultsSection').style.display = 'none';
+                    requestAnimationFrame(() => {
+                        document.getElementById('resultsSection').style.display = 'block';
+                        document.getElementById('loadingSection').classList.add('hidden');
+                        
+                        // Mostrar mensaje de éxito
+                        if (successMsg) {
+                            successMsg.textContent = `✅ Amplificación actualizada exitosamente a ${window.CURRENT_GAIN}×`;
+                            successMsg.style.display = 'block';
+                            setTimeout(() => {
+                                successMsg.style.display = 'none';
+                            }, 3000);
+                        }
+                        
+                        console.log('✅ Reprocesamiento completado con GAIN=' + window.CURRENT_GAIN);
+                        console.log('🎨 Canvas actualizados visualmente');
+                    });
+                    
                 } catch (error) {
                     console.error('❌ Error al reprocesar:', error);
+                    console.error('Stack trace:', error.stack);
                     document.getElementById('loadingSection').classList.add('hidden');
-                    alert('Error al reprocesar: ' + error.message);
+                    alert('Error al reprocesar: ' + error.message + '\nRevisa la consola para más detalles.');
                 }
-            }, 100);
+            });
         }
         
         // Exportar inmediatamente a window
@@ -1665,6 +1702,8 @@
         
         function displayResult(data, width, height, canvasId) {
             try {
+                console.log(`\n📊 === displayResult INICIADO para ${canvasId} ===`);
+                
                 for (let i = 0; i < data.length; i++) {
                     if (!isFinite(data[i])) {
                         data[i] = 0;
@@ -1672,12 +1711,16 @@
                 }
                 
                 const isHighPass = canvasId.startsWith('hp');
-                
-                console.log(`📊 displayResult llamado para ${canvasId}`);
-                console.log(`  - isHighPass: ${isHighPass}`);
-                console.log(`  - window.CURRENT_GAIN: ${window.CURRENT_GAIN}`);
+                console.log(`  ➡️ isHighPass: ${isHighPass}`);
+                console.log(`  ➡️ window.CURRENT_GAIN: ${window.CURRENT_GAIN}`);
+                console.log(`  ➡️ Dimensiones: ${width}x${height}`);
                 
                 const canvas = document.getElementById(canvasId);
+                if (!canvas) {
+                    console.error(`  ❌ Canvas ${canvasId} no encontrado!`);
+                    return;
+                }
+                console.log(`  ✅ Canvas ${canvasId} encontrado`);
                 
                 const displayScale = 1.6;
                 const displayWidth = width * displayScale;
@@ -1685,6 +1728,8 @@
                 
                 canvas.width = displayWidth;
                 canvas.height = displayHeight;
+                console.log(`  ✅ Canvas redimensionado a ${displayWidth}x${displayHeight}`);
+                
                 const ctx = canvas.getContext('2d');
                 
                 const tempCanvas = document.createElement('canvas');
@@ -1695,18 +1740,19 @@
                 
                 if (isHighPass) {
                     const GAIN = window.CURRENT_GAIN;
-                    console.log(`  🎯 Usando GAIN=${GAIN} para filtro pasa-altas`);
+                    console.log(`  🎯 APLICANDO GAIN=${GAIN} para filtro pasa-altas`);
                     
                     const amplified = new Float32Array(data.length);
                     for (let i = 0; i < data.length; i++) {
                         amplified[i] = data[i] * GAIN;
                     }
+                    console.log(`  ✅ Datos amplificados con GAIN=${GAIN}`);
                     
                     const sorted = Array.from(amplified).sort((a, b) => a - b);
                     const p2 = sorted[Math.floor(sorted.length * 0.02)];
                     const p98 = sorted[Math.floor(sorted.length * 0.98)];
-                    
                     const range = p98 - p2;
+                    console.log(`  📊 Rango de valores: [${p2.toFixed(2)}, ${p98.toFixed(2)}]`);
                     
                     for (let i = 0; i < width * height; i++) {
                         let value;
@@ -1725,6 +1771,7 @@
                             imageData.data[idx + 3] = 255;
                         }
                     }
+                    console.log(`  ✅ ImageData creado con GAIN=${GAIN}`);
                 } else {
                     let min = Infinity;
                     let max = -Infinity;
@@ -1734,6 +1781,7 @@
                     }
                     
                     const range = max - min;
+                    console.log(`  📊 Rango normalizado: [${min.toFixed(2)}, ${max.toFixed(2)}]`);
                     
                     for (let i = 0; i < width * height; i++) {
                         const normalized = range === 0 ? 0 : ((data[i] - min) / range) * 255;
@@ -1746,15 +1794,28 @@
                             imageData.data[idx + 3] = 255;
                         }
                     }
+                    console.log(`  ✅ ImageData creado (pasa-bajas)`);
                 }
                 
                 tempCtx.putImageData(imageData, 0, 0);
+                console.log(`  ✅ ImageData aplicado a tempCanvas`);
+                
+                // Limpiar canvas antes de dibujar
+                ctx.clearRect(0, 0, displayWidth, displayHeight);
                 
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(tempCanvas, 0, 0, displayWidth, displayHeight);
+                console.log(`  ✅ Imagen dibujada en canvas visible (${displayWidth}x${displayHeight})`);
+                
+                // Agregar animación visual para mostrar actualización
+                canvas.classList.add('canvas-updating');
+                setTimeout(() => {
+                    canvas.classList.remove('canvas-updating');
+                }, 1000);
                 
                 currentResults[canvasId] = tempCanvas.toDataURL('image/jpeg', JPEG_QUALITY);
+                console.log(`  ✅ Resultado guardado en currentResults[${canvasId}]`);
                 
                 const params = currentParams[canvasId];
                 if (params) {
@@ -1762,12 +1823,14 @@
                     const nElem = document.getElementById(`param_${canvasId}_n`);
                     if (d0Elem) d0Elem.textContent = params.D0;
                     if (nElem) nElem.textContent = params.n;
+                    console.log(`  ✅ Parámetros actualizados en UI`);
                 }
                 
-                console.log(`  ✅ Imagen renderizada exitosamente`);
+                console.log(`✅ === displayResult COMPLETADO para ${canvasId} ===\n`);
                 
             } catch (error) {
-                console.error(`Error displaying ${canvasId}:`, error);
+                console.error(`❌ Error displaying ${canvasId}:`, error);
+                console.error(`Stack trace:`, error.stack);
             }
         }
         
