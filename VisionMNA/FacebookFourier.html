@@ -851,40 +851,30 @@
                 <div class="filter-category">
                     <h3>🔼 Filtros Pasa-Altas (Realce de bordes - Eliminan baja frecuencia)</h3>
                     <div style="background: #e7f3ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #4267b2;">
-                        <div style="margin-bottom: 15px; padding-bottom: 12px; border-bottom: 2px solid #ddd;">
-                            <strong style="color: #1F497D;">🎨 Modo de Visualización:</strong>
-                            <button id="normalizeToggleBtn" onclick="toggleNormalization()" 
-                                    style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 13px; font-weight: bold;">
-                                🔢 Modo: Sin Normalizar
+                        <strong style="color: #1F497D;">🎨 Modo de Visualización:</strong>
+                        <select id="displayModeSelect" onchange="changeDisplayMode()" 
+                                style="padding: 8px 12px; border-radius: 4px; margin-left: 10px; font-size: 13px; font-weight: bold; border: 2px solid #4267b2; cursor: pointer;">
+                            <option value="matplotlib">📊 Estilo Matplotlib (Recomendado)</option>
+                            <option value="amplified">⚡ Con Amplificación Manual</option>
+                        </select>
+                        <p id="modeDescription" style="margin: 8px 0 0 0; font-size: 12px; color: #28a745; font-weight: bold;">
+                            ✅ Normalización automática [min, max] → [0, 255] (igual que el profesor)
+                        </p>
+                        
+                        <div id="amplificationControls" class="hidden" style="margin-top: 12px; padding-top: 12px; border-top: 2px solid #ddd;">
+                            <strong style="color: #1F497D;">⚙️ Factor de Amplificación:</strong>
+                            <input type="range" id="gainSlider" min="1" max="10" value="3" step="0.5" 
+                                   style="width: 200px; vertical-align: middle; margin: 0 10px;"
+                                   oninput="updateGainValue(this.value)">
+                            <span id="gainValue" style="font-weight: bold; color: #4267b2;">3×</span>
+                            <button onclick="reprocessWithNewGain()" 
+                                    style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                                🔄 Aplicar
                             </button>
-                            <p id="normalizeStatus" style="margin: 8px 0 0 0; font-size: 12px; color: #6c757d; font-weight: bold;">
-                                ⚡ Sin Normalización - GAIN directo (más oscuro pero más fiel)
+                            <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
+                                Amplifica antes de normalizar para mayor contraste en los bordes
                             </p>
                         </div>
-                        
-                        <strong style="color: #1F497D;">⚙️ Amplificación de Bordes (GAIN):</strong>
-                        <input type="range" id="gainSlider" min="1" max="50" value="10" step="1" 
-                               style="width: 200px; vertical-align: middle; margin: 0 10px;"
-                               oninput="updateGainValue(this.value)">
-                        <span id="gainValue" style="font-weight: bold; color: #4267b2;">10×</span>
-                        <button onclick="reprocessWithNewGain()" 
-                                style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px; font-weight: bold;">
-                            🔄 Aplicar Cambio
-                        </button>
-                        <div id="gainSuccessMessage" class="gain-success-message">
-                            ✅ Amplificación actualizada exitosamente
-                        </div>
-                        <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
-                            <strong>📌 Instrucciones:</strong> 
-                            1️⃣ Elige modo (Normalizado vs Sin Normalizar)
-                            2️⃣ Ajusta el GAIN (1× a 50×)
-                            3️⃣ Haz clic en "🔄 Aplicar Cambio"
-                        </p>
-                        <p style="margin: 4px 0 0 0; font-size: 11px; color: #28a745;">
-                            💡 <strong>Tip:</strong> 
-                            <span style="color: #6c757d;">Sin normalizar: GAIN 10-30× recomendado</span> | 
-                            <span style="color: #28a745;">Normalizado: GAIN 1-5× recomendado</span>
-                        </p>
                     </div>
                     <div class="filters-grid">
                         <div class="filter-result">
@@ -1004,9 +994,9 @@
         let feedPosts = [];
         let userLikes = new Set();
         
-        // CRITICAL: Hacer CURRENT_GAIN explícitamente global usando window
-        window.CURRENT_GAIN = 10.0;  // Valor inicial de amplificación
-        window.AUTO_NORMALIZE = false;  // Por defecto: SIN normalización automática
+        // Sistema de visualización simplificado
+        window.DISPLAY_MODE = 'matplotlib';  // 'matplotlib' o 'amplified'
+        window.AMPLIFICATION_FACTOR = 3.0;   // Para modo amplified
         let lastGrayData = null;  
         let lastWidth = 0;
         let lastHeight = 0;
@@ -1018,124 +1008,83 @@
         const JPEG_QUALITY = 0.85;      
         
         // ========================================
-        // FUNCIONES DE CONTROL DE GAIN
+        // FUNCIONES DE CONTROL DE VISUALIZACIÓN
         // ========================================
         function updateGainValue(value) {
-            window.CURRENT_GAIN = parseFloat(value);
+            window.AMPLIFICATION_FACTOR = parseFloat(value);
             document.getElementById('gainValue').textContent = value + '×';
-            console.log('🎚️ GAIN ajustado a:', window.CURRENT_GAIN);
         }
         
-        function toggleNormalization() {
-            window.AUTO_NORMALIZE = !window.AUTO_NORMALIZE;
+        function changeDisplayMode() {
+            const mode = document.getElementById('displayModeSelect').value;
+            window.DISPLAY_MODE = mode;
             
-            const button = document.getElementById('normalizeToggleBtn');
-            const statusText = document.getElementById('normalizeStatus');
+            const description = document.getElementById('modeDescription');
+            const controls = document.getElementById('amplificationControls');
             
-            if (window.AUTO_NORMALIZE) {
-                button.textContent = '📊 Modo: Normalizado';
-                button.style.background = '#28a745';
-                statusText.textContent = '✅ Normalización Automática ACTIVA (como matplotlib)';
-                statusText.style.color = '#28a745';
+            if (mode === 'matplotlib') {
+                description.textContent = '✅ Normalización automática [min, max] → [0, 255] (igual que el profesor)';
+                description.style.color = '#28a745';
+                controls.classList.add('hidden');
             } else {
-                button.textContent = '🔢 Modo: Sin Normalizar';
-                button.style.background = '#6c757d';
-                statusText.textContent = '⚡ Sin Normalización - GAIN directo (más oscuro pero más fiel)';
-                statusText.style.color = '#6c757d';
+                description.textContent = '⚡ Amplificación manual antes de normalizar (más control sobre contraste)';
+                description.style.color = '#4267b2';
+                controls.classList.remove('hidden');
             }
             
-            console.log('🔄 Normalización automática:', window.AUTO_NORMALIZE ? 'ACTIVA' : 'DESACTIVADA');
-            
-            // Reprocesar automáticamente si hay imagen
+            // Reprocesar si hay imagen
             if (lastGrayData && lastWidth > 0 && lastHeight > 0) {
                 reprocessWithNewGain();
             }
         }
         
         function reprocessWithNewGain() {
-            console.log('🔄 Botón "Aplicar Cambio" clickeado');
-            console.log('📊 Estado actual:');
-            console.log('  - GAIN actual:', window.CURRENT_GAIN);
-            console.log('  - lastGrayData:', lastGrayData ? 'disponible' : 'NO disponible');
-            console.log('  - Dimensiones:', lastWidth, 'x', lastHeight);
-            
             if (!lastGrayData || lastWidth === 0 || lastHeight === 0) {
-                alert('⚠️ Primero procesa una imagen antes de ajustar la amplificación.');
+                alert('⚠️ Primero procesa una imagen antes de ajustar la visualización.');
                 return;
             }
             
-            // Ocultar mensaje de éxito si existe
-            const successMsg = document.getElementById('gainSuccessMessage');
-            if (successMsg) {
-                successMsg.style.display = 'none';
-            }
-            
-            // Mostrar indicador de carga
-            document.getElementById('loadingText').textContent = `🔄 Ajustando amplificación de bordes a ${window.CURRENT_GAIN}×...`;
+            document.getElementById('loadingText').textContent = '🔄 Actualizando visualización...';
             document.getElementById('loadingSection').classList.remove('hidden');
             
-            // Usar requestAnimationFrame para asegurar que el DOM se actualice
             requestAnimationFrame(() => {
                 try {
-                    console.log('🚀 Iniciando reprocesamiento con GAIN=' + window.CURRENT_GAIN);
-                    
                     const D0 = 50;
                     const n = 2;
                     
-                    // Limpiar los canvas antes de redibujar
+                    // Limpiar canvas
                     const canvasIds = ['hpIdeal', 'hpButterworth', 'hpGaussian'];
                     canvasIds.forEach(id => {
                         const canvas = document.getElementById(id);
                         if (canvas) {
                             const ctx = canvas.getContext('2d');
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            console.log(`  🧹 Canvas ${id} limpiado`);
                         }
                     });
                     
-                    console.log('  📐 Procesando Ideal HP con GAIN=' + window.CURRENT_GAIN);
+                    // Reprocesar filtros pasa-altas
                     applyFilter(lastGrayData, lastWidth, lastHeight, 'ideal', false, D0, n, 'hpIdeal');
-                    
-                    console.log('  📐 Procesando Butterworth HP con GAIN=' + window.CURRENT_GAIN);
                     applyFilter(lastGrayData, lastWidth, lastHeight, 'butterworth', false, D0, n, 'hpButterworth');
-                    
-                    console.log('  📐 Procesando Gaussian HP con GAIN=' + window.CURRENT_GAIN);
                     applyFilter(lastGrayData, lastWidth, lastHeight, 'gaussian', false, D0, n, 'hpGaussian');
                     
-                    // Actualizar indicadores de GAIN en cada filtro
+                    // Actualizar indicadores
                     canvasIds.forEach(id => {
                         const indicator = document.getElementById(`gainIndicator_${id}`);
                         if (indicator) {
-                            const normalizeText = window.AUTO_NORMALIZE ? ' NORM' : '';
-                            indicator.textContent = `(GAIN: ${window.CURRENT_GAIN}×${normalizeText})`;
-                            console.log(`  ✅ Indicador ${id} actualizado`);
+                            if (window.DISPLAY_MODE === 'matplotlib') {
+                                indicator.textContent = '(Normalizado)';
+                            } else {
+                                indicator.textContent = `(${window.AMPLIFICATION_FACTOR}× → Normalizado)`;
+                            }
                         }
                     });
                     
-                    // Forzar repaint del navegador
-                    document.getElementById('resultsSection').style.display = 'none';
-                    requestAnimationFrame(() => {
-                        document.getElementById('resultsSection').style.display = 'block';
-                        document.getElementById('loadingSection').classList.add('hidden');
-                        
-                        // Mostrar mensaje de éxito
-                        if (successMsg) {
-                            successMsg.textContent = `✅ Amplificación actualizada exitosamente a ${window.CURRENT_GAIN}×`;
-                            successMsg.style.display = 'block';
-                            setTimeout(() => {
-                                successMsg.style.display = 'none';
-                            }, 3000);
-                        }
-                        
-                        console.log('✅ Reprocesamiento completado con GAIN=' + window.CURRENT_GAIN);
-                        console.log('🎨 Canvas actualizados visualmente');
-                    });
+                    document.getElementById('loadingSection').classList.add('hidden');
                     
                 } catch (error) {
                     console.error('❌ Error al reprocesar:', error);
-                    console.error('Stack trace:', error.stack);
                     document.getElementById('loadingSection').classList.add('hidden');
-                    alert('Error al reprocesar: ' + error.message + '\nRevisa la consola para más detalles.');
+                    alert('Error al reprocesar: ' + error.message);
                 }
             });
         }
@@ -1143,11 +1092,7 @@
         // Exportar inmediatamente a window
         window.updateGainValue = updateGainValue;
         window.reprocessWithNewGain = reprocessWithNewGain;
-        
-        console.log('✅ Funciones de GAIN exportadas');
-        console.log('  - updateGainValue:', typeof window.updateGainValue);
-        console.log('  - reprocessWithNewGain:', typeof window.reprocessWithNewGain);
-        console.log('  - CURRENT_GAIN inicial:', window.CURRENT_GAIN, '(1.0 = método del profesor)');
+        window.changeDisplayMode = changeDisplayMode;
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1378,7 +1323,6 @@
             lastHeight = height;
             
             console.log(`✅ Datos guardados para reprocesamiento: ${width}×${height} pixels`);
-            console.log('📊 GAIN actual para procesamiento inicial:', window.CURRENT_GAIN);
             
             const D0 = 50;  
             const n = 2;    
@@ -1391,12 +1335,15 @@
             applyFilter(grayData, width, height, 'butterworth', false, D0, n, 'hpButterworth');
             applyFilter(grayData, width, height, 'gaussian', false, D0, n, 'hpGaussian');
             
-            // Actualizar indicadores de GAIN
-            const normalizeText = window.AUTO_NORMALIZE ? ' NORM' : '';
+            // Actualizar indicadores de visualización
             ['hpIdeal', 'hpButterworth', 'hpGaussian'].forEach(id => {
                 const indicator = document.getElementById(`gainIndicator_${id}`);
                 if (indicator) {
-                    indicator.textContent = `(GAIN: ${window.CURRENT_GAIN}×${normalizeText})`;
+                    if (window.DISPLAY_MODE === 'matplotlib') {
+                        indicator.textContent = '(Normalizado)';
+                    } else {
+                        indicator.textContent = `(${window.AMPLIFICATION_FACTOR}× → Normalizado)`;
+                    }
                 }
             });
         }
@@ -1744,8 +1691,7 @@
         
         function displayResult(data, width, height, canvasId) {
             try {
-                console.log(`\n📊 === displayResult INICIADO para ${canvasId} ===`);
-                
+                // Limpiar valores no finitos
                 for (let i = 0; i < data.length; i++) {
                     if (!isFinite(data[i])) {
                         data[i] = 0;
@@ -1753,27 +1699,19 @@
                 }
                 
                 const isHighPass = canvasId.startsWith('hp');
-                console.log(`  ➡️ isHighPass: ${isHighPass}`);
-                console.log(`  ➡️ window.CURRENT_GAIN: ${window.CURRENT_GAIN}`);
-                console.log(`  ➡️ Dimensiones: ${width}x${height}`);
-                
                 const canvas = document.getElementById(canvasId);
-                if (!canvas) {
-                    console.error(`  ❌ Canvas ${canvasId} no encontrado!`);
-                    return;
-                }
-                console.log(`  ✅ Canvas ${canvasId} encontrado`);
+                if (!canvas) return;
                 
+                // Configurar canvas para visualización escalada
                 const displayScale = 1.6;
                 const displayWidth = width * displayScale;
                 const displayHeight = height * displayScale;
                 
                 canvas.width = displayWidth;
                 canvas.height = displayHeight;
-                console.log(`  ✅ Canvas redimensionado a ${displayWidth}x${displayHeight}`);
-                
                 const ctx = canvas.getContext('2d');
                 
+                // Canvas temporal para procesar
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = width;
                 tempCanvas.height = height;
@@ -1781,66 +1719,58 @@
                 const imageData = tempCtx.createImageData(width, height);
                 
                 if (isHighPass) {
-                    const GAIN = window.CURRENT_GAIN;
-                    const NORMALIZE = window.AUTO_NORMALIZE;
+                    // === FILTROS PASA-ALTAS ===
+                    // Replicar exactamente el comportamiento de matplotlib/numpy del profesor
                     
-                    console.log(`  🎯 Filtro pasa-altas con GAIN=${GAIN}, Normalización=${NORMALIZE}`);
+                    let processedData;
                     
-                    if (NORMALIZE) {
-                        // MODO NORMALIZADO: Como matplotlib (min-max automático)
-                        const amplified = new Float32Array(data.length);
-                        let minVal = Infinity;
-                        let maxVal = -Infinity;
-                        
+                    if (window.DISPLAY_MODE === 'matplotlib') {
+                        // Modo por defecto: igual que el profesor
+                        // 1. Tomar valor absoluto (como np.abs())
+                        processedData = new Float32Array(data.length);
                         for (let i = 0; i < data.length; i++) {
-                            amplified[i] = Math.abs(data[i]) * GAIN;
-                            if (amplified[i] < minVal) minVal = amplified[i];
-                            if (amplified[i] > maxVal) maxVal = amplified[i];
+                            processedData[i] = Math.abs(data[i]);
                         }
-                        
-                        const range = maxVal - minVal;
-                        console.log(`  📊 Rango normalizado: [${minVal.toFixed(4)}, ${maxVal.toFixed(4)}]`);
-                        
-                        for (let i = 0; i < width * height; i++) {
-                            let value;
-                            if (range === 0) {
-                                value = 0;
-                            } else {
-                                value = ((amplified[i] - minVal) / range) * 255;
-                                value = Math.max(0, Math.min(255, Math.round(value)));
-                            }
-                            
-                            const idx = i * 4;
-                            if (idx + 3 < imageData.data.length) {
-                                imageData.data[idx] = value;
-                                imageData.data[idx + 1] = value;
-                                imageData.data[idx + 2] = value;
-                                imageData.data[idx + 3] = 255;
-                            }
-                        }
-                        console.log(`  ✅ ImageData creado NORMALIZADO con GAIN=${GAIN}`);
-                        
                     } else {
-                        // MODO SIN NORMALIZAR: GAIN directo (más oscuro pero más fiel)
-                        for (let i = 0; i < width * height; i++) {
-                            // Aplicar GAIN directo al valor absoluto
-                            let value = Math.abs(data[i]) * GAIN * 255;
-                            
-                            // Clip a rango válido [0, 255]
-                            value = Math.max(0, Math.min(255, Math.round(value)));
-                            
-                            const idx = i * 4;
-                            if (idx + 3 < imageData.data.length) {
-                                imageData.data[idx] = value;
-                                imageData.data[idx + 1] = value;
-                                imageData.data[idx + 2] = value;
-                                imageData.data[idx + 3] = 255;
-                            }
+                        // Modo amplificado: multiplicar antes de normalizar
+                        processedData = new Float32Array(data.length);
+                        for (let i = 0; i < data.length; i++) {
+                            processedData[i] = Math.abs(data[i]) * window.AMPLIFICATION_FACTOR;
                         }
-                        console.log(`  ✅ ImageData creado SIN NORMALIZAR con GAIN=${GAIN}`);
                     }
+                    
+                    // 2. Normalizar [min, max] -> [0, 255] (como hace plt.imshow automáticamente)
+                    let minVal = Infinity;
+                    let maxVal = -Infinity;
+                    
+                    for (let i = 0; i < processedData.length; i++) {
+                        if (processedData[i] < minVal) minVal = processedData[i];
+                        if (processedData[i] > maxVal) maxVal = processedData[i];
+                    }
+                    
+                    const range = maxVal - minVal;
+                    
+                    for (let i = 0; i < width * height; i++) {
+                        let value;
+                        if (range === 0) {
+                            value = 0;
+                        } else {
+                            value = ((processedData[i] - minVal) / range) * 255;
+                            value = Math.max(0, Math.min(255, Math.round(value)));
+                        }
+                        
+                        const idx = i * 4;
+                        if (idx + 3 < imageData.data.length) {
+                            imageData.data[idx] = value;
+                            imageData.data[idx + 1] = value;
+                            imageData.data[idx + 2] = value;
+                            imageData.data[idx + 3] = 255;
+                        }
+                    }
+                    
                 } else {
-                    // Para filtros pasa-bajas: normalización estándar [min, max]
+                    // === FILTROS PASA-BAJAS ===
+                    // Normalización estándar [min, max] -> [0, 255]
                     let min = Infinity;
                     let max = -Infinity;
                     for (let i = 0; i < data.length; i++) {
@@ -1849,7 +1779,6 @@
                     }
                     
                     const range = max - min;
-                    console.log(`  📊 Rango normalizado: [${min.toFixed(2)}, ${max.toFixed(2)}]`);
                     
                     for (let i = 0; i < width * height; i++) {
                         const normalized = range === 0 ? 0 : ((data[i] - min) / range) * 255;
@@ -1862,43 +1791,36 @@
                             imageData.data[idx + 3] = 255;
                         }
                     }
-                    console.log(`  ✅ ImageData creado (pasa-bajas)`);
                 }
                 
                 tempCtx.putImageData(imageData, 0, 0);
-                console.log(`  ✅ ImageData aplicado a tempCanvas`);
                 
-                // Limpiar canvas antes de dibujar
+                // Limpiar y dibujar en canvas visible
                 ctx.clearRect(0, 0, displayWidth, displayHeight);
-                
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(tempCanvas, 0, 0, displayWidth, displayHeight);
-                console.log(`  ✅ Imagen dibujada en canvas visible (${displayWidth}x${displayHeight})`);
                 
-                // Agregar animación visual para mostrar actualización
+                // Animación visual
                 canvas.classList.add('canvas-updating');
                 setTimeout(() => {
                     canvas.classList.remove('canvas-updating');
                 }, 1000);
                 
+                // Guardar resultado
                 currentResults[canvasId] = tempCanvas.toDataURL('image/jpeg', JPEG_QUALITY);
-                console.log(`  ✅ Resultado guardado en currentResults[${canvasId}]`);
                 
+                // Actualizar parámetros en UI
                 const params = currentParams[canvasId];
                 if (params) {
                     const d0Elem = document.getElementById(`param_${canvasId}_D0`);
                     const nElem = document.getElementById(`param_${canvasId}_n`);
                     if (d0Elem) d0Elem.textContent = params.D0;
                     if (nElem) nElem.textContent = params.n;
-                    console.log(`  ✅ Parámetros actualizados en UI`);
                 }
-                
-                console.log(`✅ === displayResult COMPLETADO para ${canvasId} ===\n`);
                 
             } catch (error) {
                 console.error(`❌ Error displaying ${canvasId}:`, error);
-                console.error(`Stack trace:`, error.stack);
             }
         }
         
@@ -2326,15 +2248,11 @@
         window.submitComment = submitComment;
         window.deleteComment = deleteComment;
         window.deletePost = deletePost;
-        window.toggleNormalization = toggleNormalization;
         
-        console.log('✅ Todas las funciones globales exportadas correctamente');
-        console.log('📊 Estado inicial:');
-        console.log('  - window.CURRENT_GAIN:', window.CURRENT_GAIN);
-        console.log('  - window.AUTO_NORMALIZE:', window.AUTO_NORMALIZE, '(false = sin normalizar por defecto)');
-        console.log('  - updateGainValue:', typeof window.updateGainValue);
-        console.log('  - reprocessWithNewGain:', typeof window.reprocessWithNewGain);
-        console.log('  - toggleNormalization:', typeof window.toggleNormalization);
+        console.log('✅ Sistema de visualización de filtros de Fourier inicializado');
+        console.log('📊 Modo por defecto: Estilo Matplotlib (igual que el profesor)');
+        console.log('  - DISPLAY_MODE:', window.DISPLAY_MODE);
+        console.log('  - AMPLIFICATION_FACTOR:', window.AMPLIFICATION_FACTOR);
     </script>
 </body>
 </html>
