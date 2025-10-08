@@ -1468,8 +1468,18 @@
                     }
                 }
                 
-                // Detectar si es un filtro pasa-altas (por el nombre del canvas)
-                const isHighPass = canvasId.startsWith('hp');
+                let min = Infinity;
+                let max = -Infinity;
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i] < min) min = data[i];
+                    if (data[i] > max) max = data[i];
+                }
+                
+                const range = max - min;
+                if (range === 0) {
+                    min = 0;
+                    max = 1;
+                }
                 
                 const canvas = document.getElementById(canvasId);
                 
@@ -1489,58 +1499,15 @@
                 const tempCtx = tempCanvas.getContext('2d');
                 const imageData = tempCtx.createImageData(width, height);
                 
-                if (isHighPass) {
-                    // Para filtros pasa-altas: normalizar y agregar offset de 128 (gris medio)
-                    // Esto hace que el fondo sea gris y los bordes resalten
-                    let min = Infinity;
-                    let max = -Infinity;
-                    for (let i = 0; i < data.length; i++) {
-                        if (data[i] < min) min = data[i];
-                        if (data[i] > max) max = data[i];
-                    }
-                    
-                    const range = max - min;
-                    
-                    for (let i = 0; i < width * height; i++) {
-                        // Normalizar a rango [0, 255] y luego centrar en 128
-                        let normalized;
-                        if (range === 0) {
-                            normalized = 128;
-                        } else {
-                            // Escalar a [-127, 127] y sumar 128 para centrar
-                            normalized = ((data[i] - min) / range - 0.5) * 254 + 128;
-                        }
-                        
-                        const value = Math.max(0, Math.min(255, Math.round(normalized)));
-                        const idx = i * 4;
-                        if (idx + 3 < imageData.data.length) {
-                            imageData.data[idx] = value;
-                            imageData.data[idx + 1] = value;
-                            imageData.data[idx + 2] = value;
-                            imageData.data[idx + 3] = 255;
-                        }
-                    }
-                } else {
-                    // Para filtros pasa-bajas: normalización estándar [0, 255]
-                    let min = Infinity;
-                    let max = -Infinity;
-                    for (let i = 0; i < data.length; i++) {
-                        if (data[i] < min) min = data[i];
-                        if (data[i] > max) max = data[i];
-                    }
-                    
-                    const range = max - min;
-                    
-                    for (let i = 0; i < width * height; i++) {
-                        const normalized = range === 0 ? 0 : ((data[i] - min) / range) * 255;
-                        const value = Math.max(0, Math.min(255, Math.round(normalized)));
-                        const idx = i * 4;
-                        if (idx + 3 < imageData.data.length) {
-                            imageData.data[idx] = value;
-                            imageData.data[idx + 1] = value;
-                            imageData.data[idx + 2] = value;
-                            imageData.data[idx + 3] = 255;
-                        }
+                for (let i = 0; i < width * height; i++) {
+                    const normalized = range === 0 ? 0 : ((data[i] - min) / range) * 255;
+                    const value = Math.max(0, Math.min(255, Math.round(normalized)));
+                    const idx = i * 4;
+                    if (idx + 3 < imageData.data.length) {
+                        imageData.data[idx] = value;
+                        imageData.data[idx + 1] = value;
+                        imageData.data[idx + 2] = value;
+                        imageData.data[idx + 3] = 255;
                     }
                 }
                 
