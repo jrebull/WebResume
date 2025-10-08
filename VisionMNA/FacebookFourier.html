@@ -1742,26 +1742,15 @@
                     const GAIN = window.CURRENT_GAIN;
                     console.log(`  🎯 APLICANDO GAIN=${GAIN} para filtro pasa-altas`);
                     
-                    const amplified = new Float32Array(data.length);
-                    for (let i = 0; i < data.length; i++) {
-                        amplified[i] = data[i] * GAIN;
-                    }
-                    console.log(`  ✅ Datos amplificados con GAIN=${GAIN}`);
-                    
-                    const sorted = Array.from(amplified).sort((a, b) => a - b);
-                    const p2 = sorted[Math.floor(sorted.length * 0.02)];
-                    const p98 = sorted[Math.floor(sorted.length * 0.98)];
-                    const range = p98 - p2;
-                    console.log(`  📊 Rango de valores: [${p2.toFixed(2)}, ${p98.toFixed(2)}]`);
+                    // Para filtros pasa-altas: valores centrados en 0
+                    // Aplicar GAIN y luego mapear a [0, 255] con centro en 128 (gris medio)
                     
                     for (let i = 0; i < width * height; i++) {
-                        let value;
-                        if (range === 0) {
-                            value = 128;
-                        } else {
-                            value = ((amplified[i] - p2) / range) * 255;
-                            value = Math.max(0, Math.min(255, Math.round(value)));
-                        }
+                        // Amplificar y centrar en 128 (gris medio)
+                        let value = 128 + (data[i] * GAIN);
+                        
+                        // Clip a rango válido [0, 255]
+                        value = Math.max(0, Math.min(255, Math.round(value)));
                         
                         const idx = i * 4;
                         if (idx + 3 < imageData.data.length) {
@@ -1771,7 +1760,7 @@
                             imageData.data[idx + 3] = 255;
                         }
                     }
-                    console.log(`  ✅ ImageData creado con GAIN=${GAIN}`);
+                    console.log(`  ✅ ImageData creado con GAIN=${GAIN} (método: 128 + GAIN*valor)`);
                 } else {
                     let min = Infinity;
                     let max = -Infinity;
