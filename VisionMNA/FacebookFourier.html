@@ -827,14 +827,14 @@
                         <strong style="color: #1F497D;">⚙️ Amplificación de Bordes:</strong>
                         <input type="range" id="gainSlider" min="1" max="30" value="15" step="1" 
                                style="width: 200px; vertical-align: middle; margin: 0 10px;"
-                               onchange="updateGainValue(this.value)">
+                               oninput="updateGainValue(this.value)">
                         <span id="gainValue" style="font-weight: bold; color: #4267b2;">15×</span>
                         <button onclick="reprocessWithNewGain()" 
-                                style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px;">
-                            🔄 Aplicar
+                                style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                            🔄 Aplicar Cambio
                         </button>
                         <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
-                            Ajusta la intensidad de los bordes en los filtros pasa-altas. Valores más altos = bordes más visibles.
+                            Ajusta la intensidad de los bordes en los filtros pasa-altas. Valores más altos = bordes más visibles. <strong>Mueve el slider y haz clic en "Aplicar Cambio".</strong>
                         </p>
                     </div>
                     <div class="filters-grid">
@@ -955,6 +955,12 @@
         let feedPosts = [];
         let userLikes = new Set();
         
+        // Variables para reprocesamiento con GAIN dinámico
+        let CURRENT_GAIN = 15.0;  // Valor inicial de amplificación
+        let lastGrayData = null;  // Guardar datos en escala de grises para reprocesar
+        let lastWidth = 0;
+        let lastHeight = 0;
+        
         // Tamaños optimizados para Firebase Storage (Plan Blaze)
         // Storage puede manejar archivos más grandes sin problema
         const MAX_DISPLAY_SIZE = 500;   // Para mostrar en pantalla
@@ -962,30 +968,57 @@
         const MAX_PROCESS_SIZE = 256;   // Para procesamiento FFT
         const JPEG_QUALITY = 0.85;      // Mejor calidad ahora que usamos Storage
         
-        let CURRENT_GAIN = 15.0;  // Valor inicial de amplificación
-        let lastGrayData = null;  // Guardar datos en escala de grises para reprocesar
-        let lastWidth = 0;
-        let lastHeight = 0;
-        
+        // ========================================
+        // FUNCIONES DE CONTROL DE GAIN (Declaradas temprano para onclick)
+        // ========================================
         function updateGainValue(value) {
             document.getElementById('gainValue').textContent = value + '×';
             CURRENT_GAIN = parseFloat(value);
+            console.log('GAIN actualizado a:', CURRENT_GAIN);
         }
         
         function reprocessWithNewGain() {
+            console.log('🔄 Botón clickeado. GAIN actual:', CURRENT_GAIN);
+            console.log('lastGrayData:', lastGrayData ? 'disponible' : 'NO disponible');
+            console.log('lastWidth:', lastWidth, 'lastHeight:', lastHeight);
+            
             if (!lastGrayData || lastWidth === 0 || lastHeight === 0) {
-                alert('Primero procesa una imagen antes de ajustar la amplificación.');
+                alert('⚠️ Primero procesa una imagen antes de ajustar la amplificación.');
                 return;
             }
             
-            // Reprocesar solo los filtros pasa-altas con el nuevo GAIN
-            const D0 = 50;
-            const n = 2;
+            // Mostrar indicador de carga
+            document.getElementById('loadingText').textContent = '🔄 Ajustando amplificación de bordes a ' + CURRENT_GAIN + '×...';
+            document.getElementById('loadingSection').classList.remove('hidden');
             
-            applyFilter(lastGrayData, lastWidth, lastHeight, 'ideal', false, D0, n, 'hpIdeal');
-            applyFilter(lastGrayData, lastWidth, lastHeight, 'butterworth', false, D0, n, 'hpButterworth');
-            applyFilter(lastGrayData, lastWidth, lastHeight, 'gaussian', false, D0, n, 'hpGaussian');
+            setTimeout(() => {
+                try {
+                    // Reprocesar solo los filtros pasa-altas con el nuevo GAIN
+                    const D0 = 50;
+                    const n = 2;
+                    
+                    console.log('Aplicando filtro Ideal HP con GAIN=' + CURRENT_GAIN);
+                    applyFilter(lastGrayData, lastWidth, lastHeight, 'ideal', false, D0, n, 'hpIdeal');
+                    
+                    console.log('Aplicando filtro Butterworth HP con GAIN=' + CURRENT_GAIN);
+                    applyFilter(lastGrayData, lastWidth, lastHeight, 'butterworth', false, D0, n, 'hpButterworth');
+                    
+                    console.log('Aplicando filtro Gaussian HP con GAIN=' + CURRENT_GAIN);
+                    applyFilter(lastGrayData, lastWidth, lastHeight, 'gaussian', false, D0, n, 'hpGaussian');
+                    
+                    document.getElementById('loadingSection').classList.add('hidden');
+                    console.log('✅ Reprocesamiento completado con GAIN=' + CURRENT_GAIN);
+                } catch (error) {
+                    console.error('❌ Error al reprocesar:', error);
+                    document.getElementById('loadingSection').classList.add('hidden');
+                    alert('Error al reprocesar: ' + error.message);
+                }
+            }, 100);
         }
+        
+        // Exportar inmediatamente a window para que onclick funcione
+        window.updateGainValue = updateGainValue;
+        window.reprocessWithNewGain = reprocessWithNewGain;
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1220,6 +1253,8 @@
             lastGrayData = new Float32Array(grayData);
             lastWidth = width;
             lastHeight = height;
+            
+            console.log(`✅ Datos guardados para reprocesamiento: ${width}×${height} pixels`);
             
             const D0 = 50;  // Frecuencia de corte (igual que en Python)
             const n = 2;    // Orden del filtro Butterworth
@@ -2143,6 +2178,12 @@
         window.deletePost = deletePost;
         window.updateGainValue = updateGainValue;
         window.reprocessWithNewGain = reprocessWithNewGain;
+        
+        console.log('✅ Funciones globales exportadas:', {
+            processImage: typeof window.processImage,
+            updateGainValue: typeof window.updateGainValue,
+            reprocessWithNewGain: typeof window.reprocessWithNewGain
+        });
     </script>
 </body>
 </html>
