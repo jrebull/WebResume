@@ -852,10 +852,10 @@
                     <h3>🔼 Filtros Pasa-Altas (Realce de bordes - Eliminan baja frecuencia)</h3>
                     <div style="background: #e7f3ff; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #4267b2;">
                         <strong style="color: #1F497D;">⚙️ Amplificación de Bordes:</strong>
-                        <input type="range" id="gainSlider" min="1" max="30" value="15" step="1" 
+                        <input type="range" id="gainSlider" min="0.5" max="10" value="1" step="0.5" 
                                style="width: 200px; vertical-align: middle; margin: 0 10px;"
                                oninput="updateGainValue(this.value)">
-                        <span id="gainValue" style="font-weight: bold; color: #4267b2;">15×</span>
+                        <span id="gainValue" style="font-weight: bold; color: #4267b2;">1×</span>
                         <button onclick="reprocessWithNewGain()" 
                                 style="background: #4267b2; color: white; border: none; padding: 6px 12px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-size: 12px; font-weight: bold;">
                             🔄 Aplicar Cambio
@@ -865,12 +865,12 @@
                         </div>
                         <p style="margin: 8px 0 0 0; font-size: 11px; color: #666;">
                             <strong>📌 Instrucciones:</strong> 
-                            1️⃣ Mueve el slider al valor deseado (1× a 30×) 
+                            1️⃣ Mueve el slider al valor deseado (0.5× a 10×) 
                             2️⃣ Haz clic en "🔄 Aplicar Cambio"
                             3️⃣ Los 3 filtros pasa-altas se actualizarán con borde verde brillante
                         </p>
                         <p style="margin: 4px 0 0 0; font-size: 11px; color: #28a745;">
-                            💡 <strong>Tip:</strong> Valores bajos (1-5×) = bordes sutiles | Valores altos (20-30×) = bordes muy marcados
+                            💡 <strong>Tip:</strong> GAIN=1× reproduce el resultado del profesor (normalización automática) | GAIN > 1× enfatiza bordes
                         </p>
                     </div>
                     <div class="filters-grid">
@@ -992,7 +992,7 @@
         let userLikes = new Set();
         
         // CRITICAL: Hacer CURRENT_GAIN explícitamente global usando window
-        window.CURRENT_GAIN = 15.0;  // Valor inicial de amplificación
+        window.CURRENT_GAIN = 1.0;  // Valor inicial de amplificación (1.0 = sin amplificación, como el profesor)
         let lastGrayData = null;  
         let lastWidth = 0;
         let lastHeight = 0;
@@ -1106,7 +1106,7 @@
         console.log('✅ Funciones de GAIN exportadas');
         console.log('  - updateGainValue:', typeof window.updateGainValue);
         console.log('  - reprocessWithNewGain:', typeof window.reprocessWithNewGain);
-        console.log('  - CURRENT_GAIN inicial:', window.CURRENT_GAIN);
+        console.log('  - CURRENT_GAIN inicial:', window.CURRENT_GAIN, '(1.0 = método del profesor)');
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -1739,18 +1739,34 @@
                 const imageData = tempCtx.createImageData(width, height);
                 
                 if (isHighPass) {
+                    // Para filtros pasa-altas: método del profesor
+                    // 1. Aplicar GAIN
+                    // 2. Encontrar max para normalizar
+                    // 3. Mapear a [0, 255]
+                    
                     const GAIN = window.CURRENT_GAIN;
                     console.log(`  🎯 APLICANDO GAIN=${GAIN} para filtro pasa-altas`);
                     
-                    // Para filtros pasa-altas: valores centrados en 0
-                    // Aplicar GAIN y luego mapear a [0, 255] con centro en 128 (gris medio)
+                    const amplified = new Float32Array(data.length);
+                    let maxVal = 0;
                     
+                    for (let i = 0; i < data.length; i++) {
+                        amplified[i] = Math.abs(data[i]) * GAIN;
+                        if (amplified[i] > maxVal) maxVal = amplified[i];
+                    }
+                    
+                    console.log(`  📊 Valor máximo después de GAIN: ${maxVal.toFixed(4)}`);
+                    
+                    // Normalizar al rango [0, 255] basado en el máximo encontrado
                     for (let i = 0; i < width * height; i++) {
-                        // Amplificar y centrar en 128 (gris medio)
-                        let value = 128 + (data[i] * GAIN);
-                        
-                        // Clip a rango válido [0, 255]
-                        value = Math.max(0, Math.min(255, Math.round(value)));
+                        let value;
+                        if (maxVal === 0) {
+                            value = 0;
+                        } else {
+                            // Normalización simple: (valor / max) * 255
+                            value = (amplified[i] / maxVal) * 255;
+                            value = Math.max(0, Math.min(255, Math.round(value)));
+                        }
                         
                         const idx = i * 4;
                         if (idx + 3 < imageData.data.length) {
@@ -1760,8 +1776,10 @@
                             imageData.data[idx + 3] = 255;
                         }
                     }
-                    console.log(`  ✅ ImageData creado con GAIN=${GAIN} (método: 128 + GAIN*valor)`);
+                    console.log(`  ✅ ImageData creado con GAIN=${GAIN} (normalizado por máximo)`);
+                    
                 } else {
+                    // Para filtros pasa-bajas: normalización estándar [min, max]
                     let min = Infinity;
                     let max = -Infinity;
                     for (let i = 0; i < data.length; i++) {
