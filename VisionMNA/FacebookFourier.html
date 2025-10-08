@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mejoramiento de Imágenes con Fourier - Team 13 - Visión Computacional</title>
+    <title>Mejoramiento de Imágenes con Fourier - Visión Computacional</title>
     <style>
         * {
             margin: 0;
@@ -28,163 +28,23 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #1F497D 0%, #3b5998 100%);
+            background: #3b5998;
             color: white;
             padding: 20px;
             text-align: center;
         }
         
         .header h1 {
-            font-size: 22px;
-            margin-bottom: 8px;
-        }
-        
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .institution-info {
-            background: white;
-            padding: 20px;
-            border-bottom: 3px solid #1F497D;
-        }
-        
-        .institution-header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .institution-header h2 {
-            color: #1F497D;
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-        
-        .institution-header h3 {
-            color: #666;
-            font-size: 16px;
-            font-weight: normal;
-        }
-        
-        .badges {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 12px 0;
-        }
-        
-        .badge {
-            background: #1F497D;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .badge.course {
-            background: #FF6B6B;
-        }
-        
-        .badge.activity {
-            background: #F9AB00;
-        }
-        
-        .professors {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 12px 0;
-        }
-        
-        .professors h4 {
-            color: #1F497D;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .professors ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .professors li {
-            color: #444;
-            padding: 4px 0;
-            font-size: 13px;
-        }
-        
-        .team-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            color: white;
-        }
-        
-        .team-section h3 {
-            text-align: center;
-            font-size: 22px;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .team-member {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .team-member:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
-        }
-        
-        .team-member img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            font-size: 24px;
             margin-bottom: 10px;
-            border: 3px solid #667eea;
-            object-fit: cover;
-        }
-        
-        .team-member h4 {
-            color: #1F497D;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-        
-        .team-member .matricula {
-            color: #667eea;
-            font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 4px;
-        }
-        
-        .team-member .role {
-            color: #666;
-            font-size: 12px;
         }
         
         .firebase-status {
             background: #2ecc71;
             color: white;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
             font-weight: bold;
-            font-size: 13px;
         }
         
         .firebase-status.disconnected {
@@ -199,14 +59,9 @@
             background: #f6f7f9;
             border: 2px dashed #cbd0d8;
             border-radius: 8px;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .upload-section h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
         }
         
         .upload-section input[type="file"] {
@@ -216,10 +71,10 @@
         .upload-btn {
             background: #4267b2;
             color: white;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             transition: background 0.3s;
             display: inline-block;
@@ -232,13 +87,13 @@
         .process-btn {
             background: #42b72a;
             color: white;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             transition: background 0.3s;
-            margin-top: 12px;
+            margin-top: 15px;
         }
         
         .process-btn:hover {
@@ -251,14 +106,14 @@
         }
         
         .original-section {
-            margin: 15px 0;
+            margin: 20px 0;
             text-align: center;
         }
         
         .original-section h2 {
             color: #333;
-            margin-bottom: 12px;
-            font-size: 18px;
+            margin-bottom: 15px;
+            font-size: 20px;
         }
         
         canvas {
@@ -270,44 +125,44 @@
         }
         
         .results-section {
-            margin-top: 20px;
+            margin-top: 30px;
         }
         
         .results-section h2 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-            padding-bottom: 8px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #3b5998;
         }
         
         .filter-category {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         
         .filter-category h3 {
             color: #4267b2;
-            margin-bottom: 12px;
-            font-size: 16px;
+            margin-bottom: 15px;
+            font-size: 18px;
         }
         
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
         }
         
         .filter-result {
             background: #f6f7f9;
-            padding: 12px;
+            padding: 15px;
             border-radius: 8px;
             text-align: center;
         }
         
         .filter-result h4 {
             color: #555;
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-size: 16px;
             font-weight: bold;
         }
         
@@ -317,26 +172,26 @@
         }
         
         .filter-description {
-            margin-top: 8px;
-            padding: 8px;
+            margin-top: 10px;
+            padding: 10px;
             background: white;
             border-radius: 5px;
-            font-size: 12px;
+            font-size: 13px;
             color: #666;
             text-align: left;
-            line-height: 1.4;
+            line-height: 1.5;
         }
         
         .post-button {
             background: #42b72a;
             color: white;
-            padding: 12px 30px;
+            padding: 15px 40px;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            margin: 20px auto;
+            margin: 30px auto;
             display: block;
             transition: background 0.3s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -355,22 +210,22 @@
         }
         
         .feed-section {
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-top: 40px;
+            padding-top: 30px;
             border-top: 3px solid #3b5998;
         }
         
         .feed-section h2 {
             color: #3b5998;
-            margin-bottom: 20px;
-            font-size: 20px;
+            margin-bottom: 25px;
+            font-size: 24px;
         }
         
         .post-item {
             background: #f6f7f9;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
@@ -378,21 +233,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 1px solid #ddd;
         }
         
         .post-avatar {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             background: #4267b2;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 18px;
+            font-size: 20px;
         }
         
         .post-info {
@@ -402,22 +257,22 @@
         .post-author {
             font-weight: bold;
             color: #3b5998;
-            font-size: 14px;
+            font-size: 15px;
         }
         
         .post-time {
             color: #90949c;
-            font-size: 11px;
+            font-size: 12px;
         }
         
         .delete-post-btn {
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             transition: background 0.3s;
         }
         
@@ -426,15 +281,14 @@
         }
         
         .post-content {
-            margin-bottom: 12px;
-            font-size: 14px;
+            margin-bottom: 15px;
         }
         
         .post-images {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 12px;
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .post-images canvas, .post-images img {
@@ -446,28 +300,28 @@
         
         .interpretation-text {
             background: white;
-            padding: 12px;
+            padding: 15px;
             border-radius: 8px;
-            margin-top: 12px;
+            margin-top: 15px;
             border-left: 4px solid #4267b2;
         }
         
         .interpretation-text h4 {
             color: #4267b2;
-            margin-bottom: 8px;
-            font-size: 15px;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
         
         .interpretation-text p {
             color: #333;
-            line-height: 1.5;
-            margin-bottom: 8px;
-            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
         
         .no-posts {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
             color: #666;
             font-style: italic;
         }
@@ -475,29 +329,29 @@
         .post-actions {
             background: white;
             border-top: 1px solid #e5e5e5;
-            padding: 12px;
-            margin-top: 12px;
+            padding: 15px;
+            margin-top: 15px;
             border-radius: 0 0 8px 8px;
         }
         
         .action-buttons {
             display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
             border-bottom: 1px solid #e5e5e5;
         }
         
         .action-btn {
             background: white;
             border: 1px solid #cbd0d8;
-            padding: 6px 15px;
+            padding: 8px 20px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: all 0.3s;
             flex: 1;
             justify-content: center;
@@ -515,22 +369,22 @@
         }
         
         .action-icon {
-            font-size: 16px;
+            font-size: 18px;
         }
         
         .comment-form {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         
         .comment-input {
             flex: 1;
             border: 1px solid #cbd0d8;
             border-radius: 20px;
-            padding: 8px 12px;
-            font-size: 13px;
+            padding: 10px 15px;
+            font-size: 14px;
             outline: none;
         }
         
@@ -542,10 +396,10 @@
             background: #4267b2;
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
             transition: background 0.3s;
         }
         
@@ -554,14 +408,14 @@
         }
         
         .comments-list {
-            margin-top: 12px;
+            margin-top: 15px;
         }
         
         .comment {
             background: #f0f2f5;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             position: relative;
         }
         
@@ -569,13 +423,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
         
         .comment-author {
             font-weight: bold;
             color: #3b5998;
-            font-size: 12px;
+            font-size: 13px;
         }
         
         .delete-comment-btn {
@@ -583,8 +437,8 @@
             border: none;
             color: #90949c;
             cursor: pointer;
-            font-size: 16px;
-            padding: 0 4px;
+            font-size: 18px;
+            padding: 0 5px;
             transition: color 0.3s;
         }
         
@@ -594,18 +448,18 @@
         
         .comment-text {
             color: #333;
-            font-size: 13px;
-            margin-bottom: 4px;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
         
         .comment-time {
             color: #90949c;
-            font-size: 10px;
+            font-size: 11px;
         }
         
         .loading {
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             color: #666;
         }
         
@@ -613,10 +467,10 @@
             border: 3px solid #f3f3f3;
             border-top: 3px solid #4267b2;
             border-radius: 50%;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 15px auto;
+            margin: 20px auto;
         }
         
         @keyframes spin {
@@ -631,42 +485,28 @@
         .info-box {
             background: #d4edda;
             border-left: 4px solid #28a745;
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
             border-radius: 4px;
         }
         
         .info-box p {
             color: #155724;
-            font-size: 13px;
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.6;
         }
         
         .format-support {
             background: #d1ecf1;
             border-left: 4px solid #0c5460;
-            padding: 10px;
-            margin-top: 8px;
+            padding: 12px;
+            margin-top: 10px;
             border-radius: 4px;
         }
         
         .format-support p {
             color: #0c5460;
-            font-size: 12px;
-            margin: 0;
-        }
-        
-        .optimization-info {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 10px;
-            margin-top: 8px;
-            border-radius: 4px;
-        }
-        
-        .optimization-info p {
-            color: #856404;
-            font-size: 12px;
+            font-size: 13px;
             margin: 0;
         }
     </style>
@@ -675,69 +515,7 @@
     <div class="container">
         <div class="header">
             <h1>🖼️ Mejoramiento de Imágenes con Transformada de Fourier</h1>
-            <p>Algoritmos de mejoramiento en el dominio de Fourier</p>
-        </div>
-        
-        <!-- Información Institucional -->
-        <div class="institution-info">
-            <div class="institution-header">
-                <h2>🎓 Maestría en Inteligencia Artificial Aplicada</h2>
-                <h3>Tecnológico de Monterrey</h3>
-            </div>
-            
-            <div class="badges">
-                <span class="badge">Tecnológico de Monterrey</span>
-                <span class="badge course">Computer Vision</span>
-                <span class="badge activity">Actividad 5.4 - Google Colab</span>
-            </div>
-            
-            <div class="professors">
-                <h4>👨‍🏫 Profesores</h4>
-                <ul>
-                    <li><strong>Profesor Titular:</strong> Dr. Gilberto Ochoa Ruiz</li>
-                    <li><strong>Profesor Asistente:</strong> MIP Ma. del Refugio Melendez Alfaro</li>
-                    <li><strong>Profesor Tutor:</strong> M. en C. Jose Angel Martinez Navarro</li>
-                </ul>
-            </div>
-            
-            <div style="text-align: center; margin-top: 12px;">
-                <p style="font-size: 13px;"><strong>📌 Título:</strong> Algoritmos de mejoramiento de imágenes en el dominio de Fourier</p>
-                <p style="font-size: 13px;"><strong>📅 Fecha de entrega:</strong> Octubre 12, 2025 a las 23:59</p>
-            </div>
-        </div>
-        
-        <!-- Sección del Equipo -->
-        <div class="team-section">
-            <h3>👥 Team 13 - Nuestro Equipo</h3>
-            <div class="team-grid">
-                <div class="team-member">
-                    <img src="https://iili.io/KuvsGKx.png" alt="Javier Augusto Rebull Saucedo">
-                    <h4>Javier Augusto Rebull Saucedo</h4>
-                    <p class="matricula">A01795838</p>
-                    <p class="role">🎓 MNA Student</p>
-                </div>
-                
-                <div class="team-member">
-                    <img src="https://iili.io/KuvP4gp.png" alt="Juan Carlos Pérez Nava">
-                    <h4>Juan Carlos Pérez Nava</h4>
-                    <p class="matricula">A01795941</p>
-                    <p class="role">🎓 MNA Student</p>
-                </div>
-                
-                <div class="team-member">
-                    <img src="https://iili.io/KuvLaJp.png" alt="Luis Gerardo Sánchez Salazar">
-                    <h4>Luis Gerardo Sánchez Salazar</h4>
-                    <p class="matricula">A01232963</p>
-                    <p class="role">🎓 MNA Student</p>
-                </div>
-                
-                <div class="team-member">
-                    <img src="https://iili.io/KuvQx24.png" alt="Oscar Enrique García García">
-                    <h4>Oscar Enrique García García</h4>
-                    <p class="matricula">A01016093</p>
-                    <p class="role">🎓 MNA Student</p>
-                </div>
-            </div>
+            <p>Tarea de Visión Computacional - Filtros Pasa-Bajas y Pasa-Altas</p>
         </div>
         
         <div id="firebaseStatus" class="firebase-status">
@@ -746,19 +524,16 @@
         
         <div class="content">
             <div class="info-box">
-                <p><strong>🌐 Feed Global con Firebase:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube y son visibles para cualquiera que visite esta página. ¡Ahora puedes dar like, comentar y eliminar posts!</p>
+                <p><strong>🌍 Feed Global con Firebase:</strong> ¡Todos los visitantes ven las mismas publicaciones! Tus posts se guardan en la nube y son visibles para cualquiera que visite esta página. ¡Ahora puedes dar like, comentar y eliminar posts!</p>
             </div>
             
             <div class="upload-section">
-                <h3>📤 Subir Imagen</h3>
-                <input type="file" id="imageUpload" accept="image/*,.heic,.HEIC,.heif,.HEIF,.dng,.DNG">
+                <h3 style="margin-bottom: 15px;">📤 Subir Imagen</h3>
+                <input type="file" id="imageUpload" accept="image/*,.heic,.HEIC,.dng,.DNG">
                 <label for="imageUpload" class="upload-btn">Seleccionar Imagen</label>
-                <p id="fileName" style="margin-top: 8px; color: #666; font-size: 13px;"></p>
+                <p id="fileName" style="margin-top: 10px; color: #666;"></p>
                 <div class="format-support">
                     <p>✅ Formatos soportados: JPG, PNG, WEBP, HEIC (iPhone), DNG (RAW), y más</p>
-                </div>
-                <div class="optimization-info">
-                    <p>⚡ Optimización automática: Las imágenes se procesan eficientemente</p>
                 </div>
                 <button id="processBtn" class="process-btn" onclick="processImage()" disabled>🔬 Procesar con Filtros de Fourier</button>
             </div>
@@ -834,7 +609,7 @@
             </div>
             
             <div class="feed-section" id="feedSection">
-                <h2>🌐 Feed Global de Procesamiento</h2>
+                <h2>🌍 Feed Global de Procesamiento</h2>
                 <div id="feedContainer">
                     <div class="no-posts">
                         <div class="spinner"></div>
@@ -845,44 +620,41 @@
         </div>
     </div>
 
-    <!-- Firebase SDK v9 modular -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <!-- HEIC support -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
-        // Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyD3HXas_ZlSBHkcgqj58gtvOaDIE751skg",
-          authDomain: "fourier-vision-9243d.firebaseapp.com",
-          projectId: "fourier-vision-9243d",
-          storageBucket: "fourier-vision-9243d.firebasestorage.app",
-          messagingSenderId: "713813028117",
-          appId: "1:713813028117:web:bb7e8bdf989a7966498d1c",
-          measurementId: "G-24BGNP617J"
-        };
+    <script>
+				// Your web app's Firebase configuration
+				// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+				const firebaseConfig = {
+				  apiKey: "AIzaSyD3HXas_ZlSBHkcgqj58gtvOaDIE751skg",
+				  authDomain: "fourier-vision-9243d.firebaseapp.com",
+				  projectId: "fourier-vision-9243d",
+				  storageBucket: "fourier-vision-9243d.firebasestorage.app",
+				  messagingSenderId: "713813028117",
+				  appId: "1:713813028117:web:bb7e8bdf989a7966498d1c",
+				  measurementId: "G-24BGNP617J"
+				};
 
         // Inicializar Firebase
-        let db, storage, firebaseInitialized = false;
+        let db;
+        let storage;
+        let firebaseInitialized = false;
 
         try {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            storage = getStorage(app);
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            storage = firebase.storage();
             firebaseInitialized = true;
             updateFirebaseStatus(true);
-            console.log('✅ Firebase conectado correctamente');
-            
-            // Hacer disponibles globalmente
-            window.db = db;
-            window.storage = storage;
-            window.firebaseInitialized = firebaseInitialized;
-            window.firebaseModules = { collection, addDoc, query, orderBy, limit, onSnapshot, deleteDoc, doc, updateDoc, arrayUnion, serverTimestamp, ref, uploadBytes, getDownloadURL, deleteObject };
-            
-            // Cargar feed después de inicializar
-            loadFeed();
+            console.log('Firebase conectado correctamente');
         } catch (error) {
-            console.error('❌ Error al conectar Firebase:', error);
+            console.error('Error al conectar Firebase:', error);
             updateFirebaseStatus(false);
         }
 
@@ -896,27 +668,14 @@
                 statusDiv.className = 'firebase-status disconnected';
             }
         }
-        
-        window.updateFirebaseStatus = updateFirebaseStatus;
-    </script>
-    
-    <!-- HEIC support -->
-    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
-    <script>
         // ========================================
         // VARIABLES GLOBALES
         // ========================================
         let uploadedImage = null;
         let currentResults = {};
         let feedPosts = [];
-        let userLikes = new Set();
-        
-        // Tamaños más pequeños y mejor compresión
-        const MAX_DISPLAY_SIZE = 400;   // Reducido de 600
-        const MAX_STORAGE_SIZE = 400;   // Reducido de 512
-        const MAX_PROCESS_SIZE = 256;   // Igual
-        const JPEG_QUALITY = 0.88;      // Aumentado de 0.7 para mejor calidad
+        let userLikes = new Set(); // Guarda los IDs de posts con like
         
         // ========================================
         // MANEJO DE ARCHIVOS HEIC Y DNG
@@ -924,30 +683,20 @@
         
         async function convertHEICtoJPEG(file) {
             try {
-                console.log('🔄 Convirtiendo archivo HEIC...');
-                
-                // Verificar que heic2any esté disponible
-                if (typeof heic2any === 'undefined') {
-                    throw new Error('La librería heic2any no está cargada. Recarga la página.');
-                }
-                
                 const convertedBlob = await heic2any({
                     blob: file,
                     toType: "image/jpeg",
-                    quality: 0.92
+                    quality: 0.9
                 });
-                
-                console.log('✅ HEIC convertido exitosamente');
-                return new File([convertedBlob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { 
-                    type: 'image/jpeg' 
-                });
+                return new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' });
             } catch (error) {
-                console.error('❌ Error converting HEIC:', error);
-                throw new Error('No se pudo convertir el archivo HEIC. Error: ' + error.message);
+                console.error('Error converting HEIC:', error);
+                throw new Error('No se pudo convertir el archivo HEIC. Intenta con otro formato.');
             }
         }
         
         async function convertDNGtoJPEG(file) {
+            // DNG es más complejo, usamos un canvas para extraer lo que podamos
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -960,44 +709,16 @@
                         ctx.drawImage(img, 0, 0);
                         
                         canvas.toBlob((blob) => {
-                            resolve(new File([blob], file.name.replace(/\.dng$/i, '.jpg'), { 
-                                type: 'image/jpeg' 
-                            }));
-                        }, 'image/jpeg', 0.92);
+                            resolve(new File([blob], file.name.replace(/\.dng$/i, '.jpg'), { type: 'image/jpeg' }));
+                        }, 'image/jpeg', 0.9);
                     };
                     img.onerror = () => {
                         reject(new Error('El archivo DNG no se pudo procesar. Intenta convertirlo a JPG primero.'));
                     };
                     img.src = e.target.result;
                 };
-                reader.onerror = () => {
-                    reject(new Error('Error al leer el archivo DNG'));
-                };
                 reader.readAsDataURL(file);
             });
-        }
-        
-        // ========================================
-        // OPTIMIZACIÓN DE IMÁGENES
-        // ========================================
-        
-        function resizeImage(img, maxSize, quality = 0.9) {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-            
-            if (width > maxSize || height > maxSize) {
-                const ratio = Math.min(maxSize / width, maxSize / height);
-                width = Math.floor(width * ratio);
-                height = Math.floor(height * ratio);
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            return canvas.toDataURL('image/jpeg', quality);
         }
         
         // File upload handler
@@ -1006,28 +727,19 @@
             if (!file) return;
             
             const fileName = file.name.toLowerCase();
-            const fileNameDisplay = document.getElementById('fileName');
             
             try {
-                if (fileName.endsWith('.heic') || fileName.endsWith('.heif')) {
-                    fileNameDisplay.textContent = `🔄 Convirtiendo HEIC: ${file.name}...`;
-                    fileNameDisplay.style.color = '#4267b2';
-                    
+                // Mostrar mensaje de conversión si es necesario
+                if (fileName.endsWith('.heic')) {
+                    document.getElementById('fileName').textContent = `🔄 Convirtiendo HEIC: ${file.name}...`;
                     file = await convertHEICtoJPEG(file);
-                    
-                    fileNameDisplay.textContent = `✅ Convertido: ${file.name}`;
-                    fileNameDisplay.style.color = '#28a745';
+                    document.getElementById('fileName').textContent = `✅ Convertido: ${file.name}`;
                 } else if (fileName.endsWith('.dng')) {
-                    fileNameDisplay.textContent = `🔄 Procesando DNG: ${file.name}...`;
-                    fileNameDisplay.style.color = '#4267b2';
-                    
+                    document.getElementById('fileName').textContent = `🔄 Procesando DNG: ${file.name}...`;
                     file = await convertDNGtoJPEG(file);
-                    
-                    fileNameDisplay.textContent = `✅ Procesado: ${file.name}`;
-                    fileNameDisplay.style.color = '#28a745';
+                    document.getElementById('fileName').textContent = `✅ Procesado: ${file.name}`;
                 } else {
-                    fileNameDisplay.textContent = `📄 ${file.name}`;
-                    fileNameDisplay.style.color = '#666';
+                    document.getElementById('fileName').textContent = `📄 ${file.name}`;
                 }
                 
                 document.getElementById('processBtn').disabled = false;
@@ -1044,10 +756,8 @@
                 reader.readAsDataURL(file);
                 
             } catch (error) {
-                console.error('Error procesando archivo:', error);
                 alert(error.message);
-                fileNameDisplay.textContent = `❌ Error: ${error.message}`;
-                fileNameDisplay.style.color = '#e74c3c';
+                document.getElementById('fileName').textContent = `❌ Error: ${error.message}`;
                 document.getElementById('processBtn').disabled = true;
             }
         });
@@ -1056,12 +766,12 @@
             const canvas = document.getElementById('originalCanvas');
             const ctx = canvas.getContext('2d');
             
+            const maxSize = 400;
             let width = img.width;
             let height = img.height;
             
-            // Tamaño para display
-            if (width > MAX_DISPLAY_SIZE || height > MAX_DISPLAY_SIZE) {
-                const ratio = Math.min(MAX_DISPLAY_SIZE / width, MAX_DISPLAY_SIZE / height);
+            if (width > maxSize || height > maxSize) {
+                const ratio = Math.min(maxSize / width, maxSize / height);
                 width = Math.floor(width * ratio);
                 height = Math.floor(height * ratio);
             }
@@ -1070,8 +780,7 @@
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Guardar versión optimizada para storage
-            currentResults['original'] = resizeImage(img, MAX_STORAGE_SIZE, JPEG_QUALITY);
+            currentResults['original'] = canvas.toDataURL();
             
             document.getElementById('originalSection').classList.remove('hidden');
         }
@@ -1102,12 +811,12 @@
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
+            const maxProcessSize = 128;
             let width = img.width;
             let height = img.height;
             
-            // Reducir tamaño para procesamiento FFT
-            if (width > MAX_PROCESS_SIZE || height > MAX_PROCESS_SIZE) {
-                const ratio = Math.min(MAX_PROCESS_SIZE / width, MAX_PROCESS_SIZE / height);
+            if (width > maxProcessSize || height > maxProcessSize) {
+                const ratio = Math.min(maxProcessSize / width, maxProcessSize / height);
                 width = Math.floor(width * ratio);
                 height = Math.floor(height * ratio);
             }
@@ -1185,11 +894,22 @@
                 displayResult(croppedResult, width, height, canvasId);
             } catch (error) {
                 console.error(`Error in ${canvasId}:`, error);
+                const canvas = document.getElementById(canvasId);
+                canvas.width = 200;
+                canvas.height = 50;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, 200, 50);
+                ctx.fillStyle = '#ff0000';
+                ctx.font = '12px Arial';
+                ctx.fillText('Error procesando', 10, 25);
             }
         }
         
         function createFrequencyFilter(width, height, type, isLowPass, D0, n) {
             const filter = new Float32Array(width * height);
+            const centerX = width / 2;
+            const centerY = height / 2;
             
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
@@ -1415,22 +1135,10 @@
                 }
                 
                 const canvas = document.getElementById(canvasId);
-                
-                // Escalar más pequeño para visualización
-                const displayScale = 1.5;
-                const displayWidth = width * displayScale;
-                const displayHeight = height * displayScale;
-                
-                canvas.width = displayWidth;
-                canvas.height = displayHeight;
+                canvas.width = width;
+                canvas.height = height;
                 const ctx = canvas.getContext('2d');
-                
-                // Crear imagen temporal en tamaño original
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = width;
-                tempCanvas.height = height;
-                const tempCtx = tempCanvas.getContext('2d');
-                const imageData = tempCtx.createImageData(width, height);
+                const imageData = ctx.createImageData(width, height);
                 
                 for (let i = 0; i < width * height; i++) {
                     const normalized = range === 0 ? 0 : ((data[i] - min) / range) * 255;
@@ -1444,15 +1152,8 @@
                     }
                 }
                 
-                tempCtx.putImageData(imageData, 0, 0);
-                
-                // Escalar al canvas de visualización
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(tempCanvas, 0, 0, displayWidth, displayHeight);
-                
-                // Guardar versión con mejor compresión
-                currentResults[canvasId] = tempCanvas.toDataURL('image/jpeg', JPEG_QUALITY);
+                ctx.putImageData(imageData, 0, 0);
+                currentResults[canvasId] = canvas.toDataURL();
                 
             } catch (error) {
                 console.error(`Error displaying ${canvasId}:`, error);
@@ -1465,17 +1166,16 @@
         
         async function uploadImageToStorage(dataUrl, path) {
             try {
+                // Convertir data URL a blob
                 const response = await fetch(dataUrl);
                 const blob = await response.blob();
                 
-                const { ref, uploadBytes, getDownloadURL } = window.firebaseModules;
-                const storageRef = ref(window.storage, path);
-                const snapshot = await uploadBytes(storageRef, blob, {
-                    contentType: 'image/jpeg',
-                    cacheControl: 'public,max-age=31536000'
-                });
+                // Subir a Firebase Storage
+                const storageRef = storage.ref(path);
+                const snapshot = await storageRef.put(blob);
                 
-                const downloadURL = await getDownloadURL(snapshot.ref);
+                // Obtener URL de descarga
+                const downloadURL = await snapshot.ref.getDownloadURL();
                 return downloadURL;
             } catch (error) {
                 console.error('Error uploading to storage:', error);
@@ -1484,7 +1184,7 @@
         }
         
         async function publishToFeed() {
-            if (!window.firebaseInitialized) {
+            if (!firebaseInitialized) {
                 alert('Error: Firebase no está configurado.');
                 return;
             }
@@ -1495,35 +1195,28 @@
             }
             
             try {
-                document.getElementById('loadingText').textContent = '⚡ Optimizando y subiendo imágenes...';
+                document.getElementById('loadingText').textContent = 'Subiendo imágenes a Firebase Storage...';
                 document.getElementById('loadingSection').classList.remove('hidden');
                 
                 const timestamp = Date.now();
                 const imageUrls = {};
                 
-                let uploadedCount = 0;
-                const totalImages = Object.keys(currentResults).length;
-                
+                // Subir cada imagen a Storage
                 for (const [key, dataUrl] of Object.entries(currentResults)) {
-                    uploadedCount++;
-                    document.getElementById('loadingText').textContent = 
-                        `⚡ Subiendo imagen ${uploadedCount}/${totalImages}...`;
-                    
                     const path = `posts/${timestamp}/${key}.jpg`;
                     imageUrls[key] = await uploadImageToStorage(dataUrl, path);
                 }
                 
-                const { collection, addDoc, serverTimestamp } = window.firebaseModules;
-                
+                // Guardar metadata en Firestore
                 const post = {
-                    timestamp: serverTimestamp(),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     imageUrls: imageUrls,
                     createdAt: new Date().toISOString(),
                     likes: 0,
                     comments: []
                 };
                 
-                await addDoc(collection(window.db, 'posts'), post);
+                await db.collection('posts').add(post);
                 
                 document.getElementById('loadingSection').classList.add('hidden');
                 alert('¡Publicación guardada exitosamente! 🎉');
@@ -1542,24 +1235,22 @@
         // ========================================
         
         async function toggleLike(postId) {
-            if (!window.firebaseInitialized) return;
+            if (!firebaseInitialized) return;
             
             try {
-                const { doc, updateDoc } = window.firebaseModules;
-                const postRef = doc(window.db, 'posts', postId);
-                
-                const post = feedPosts.find(p => p.id === postId);
-                if (!post) return;
-                
-                const currentLikes = post.likes || 0;
+                const postRef = db.collection('posts').doc(postId);
+                const post = await postRef.get();
+                const currentLikes = post.data().likes || 0;
                 
                 if (userLikes.has(postId)) {
-                    await updateDoc(postRef, {
+                    // Quitar like
+                    await postRef.update({
                         likes: Math.max(0, currentLikes - 1)
                     });
                     userLikes.delete(postId);
                 } else {
-                    await updateDoc(postRef, {
+                    // Dar like
+                    await postRef.update({
                         likes: currentLikes + 1
                     });
                     userLikes.add(postId);
@@ -1574,11 +1265,10 @@
         // ========================================
         
         async function addComment(postId, commentText) {
-            if (!window.firebaseInitialized || !commentText.trim()) return;
+            if (!firebaseInitialized || !commentText.trim()) return;
             
             try {
-                const { doc, updateDoc, arrayUnion } = window.firebaseModules;
-                const postRef = doc(window.db, 'posts', postId);
+                const postRef = db.collection('posts').doc(postId);
                 const comment = {
                     id: Date.now().toString(),
                     text: commentText.trim(),
@@ -1586,8 +1276,8 @@
                     timestamp: new Date().toISOString()
                 };
                 
-                await updateDoc(postRef, {
-                    comments: arrayUnion(comment)
+                await postRef.update({
+                    comments: firebase.firestore.FieldValue.arrayUnion(comment)
                 });
                 
             } catch (error) {
@@ -1596,21 +1286,18 @@
         }
         
         async function deleteComment(postId, commentId) {
-            if (!window.firebaseInitialized) return;
+            if (!firebaseInitialized) return;
             
             if (!confirm('¿Eliminar este comentario?')) return;
             
             try {
-                const { doc, updateDoc } = window.firebaseModules;
-                const postRef = doc(window.db, 'posts', postId);
+                const postRef = db.collection('posts').doc(postId);
+                const post = await postRef.get();
+                const comments = post.data().comments || [];
                 
-                const post = feedPosts.find(p => p.id === postId);
-                if (!post) return;
-                
-                const comments = post.comments || [];
                 const updatedComments = comments.filter(c => c.id !== commentId);
                 
-                await updateDoc(postRef, {
+                await postRef.update({
                     comments: updatedComments
                 });
                 
@@ -1624,32 +1311,29 @@
         // ========================================
         
         async function deletePost(postId) {
-            if (!window.firebaseInitialized) return;
+            if (!firebaseInitialized) return;
             
             if (!confirm('¿Estás seguro de eliminar esta publicación? Esta acción no se puede deshacer.')) {
                 return;
             }
             
             try {
-                const { doc, deleteDoc, ref, deleteObject } = window.firebaseModules;
+                // Primero obtener las URLs de las imágenes
+                const postDoc = await db.collection('posts').doc(postId).get();
+                const imageUrls = postDoc.data().imageUrls || {};
                 
-                const post = feedPosts.find(p => p.id === postId);
-                if (!post) return;
-                
-                const imageUrls = post.imageUrls || {};
-                
+                // Eliminar imágenes de Storage
                 for (const url of Object.values(imageUrls)) {
                     try {
-                        const urlParts = url.split('/o/')[1].split('?')[0];
-                        const path = decodeURIComponent(urlParts);
-                        const storageRef = ref(window.storage, path);
-                        await deleteObject(storageRef);
+                        const storageRef = storage.refFromURL(url);
+                        await storageRef.delete();
                     } catch (err) {
                         console.log('Error deleting image:', err);
                     }
                 }
                 
-                await deleteDoc(doc(window.db, 'posts', postId));
+                // Eliminar documento de Firestore
+                await db.collection('posts').doc(postId).delete();
                 
                 alert('Publicación eliminada exitosamente');
                 
@@ -1664,7 +1348,7 @@
         // ========================================
         
         function loadFeed() {
-            if (!window.firebaseInitialized) {
+            if (!firebaseInitialized) {
                 document.getElementById('feedContainer').innerHTML = `
                     <div class="no-posts">
                         <p style="color: #e74c3c;">⚠️ Firebase no está configurado.</p>
@@ -1673,16 +1357,10 @@
                 return;
             }
             
-            try {
-                const { collection, query, orderBy, limit, onSnapshot } = window.firebaseModules;
-                
-                const q = query(
-                    collection(window.db, 'posts'),
-                    orderBy('timestamp', 'desc'),
-                    limit(20)
-                );
-                
-                onSnapshot(q, (snapshot) => {
+            db.collection('posts')
+                .orderBy('timestamp', 'desc')
+                .limit(20)
+                .onSnapshot((snapshot) => {
                     feedPosts = [];
                     snapshot.forEach((doc) => {
                         feedPosts.push({ id: doc.id, ...doc.data() });
@@ -1696,9 +1374,6 @@
                         </div>
                     `;
                 });
-            } catch (error) {
-                console.error('Error setting up feed listener:', error);
-            }
         }
         
         function renderFeed() {
@@ -1711,9 +1386,10 @@
             
             feedContainer.innerHTML = '';
             
+            // Interpretación una sola vez
             const interpretationDiv = document.createElement('div');
             interpretationDiv.className = 'interpretation-text';
-            interpretationDiv.style.marginBottom = '20px';
+            interpretationDiv.style.marginBottom = '25px';
             const interpretation = generateInterpretation();
             interpretationDiv.innerHTML = `
                 <h4>${interpretation.title}</h4>
@@ -1739,9 +1415,9 @@
                 
                 postDiv.innerHTML = `
                     <div class="post-header">
-                        <div class="post-avatar">🌐</div>
+                        <div class="post-avatar">🌍</div>
                         <div class="post-info">
-                            <div class="post-author">Team 13 - TEC</div>
+                            <div class="post-author">Usuario Global</div>
                             <div class="post-time">${timeAgo}</div>
                         </div>
                         <button class="delete-post-btn" onclick="deletePost('${post.id}')">🗑️ Eliminar</button>
@@ -1753,43 +1429,43 @@
                     
                     <div class="post-images">
                         <div style="text-align: center;">
-                            <strong style="font-size: 13px; color: #4267b2; display: block; margin-bottom: 5px;">📷 Original</strong>
-                            <img src="${post.imageUrls.original}" loading="lazy" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
+                            <strong style="font-size: 14px; color: #4267b2; display: block; margin-bottom: 5px;">📷 Original</strong>
+                            <img src="${post.imageUrls.original}" style="width: 100%; border-radius: 4px; border: 2px solid #4267b2; margin-top: 5px;">
                         </div>
                     </div>
                     
-                    <div style="margin-top: 15px;">
-                        <strong style="color: #4267b2; margin-bottom: 8px; display: block; font-size: 14px;">🔽 Filtros Pasa-Bajas:</strong>
+                    <div style="margin-top: 20px;">
+                        <strong style="color: #4267b2; margin-bottom: 10px; display: block; font-size: 15px;">🔽 Filtros Pasa-Bajas:</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Ideal</small>
-                                <img src="${post.imageUrls.lpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold;">Ideal</small>
+                                <img src="${post.imageUrls.lpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Butterworth</small>
-                                <img src="${post.imageUrls.lpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold;">Butterworth</small>
+                                <img src="${post.imageUrls.lpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Gaussian</small>
-                                <img src="${post.imageUrls.lpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold;">Gaussian</small>
+                                <img src="${post.imageUrls.lpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                         </div>
                     </div>
                     
-                    <div style="margin-top: 15px;">
-                        <strong style="color: #4267b2; margin-bottom: 8px; display: block; font-size: 14px;">🔼 Filtros Pasa-Altas:</strong>
+                    <div style="margin-top: 20px;">
+                        <strong style="color: #4267b2; margin-bottom: 10px; display: block; font-size: 15px;">🔼 Filtros Pasa-Altas:</strong>
                         <div class="post-images">
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Ideal</small>
-                                <img src="${post.imageUrls.hpIdeal}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold;">Ideal</small>
+                                <img src="${post.imageUrls.hpIdeal}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Butterworth</small>
-                                <img src="${post.imageUrls.hpButterworth}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold;">Butterworth</small>
+                                <img src="${post.imageUrls.hpButterworth}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                             <div style="text-align: center;">
-                                <small style="color: #666; font-weight: bold; font-size: 11px;">Gaussian</small>
-                                <img src="${post.imageUrls.hpGaussian}" loading="lazy" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 4px;">
+                                <small style="color: #666; font-weight: bold;">Gaussian</small>
+                                <img src="${post.imageUrls.hpGaussian}" style="width: 100%; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
                             </div>
                         </div>
                     </div>
@@ -1842,7 +1518,7 @@
         
         function generateInterpretation() {
             return {
-                title: '📊 Análisis de Filtros de Fourier - Team 13',
+                title: '📊 Análisis de Filtros de Fourier',
                 sections: [
                     {
                         title: '🔽 Filtros Pasa-Bajas (Low-Pass)',
@@ -1869,13 +1545,10 @@
             return `Hace ${Math.floor(seconds / 86400)} días`;
         }
         
-        // Hacer funciones globales
-        window.processImage = processImage;
-        window.publishToFeed = publishToFeed;
-        window.toggleLike = toggleLike;
-        window.submitComment = submitComment;
-        window.deleteComment = deleteComment;
-        window.deletePost = deletePost;
+        // Cargar feed al iniciar
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFeed();
+        });
     </script>
 </body>
 </html>
