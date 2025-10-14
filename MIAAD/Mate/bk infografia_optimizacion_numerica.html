@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos de Optimización Numérica - Infografía</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --mindaro: #d9ed92;
+            --light-green: #b5e48c;
+            --light-green-2: #99d98c;
+            --emerald: #76c893;
+            --keppel: #52b69a;
+            --verdigris: #34a0a4;
+            --bondi-blue: #168aad;
+            --cerulean: #1a759f;
+            --lapis-lazuli: #1e6091;
+            --indigo-dye: #184e77;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--indigo-dye) 0%, var(--cerulean) 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--indigo-dye) 0%, var(--bondi-blue) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .student-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .student-info p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .intro {
+            padding: 30px 40px;
+            background: linear-gradient(135deg, var(--mindaro) 0%, var(--light-green) 100%);
+            text-align: center;
+        }
+
+        .intro h2 {
+            color: var(--indigo-dye);
+            margin-bottom: 15px;
+        }
+
+        .intro p {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .method-card {
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .method-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+
+        .method-card.gradient-descent {
+            background: linear-gradient(135deg, var(--mindaro) 0%, var(--light-green) 100%);
+        }
+
+        .method-card.gradient-descent::before {
+            background: var(--emerald);
+        }
+
+        .method-card.sgd {
+            background: linear-gradient(135deg, var(--light-green-2) 0%, var(--emerald) 100%);
+        }
+
+        .method-card.sgd::before {
+            background: var(--keppel);
+        }
+
+        .method-card.newton {
+            background: linear-gradient(135deg, var(--keppel) 0%, var(--verdigris) 100%);
+        }
+
+        .method-card.newton::before {
+            background: var(--bondi-blue);
+        }
+
+        .method-card.pso {
+            background: linear-gradient(135deg, var(--bondi-blue) 0%, var(--cerulean) 100%);
+        }
+
+        .method-card.pso::before {
+            background: var(--lapis-lazuli);
+        }
+
+        .method-title {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: var(--indigo-dye);
+            border-bottom: 3px solid var(--indigo-dye);
+            padding-bottom: 10px;
+        }
+
+        .method-card.newton .method-title,
+        .method-card.pso .method-title {
+            color: white;
+            border-bottom-color: white;
+        }
+
+        .section {
+            margin: 20px 0;
+        }
+
+        .section h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: var(--indigo-dye);
+            display: flex;
+            align-items: center;
+        }
+
+        .method-card.newton .section h3,
+        .method-card.pso .section h3 {
+            color: white;
+        }
+
+        .section h3::before {
+            content: '▶';
+            margin-right: 10px;
+            font-size: 0.8em;
+        }
+
+        .formula-box {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid var(--indigo-dye);
+        }
+
+        .method-card.newton .formula-box,
+        .method-card.pso .formula-box {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: white;
+        }
+
+        .formula {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--indigo-dye);
+            margin: 5px 0;
+        }
+
+        .method-card.newton .formula,
+        .method-card.pso .formula {
+            color: white;
+        }
+
+        .formula-description {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .method-card.newton .formula-description,
+        .method-card.pso .formula-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .pros, .cons {
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .pros {
+            background: rgba(118, 200, 147, 0.3);
+            border-left: 4px solid var(--emerald);
+        }
+
+        .cons {
+            background: rgba(250, 128, 114, 0.2);
+            border-left: 4px solid #fa8072;
+        }
+
+        .pros h4, .cons h4 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        ul {
+            list-style-position: inside;
+            padding-left: 10px;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        .applications {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .method-card.newton .applications,
+        .method-card.pso .applications {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .app-tag {
+            display: inline-block;
+            background: var(--indigo-dye);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .visualization {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .viz-placeholder {
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px dashed var(--indigo-dye);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 10px 0;
+        }
+
+        .method-card.newton .viz-placeholder,
+        .method-card.pso .viz-placeholder {
+            border-color: white;
+        }
+
+        footer {
+            background: var(--indigo-dye);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .references {
+            text-align: left;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .references h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .references ol {
+            list-style-position: outside;
+            padding-left: 20px;
+        }
+
+        .references li {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+
+        .references a {
+            color: var(--mindaro);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--mindaro);
+        }
+
+        .references a:hover {
+            color: var(--light-green);
+            border-bottom-color: var(--light-green);
+        }
+
+        @media (max-width: 768px) {
+            .methods-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .comparison-note {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .method-card.newton .comparison-note,
+        .method-card.pso .comparison-note {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Métodos de Optimización Numérica</h1>
+            <p style="font-size: 1.2em; margin-top: 10px;">Una guía visual para Machine Learning e Inteligencia Artificial</p>
+            <div class="student-info">
+                <p><strong>Estudiante:</strong> Javier Augusto Rebull Saucedo</p>
+                <p><strong>Matrícula:</strong> al263483</p>
+                <p><strong>Materia:</strong> Matemáticas y Estadística para Inteligencia Artificial</p>
+                <p><strong>Profesora:</strong> Helen Clara Peñate Rodríguez</p>
+                <p><strong>Maestría:</strong> MIAAD - Universidad Autónoma de Ciudad Juárez (UACJ)</p>
+                <p><strong>Tarea:</strong> Week 10 - Task 011</p>
+                <p><strong>Fecha:</strong> 19 de Octubre 2025</p>
+            </div>
+        </header>
+
+        <div class="intro">
+            <h2>🔬 ¿Qué es la Optimización Numérica?</h2>
+            <p>Los métodos de optimización numérica son algoritmos fundamentales que permiten encontrar los valores óptimos de los parámetros en modelos de Machine Learning y Deep Learning. Estos métodos buscan minimizar (o maximizar) una función objetivo, típicamente una función de pérdida (loss function), ajustando iterativamente los parámetros del modelo hasta alcanzar la convergencia.</p>
+        </div>
+
+        <div class="methods-grid">
+            <!-- Método 1: Gradient Descent -->
+            <div class="method-card gradient-descent">
+                <h2 class="method-title">1. Descenso del Gradiente (Gradient Descent)</h2>
+                
+                <div class="section">
+                    <h3>📝 Descripción</h3>
+                    <p>El Descenso del Gradiente es el método de optimización más fundamental en Machine Learning. Es un algoritmo iterativo de primer orden que actualiza los parámetros moviéndose en la dirección opuesta al gradiente de la función objetivo. En cada iteración, calcula el gradiente usando TODO el conjunto de datos de entrenamiento (batch completo), por lo que también se conoce como Batch Gradient Descent.</p>
+                </div>
+
+                <div class="section">
+                    <h3>🧮 Fórmulas Principales</h3>
+                    <div class="formula-box">
+                        <div class="formula">θ(t+1) = θ(t) - η ∇J(θ(t))</div>
+                        <div class="formula-description">
+                            • θ: Parámetros del modelo (pesos)<br>
+                            • η: Learning rate (tasa de aprendizaje)<br>
+                            • ∇J(θ): Gradiente de la función de costo
+                        </div>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula">∇J(θ) = (1/m) Σ ∇L(f(x(i); θ), y(i))</div>
+                        <div class="formula-description">
+                            • m: Tamaño total del dataset<br>
+                            • L: Función de pérdida individual<br>
+                            • Se calcula sobre TODAS las muestras
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>⚖️ Ventajas y Desventajas</h3>
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✅ Ventajas</h4>
+                            <ul>
+                                <li>Convergencia estable y suave</li>
+                                <li>Garantiza convergencia al mínimo global en funciones convexas</li>
+                                <li>Actualizaciones precisas del gradiente</li>
+                                <li>Fácil de implementar y entender</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>❌ Desventajas</h4>
+                            <ul>
+                                <li>MUY lento para datasets grandes</li>
+                                <li>Computacionalmente costoso (usa todos los datos)</li>
+                                <li>Puede quedarse atrapado en mínimos locales</li>
+                                <li>Sensible a la elección del learning rate</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🎯 Aplicaciones</h3>
+                    <div class="applications">
+                        <span class="app-tag">Regresión Lineal</span>
+                        <span class="app-tag">Regresión Logística</span>
+                        <span class="app-tag">Redes Neuronales Pequeñas</span>
+                        <span class="app-tag">SVM</span>
+                        <span class="app-tag">Datasets pequeños-medianos</span>
+                    </div>
+                    <p style="margin-top: 10px;">Ideal cuando se tiene un dataset pequeño o mediano y se requiere precisión en la convergencia. Muy usado en problemas de regresión y clasificación básicos.</p>
+                </div>
+
+                <div class="visualization">
+                    <div class="viz-placeholder">
+                        <p><strong>Visualización Conceptual:</strong></p>
+                        <p>🎯 Inicio → 📉 Calcula gradiente completo → ⬇️ Actualiza parámetros → 🔄 Repite hasta convergencia</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Cada paso usa el 100% de los datos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Método 2: SGD -->
+            <div class="method-card sgd">
+                <h2 class="method-title">2. Descenso del Gradiente Estocástico (SGD)</h2>
+                
+                <div class="section">
+                    <h3>📝 Descripción</h3>
+                    <p>SGD es una variante del Gradient Descent que realiza actualizaciones de parámetros usando SOLO UNA muestra de datos a la vez (o mini-batches). Esta característica estocástica introduce ruido en las actualizaciones pero permite un aprendizaje mucho más rápido y la capacidad de escapar de mínimos locales. Es el método más utilizado en Deep Learning moderno.</p>
+                </div>
+
+                <div class="section">
+                    <h3>🧮 Fórmulas Principales</h3>
+                    <div class="formula-box">
+                        <div class="formula">θ(t+1) = θ(t) - η ∇L(f(x(i); θ(t)), y(i))</div>
+                        <div class="formula-description">
+                            • Actualización con UNA sola muestra (i)<br>
+                            • Varianza alta en las actualizaciones<br>
+                            • Permite aprendizaje online
+                        </div>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula">Mini-batch: θ(t+1) = θ(t) - η (1/b) Σ ∇L(...)</div>
+                        <div class="formula-description">
+                            • b: Tamaño del mini-batch (típicamente 32, 64, 128, 256)<br>
+                            • Compromiso entre velocidad y estabilidad<br>
+                            • Más común en la práctica
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>⚖️ Ventajas y Desventajas</h3>
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✅ Ventajas</h4>
+                            <ul>
+                                <li>EXTREMADAMENTE rápido para datasets grandes</li>
+                                <li>Puede escapar de mínimos locales</li>
+                                <li>Permite aprendizaje online</li>
+                                <li>Eficiente en memoria</li>
+                                <li>Paralelizable con GPU</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>❌ Desventajas</h4>
+                            <ul>
+                                <li>Convergencia ruidosa y oscilante</li>
+                                <li>Puede no converger exactamente</li>
+                                <li>Requiere ajuste cuidadoso del learning rate</li>
+                                <li>Alta varianza en actualizaciones</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🎯 Aplicaciones</h3>
+                    <div class="applications">
+                        <span class="app-tag">Deep Learning</span>
+                        <span class="app-tag">Redes Neuronales Profundas</span>
+                        <span class="app-tag">CNNs</span>
+                        <span class="app-tag">RNNs/LSTMs</span>
+                        <span class="app-tag">Transformers</span>
+                        <span class="app-tag">Big Data</span>
+                        <span class="app-tag">Aprendizaje Online</span>
+                    </div>
+                    <p style="margin-top: 10px;">Es el estándar de facto en Deep Learning. Usado en casi todas las redes neuronales modernas, especialmente con variantes como Adam, RMSprop, y Momentum.</p>
+                </div>
+
+                <div class="comparison-note">
+                    <strong>💡 Nota Comparativa:</strong> SGD es hasta 1000x más rápido que Gradient Descent batch en datasets grandes. Por ejemplo, con 1 millón de muestras, Gradient Descent necesita procesar todas para una actualización, mientras SGD puede hacer 1000 actualizaciones en el mismo tiempo.
+                </div>
+
+                <div class="visualization">
+                    <div class="viz-placeholder">
+                        <p><strong>Visualización Conceptual:</strong></p>
+                        <p>🎯 Inicio → 🎲 Selecciona muestra/batch random → 📊 Calcula gradiente → ⚡ Actualiza rápido → 🔄 Repite</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Ruta de convergencia más "ruidosa" pero más rápida</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Método 3: Newton -->
+            <div class="method-card newton">
+                <h2 class="method-title">3. Método de Newton</h2>
+                
+                <div class="section">
+                    <h3>📝 Descripción</h3>
+                    <p>El Método de Newton es un algoritmo de optimización de segundo orden que utiliza información tanto del gradiente (primera derivada) como de la curvatura local (Hessiana, segunda derivada) de la función objetivo. Ofrece convergencia cuadrática, lo que significa que puede alcanzar el óptimo en muy pocas iteraciones. Sin embargo, requiere calcular e invertir la matriz Hessiana, lo que es computacionalmente costoso.</p>
+                </div>
+
+                <div class="section">
+                    <h3>🧮 Fórmulas Principales</h3>
+                    <div class="formula-box">
+                        <div class="formula">θ(t+1) = θ(t) - H⁻¹(θ(t)) ∇J(θ(t))</div>
+                        <div class="formula-description">
+                            • H: Matriz Hessiana (segundas derivadas)<br>
+                            • H⁻¹: Inversa de la Hessiana<br>
+                            • Utiliza información de curvatura
+                        </div>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula">H(θ) = ∇²J(θ) = [∂²J/∂θᵢ∂θⱼ]</div>
+                        <div class="formula-description">
+                            • Matriz nxn de segundas derivadas parciales<br>
+                            • n: Número de parámetros<br>
+                            • Costo: O(n²) memoria, O(n³) computación
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>⚖️ Ventajas y Desventajas</h3>
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✅ Ventajas</h4>
+                            <ul>
+                                <li>Convergencia cuadrática (muy rápida cerca del óptimo)</li>
+                                <li>Pocas iteraciones necesarias (5-10 típicamente)</li>
+                                <li>Invariante a transformaciones afines</li>
+                                <li>Muy preciso en el mínimo</li>
+                                <li>No requiere ajuste de learning rate</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>❌ Desventajas</h4>
+                            <ul>
+                                <li>EXTREMADAMENTE costoso computacionalmente</li>
+                                <li>Requiere O(n²) memoria para Hessiana</li>
+                                <li>O(n³) operaciones para invertir Hessiana</li>
+                                <li>Inviable para problemas de alta dimensión</li>
+                                <li>Requiere Hessiana invertible</li>
+                                <li>Puede diverger si inicio lejos del óptimo</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🎯 Aplicaciones</h3>
+                    <div class="applications">
+                        <span class="app-tag">Regresión Logística</span>
+                        <span class="app-tag">GLMs</span>
+                        <span class="app-tag">Problemas Pequeños</span>
+                        <span class="app-tag">Optimización Convexa</span>
+                        <span class="app-tag">L-BFGS (aproximación)</span>
+                    </div>
+                    <p style="margin-top: 10px;">Usado principalmente en problemas de optimización convexa con pocas variables (n < 1000). En Machine Learning moderno, se usan aproximaciones como L-BFGS o BFGS que no requieren calcular la Hessiana completa.</p>
+                </div>
+
+                <div class="comparison-note">
+                    <strong>💡 Nota Comparativa:</strong> Para un problema con 10,000 parámetros, la Hessiana requiere 10,000² = 100 millones de elementos (~800 MB de memoria), y su inversión requiere ~1 trillón de operaciones. Por esto, métodos quasi-Newton como L-BFGS son preferidos en la práctica.
+                </div>
+
+                <div class="visualization">
+                    <div class="viz-placeholder">
+                        <p><strong>Visualización Conceptual:</strong></p>
+                        <p>🎯 Inicio → 📐 Calcula gradiente Y Hessiana → 🔄 Invierte Hessiana → 🎯 Actualiza → ✅ Converge rápido</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Convergencia en ~5-10 iteraciones vs ~1000+ de GD</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Método 4: PSO -->
+            <div class="method-card pso">
+                <h2 class="method-title">4. Optimización por Enjambre de Partículas (PSO)</h2>
+                
+                <div class="section">
+                    <h3>📝 Descripción</h3>
+                    <p>PSO es un algoritmo metaheurístico bio-inspirado que simula el comportamiento social de bandadas de pájaros o cardúmenes de peces. Mantiene una población de "partículas" que exploran el espacio de búsqueda, cada una ajustando su posición basándose en su mejor experiencia personal y la mejor experiencia del grupo. NO requiere gradientes, lo que lo hace ideal para funciones no diferenciables o con múltiples mínimos locales.</p>
+                </div>
+
+                <div class="section">
+                    <h3>🧮 Fórmulas Principales</h3>
+                    <div class="formula-box">
+                        <div class="formula">v(t+1) = w·v(t) + c₁·r₁·(pbest - x(t)) + c₂·r₂·(gbest - x(t))</div>
+                        <div class="formula-description">
+                            • v: Velocidad de la partícula<br>
+                            • w: Inercia (típicamente 0.4-0.9)<br>
+                            • c₁, c₂: Coeficientes cognitivo y social (~2.0)<br>
+                            • r₁, r₂: Números aleatorios [0,1]
+                        </div>
+                    </div>
+                    <div class="formula-box">
+                        <div class="formula">x(t+1) = x(t) + v(t+1)</div>
+                        <div class="formula-description">
+                            • pbest: Mejor posición personal de la partícula<br>
+                            • gbest: Mejor posición global del enjambre<br>
+                            • Típicamente 20-50 partículas
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>⚖️ Ventajas y Desventajas</h3>
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✅ Ventajas</h4>
+                            <ul>
+                                <li>NO requiere gradientes (derivative-free)</li>
+                                <li>Excelente para funciones multimodales</li>
+                                <li>Muy simple de implementar</li>
+                                <li>Pocos hiperparámetros</li>
+                                <li>Buen explorador global</li>
+                                <li>Funciona con funciones discontinuas</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>❌ Desventajas</h4>
+                            <ul>
+                                <li>Convergencia lenta en búsqueda local</li>
+                                <li>Sin garantía de convergencia al óptimo global</li>
+                                <li>Puede converger prematuramente</li>
+                                <li>Muchas evaluaciones de función objetivo</li>
+                                <li>Sensible a parámetros en algunos problemas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🎯 Aplicaciones</h3>
+                    <div class="applications">
+                        <span class="app-tag">Hyperparameter Tuning</span>
+                        <span class="app-tag">Neural Architecture Search</span>
+                        <span class="app-tag">Feature Selection</span>
+                        <span class="app-tag">Problemas NP-Hard</span>
+                        <span class="app-tag">Optimización de Procesos</span>
+                        <span class="app-tag">Funciones Black-Box</span>
+                        <span class="app-tag">AutoML</span>
+                    </div>
+                    <p style="margin-top: 10px;">Ideal para optimización global donde el gradiente no está disponible o es difícil de calcular. Muy usado en búsqueda de hiperparámetros, diseño de arquitecturas de redes neuronales, y problemas de ingeniería.</p>
+                </div>
+
+                <div class="comparison-note">
+                    <strong>💡 Nota Comparativa:</strong> Mientras métodos basados en gradientes (GD, SGD, Newton) son rápidos y precisos para optimización local en funciones diferenciables, PSO brilla en espacios de búsqueda complejos con múltiples mínimos locales donde no se conoce el gradiente.
+                </div>
+
+                <div class="visualization">
+                    <div class="viz-placeholder">
+                        <p><strong>Visualización Conceptual:</strong></p>
+                        <p>🎯 Enjambre inicial → 🐦 Partículas exploran → 💫 Comparten información → 🎯 Convergen al óptimo</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Comportamiento emergente de inteligencia colectiva</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla Comparativa -->
+        <div style="padding: 40px; background: linear-gradient(135deg, var(--light-green) 0%, var(--emerald) 100%);">
+            <h2 style="text-align: center; color: var(--indigo-dye); margin-bottom: 30px;">📊 Tabla Comparativa de Métodos</h2>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <thead style="background: var(--indigo-dye); color: white;">
+                        <tr>
+                            <th style="padding: 15px; text-align: left; border-bottom: 2px solid white;">Característica</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid white;">Gradient Descent</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid white;">SGD</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid white;">Newton</th>
+                            <th style="padding: 15px; text-align: center; border-bottom: 2px solid white;">PSO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: var(--mindaro);">
+                            <td style="padding: 12px; font-weight: bold;">Orden del Método</td>
+                            <td style="padding: 12px; text-align: center;">1er orden</td>
+                            <td style="padding: 12px; text-align: center;">1er orden</td>
+                            <td style="padding: 12px; text-align: center;">2do orden</td>
+                            <td style="padding: 12px; text-align: center;">0 orden</td>
+                        </tr>
+                        <tr style="background: white;">
+                            <td style="padding: 12px; font-weight: bold;">Velocidad</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐</td>
+                        </tr>
+                        <tr style="background: var(--light-green);">
+                            <td style="padding: 12px; font-weight: bold;">Precisión</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐</td>
+                        </tr>
+                        <tr style="background: white;">
+                            <td style="padding: 12px; font-weight: bold;">Escalabilidad</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐⭐⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐</td>
+                            <td style="padding: 12px; text-align: center;">⭐⭐⭐</td>
+                        </tr>
+                        <tr style="background: var(--light-green-2);">
+                            <td style="padding: 12px; font-weight: bold;">Complejidad Computacional</td>
+                            <td style="padding: 12px; text-align: center;">O(mn)</td>
+                            <td style="padding: 12px; text-align: center;">O(bn)</td>
+                            <td style="padding: 12px; text-align: center;">O(n³)</td>
+                            <td style="padding: 12px; text-align: center;">O(N·n)</td>
+                        </tr>
+                        <tr style="background: white;">
+                            <td style="padding: 12px; font-weight: bold;">Requiere Gradientes</td>
+                            <td style="padding: 12px; text-align: center;">✅</td>
+                            <td style="padding: 12px; text-align: center;">✅</td>
+                            <td style="padding: 12px; text-align: center;">✅✅</td>
+                            <td style="padding: 12px; text-align: center;">❌</td>
+                        </tr>
+                        <tr style="background: var(--emerald); color: white;">
+                            <td style="padding: 12px; font-weight: bold;">Mejor Uso</td>
+                            <td style="padding: 12px; text-align: center;">Datasets pequeños</td>
+                            <td style="padding: 12px; text-align: center;">Deep Learning</td>
+                            <td style="padding: 12px; text-align: center;">Pocos parámetros</td>
+                            <td style="padding: 12px; text-align: center;">Optimización global</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top: 20px; text-align: center; font-size: 0.9em; color: var(--indigo-dye);"><strong>Nota:</strong> m=tamaño dataset, b=batch size, n=parámetros, N=partículas</p>
+        </div>
+
+        <footer>
+            <div class="references">
+                <h3>📚 Referencias Académicas</h3>
+                <ol>
+                    <li>
+                        Ruder, S. (2016). "An overview of gradient descent optimization algorithms." 
+                        <em>arXiv preprint arXiv:1609.04747</em>. 
+                        <a href="https://arxiv.org/abs/1609.04747" target="_blank">https://arxiv.org/abs/1609.04747</a>
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Revisión comprehensiva de métodos de optimización basados en gradientes, incluyendo SGD, Momentum, Adam, y variantes modernas.</span>
+                    </li>
+                    
+                    <li>
+                        Goodfellow, I., Bengio, Y., & Courville, A. (2016). 
+                        <em>Deep Learning</em>. MIT Press. Chapter 8: "Optimization for Training Deep Models."
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Texto fundamental sobre optimización en deep learning, cubre gradient descent, SGD, y métodos adaptativos.</span>
+                    </li>
+                    
+                    <li>
+                        Nocedal, J., & Wright, S. J. (2006). 
+                        <em>Numerical Optimization</em> (2nd ed.). Springer.
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Texto clásico sobre optimización numérica, incluye tratamiento detallado del método de Newton y quasi-Newton.</span>
+                    </li>
+                    
+                    <li>
+                        Kennedy, J., & Eberhart, R. (1995). "Particle swarm optimization." 
+                        <em>Proceedings of ICNN'95 - International Conference on Neural Networks</em>, 4, 1942-1948.
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Artículo original que introduce PSO, inspirado en comportamiento social de bandadas de aves.</span>
+                    </li>
+                    
+                    <li>
+                        Shi, Y., & Eberhart, R. (1998). "A modified particle swarm optimizer." 
+                        <em>1998 IEEE International Conference on Evolutionary Computation Proceedings</em>, 69-73.
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Introduce el concepto de inercia en PSO, mejorando significativamente su rendimiento.</span>
+                    </li>
+                    
+                    <li>
+                        Bottou, L., Curtis, F. E., & Nocedal, J. (2018). "Optimization methods for large-scale machine learning." 
+                        <em>SIAM Review</em>, 60(2), 223-311.
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Revisión moderna y comprehensiva de métodos de optimización para ML a gran escala.</span>
+                    </li>
+                    
+                    <li>
+                        Kingma, D. P., & Ba, J. (2014). "Adam: A method for stochastic optimization." 
+                        <em>arXiv preprint arXiv:1412.6980</em>.
+                        <a href="https://arxiv.org/abs/1412.6980" target="_blank">https://arxiv.org/abs/1412.6980</a>
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Introduce Adam, uno de los optimizadores más populares basado en SGD con momentos adaptativos.</span>
+                    </li>
+                    
+                    <li>
+                        Poli, R., Kennedy, J., & Blackwell, T. (2007). "Particle swarm optimization: An overview." 
+                        <em>Swarm Intelligence</em>, 1(1), 33-57.
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Revisión comprehensiva de PSO, sus variantes, y aplicaciones.</span>
+                    </li>
+
+                    <li>
+                        Boyd, S., & Vandenberghe, L. (2004). 
+                        <em>Convex Optimization</em>. Cambridge University Press.
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Texto fundamental sobre optimización convexa, incluye métodos de Newton y análisis de convergencia.</span>
+                    </li>
+
+                    <li>
+                        GeeksforGeeks. (2025). "Gradient Descent Algorithm in Machine Learning."
+                        <a href="https://www.geeksforgeeks.org/machine-learning/gradient-descent-algorithm-and-its-variants/" target="_blank">
+                        https://www.geeksforgeeks.org/machine-learning/gradient-descent-algorithm-and-its-variants/</a>
+                        <br><span style="font-size: 0.9em; color: var(--light-green);">Guía práctica y tutorial sobre gradient descent y sus variantes con implementaciones.</span>
+                    </li>
+                </ol>
+                
+                <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                    <p style="text-align: center; margin: 10px 0;">
+                        <strong>Infografía desarrollada para:</strong><br>
+                        Maestría en Inteligencia Artificial y Analítica de Datos (MIAAD)<br>
+                        Universidad Autónoma de Ciudad Juárez (UACJ)<br>
+                        Octubre 2025
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
