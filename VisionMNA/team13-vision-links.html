@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team 13 - Visión Computacional | Tec de Monterrey</title>
+    <style>
+        :root {
+            --antiflash-white: #e7ecef;
+            --yinmn-blue: #274c77;
+            --air-superiority-blue: #6096ba;
+            --uranian-blue: #a3cef1;
+            --battleship-gray: #8b8c89;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--antiflash-white);
+            color: var(--yinmn-blue);
+            line-height: 1.6;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            border-bottom: 1px solid var(--uranian-blue);
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--yinmn-blue);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--air-superiority-blue);
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+        
+        .team-info {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(39, 76, 119, 0.08);
+        }
+        
+        .team-section {
+            margin-bottom: 25px;
+        }
+        
+        .team-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--battleship-gray);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        
+        .team-members, .professors {
+            list-style: none;
+        }
+        
+        .team-members li, .professors li {
+            padding: 8px 0;
+            color: var(--yinmn-blue);
+            font-size: 0.95rem;
+        }
+        
+        .week-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(39, 76, 119, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .week-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 76, 119, 0.12);
+        }
+        
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--uranian-blue);
+        }
+        
+        .week-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--yinmn-blue);
+        }
+        
+        .week-number {
+            font-size: 0.85rem;
+            color: var(--air-superiority-blue);
+            font-weight: 500;
+        }
+        
+        .activity-title {
+            font-size: 1.05rem;
+            color: var(--yinmn-blue);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .due-date {
+            font-size: 0.85rem;
+            color: var(--battleship-gray);
+            margin-bottom: 15px;
+        }
+        
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .link-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--yinmn-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        
+        .link-btn:hover {
+            background-color: var(--air-superiority-blue);
+        }
+        
+        .link-btn.pending {
+            background-color: var(--battleship-gray);
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .no-activity {
+            color: var(--battleship-gray);
+            font-style: italic;
+            padding: 20px 0;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px 20px;
+            color: var(--battleship-gray);
+            font-size: 0.85rem;
+            margin-top: 60px;
+            border-top: 1px solid var(--uranian-blue);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .week-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .links {
+                flex-direction: column;
+            }
+            
+            .link-btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Visión Computacional</h1>
+            <p class="subtitle">Maestría en Inteligencia Artificial Aplicada</p>
+            <p class="subtitle">Tec de Monterrey</p>
+        </header>
+        
+        <div class="team-info">
+            <div class="team-section">
+                <h3>Team 13</h3>
+                <ul class="team-members">
+                    <li>A01795838 - Javier Augusto Rebull Saucedo</li>
+                    <li>A01795941 - Juan Carlos Pérez Nava</li>
+                    <li>A01232963 - Luis Gerardo Sánchez Salazar</li>
+                    <li>A01016093 - Oscar Enrique García García</li>
+                </ul>
+            </div>
+            
+            <div class="team-section">
+                <h3>Profesores</h3>
+                <ul class="professors">
+                    <li>Profesor Titular: Dr. Gilberto Ochoa Ruiz</li>
+                    <li>Profesor Tutor: MIP Ma. del Refugio Meléndez Alfaro</li>
+                    <li>Profesor Asistente: M. en C. Jose Angel Martinez Navarro</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Simple Image Processing</h2>
+                <span class="week-number">Week 02</span>
+            </div>
+            <p class="activity-title">2.2 Google Colab - Simple_ImgProcessing</p>
+            <p class="due-date">Fecha de entrega: 21 de sep a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/01%20-%20Actividad%202.2%20Google%20Colab%20-%20Simple_ImgProcessing/Actividad%202.2%20-%20Equipo%2013%20-%20Simple%20ImgProcessing%20vEntregada.docx?d=w8940773abba64a21acfe349f5acfadfc&csf=1&web=1&e=2cOWpy" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://colab.research.google.com/drive/1_bkOLHqwzYg48OX3R2pz8hrFgGYS111T#scrollTo=6hVtWf4pMW16" class="link-btn" target="_blank">📓 Google Colab</a>
+                <a href="https://rebull.org/visionmna/Team13_Activity_2.2_GoogleColab_vEntrega.html" class="link-btn" target="_blank">🌐 Web Link</a>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Algoritmos de Mejoramiento por Píxeles</h2>
+                <span class="week-number">Week 02</span>
+            </div>
+            <p class="activity-title">2.5 Algoritmos de mejoramiento de imágenes basado por pixeles</p>
+            <p class="due-date">Fecha de entrega: 21 de sep a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/02%20-%20Actividad%202.5%20Algoritmos%20de%20mejoramiento%20de%20im%C3%A1genes%20basado%20por%20pixeles/Actividad%202.5%20-%20Equipo%2013%20-%20Algoritmos%20de%20Mejoramiento%20de%20Imagenes_vEntrega.docx?d=wd796ad1e4efb443c8ae403692367780f&csf=1&web=1&e=GQAt6S" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://colab.research.google.com/drive/1bE3L1pU1OnudyK2EbAjvMVO9PG8bQXlr#scrollTo=lk_ebhqfmz5D" class="link-btn" target="_blank">📓 Google Colab</a>
+                <a href="https://rebull.org/visionmna/MNA_Vision_Team13_2_5_Algoritmos_x_Pixeles.html" class="link-btn" target="_blank">🌐 Web Link</a>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Dominio Espacial</h2>
+                <span class="week-number">Week 03</span>
+            </div>
+            <p class="activity-title">3.2 Algoritmos de mejoramiento de imágenes en el dominio espacial</p>
+            <p class="due-date">Fecha de entrega: 28 de sep a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/03%20-%20Actividad%203.2%20Algoritmos%20de%20mejoramiento%20de%20im%C3%A1genes%20en%20el%20dominio%20espacial/Actividad%203.2%20-%20Equipo%2013%20-%20Algoritmos%20Dominio%20Espacial%20vFinal.docx?d=w5c99b26702784bbc9e8f316b5979f7f8&csf=1&web=1&e=m6qAu9" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://colab.research.google.com/drive/1YSoRG7ofE9rp6m36P9RkXXeqKvC49QY4#scrollTo=kNtXwNLfHM1I" class="link-btn" target="_blank">📓 Google Colab</a>
+                <a href="https://rebull.org/visionmna/Team_13_MNA_Vision_3_2_Dominio_Espacial.html" class="link-btn" target="_blank">🌐 Web Link</a>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Operaciones Morfológicas</h2>
+                <span class="week-number">Week 04</span>
+            </div>
+            <p class="activity-title">4.2 Algoritmos de mejoramiento de imágenes usando operaciones morfológicas</p>
+            <p class="due-date">Fecha de entrega: 5 de oct a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/04%20-%20Actividad%204.2%20Morfologia%20Vision/Actividad%204.2%20-%20Equipo%2013%20-%20Algoritmos%20Morfolog%C3%ADa%20vFinal.docx?d=wabf70c5a3a654effbb314f36a3eeb012&csf=1&web=1&e=L7djJC" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://colab.research.google.com/drive/1zml5rOtBZV9i0RqkU4hrTLSkNGYlJYJo#scrollTo=X6aAEQVHhKk-" class="link-btn" target="_blank">📓 Google Colab</a>
+                <a href="https://rebull.org/visionmna/Team_13_MNA_Vision_4_2_morphological.html" class="link-btn" target="_blank">🌐 Web Link</a>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Dominio de Fourier</h2>
+                <span class="week-number">Week 05</span>
+            </div>
+            <p class="activity-title">5.4 Algoritmos de mejoramiento de imágenes en el dominio de Fourier</p>
+            <p class="due-date">Fecha de entrega: 12 de oct a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/05%20-%20Actividad%205.4%20Mejoramiento%20de%20Im%C3%A1genes%20en%20el%20Dominio%20de%20Fourier/Actividad%205.4%20-%20Equipo%2013%20-%20Dominio%20de%20Fourier%20vFinal.docx?d=w08a34ea42f074183a1e8133de321e974&csf=1&web=1&e=4Bsbmg" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://colab.research.google.com/drive/1iHmB_3l2gI6nPMp8Nwq8wduWCyJ56fRv?usp=sharing" class="link-btn" target="_blank">📓 Google Colab</a>
+                <a href="https://rebull.org/visionmna/Team_13_MNA_Vision_5_4_Fourier_vEntrega.html" class="link-btn" target="_blank">🌐 Web Link</a>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Algoritmo de Canny</h2>
+                <span class="week-number">Week 06</span>
+            </div>
+            <p class="activity-title">6.4 Extracción de líneas con algoritmo de Canny</p>
+            <p class="due-date">Fecha de entrega: 19 de oct a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/06%20-%20Actividad%206.4%20Google%20Colab%20-%20Canny/Actividad%206.4%20-%20Equipo%2013%20-%20Canny.docx?d=wb8bdd3605b1f43ff880ca9170cb0a0ba&csf=1&web=1&e=qdSbcx" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://drive.google.com/file/d/1AarcVcN74J0zqBxKHfGDTwbOUybctUhr/view?usp=sharing" class="link-btn" target="_blank">📓 Notebook Colab</a>
+                <a href="https://rebull.org/visionmna/team_13_mna_vision_6_4_canny" class="link-btn" target="_blank">🌐 Web Link</a>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Extracción de Características</h2>
+                <span class="week-number">Week 07</span>
+            </div>
+            <p class="activity-title">7.2 Algoritmos de extracción de características</p>
+            <p class="due-date">Fecha de entrega: 26 de oct a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/07%20-%20Actividad%207.2%20Algoritmos%20de%20Extracci%C3%B3n%20de%20Caracter%C3%ADsticas/Equipo%2013_Actividad%207.2_Algo_Extra_Caracter%C3%ADsticas_vDraft.docx?d=w730e3877c20d44759952646d126bd648&csf=1&web=1&e=f25D7p" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://colab.research.google.com/drive/16a9cx_iS7uzCNl3UiwJ5bayuufU0IKRU?usp=sharing" class="link-btn" target="_blank">📓 Notebook 7_harris</a>
+                <a href="https://colab.research.google.com/drive/1X7l1whtJEQjiDIvp3qaV2KujP7R38GMD?usp=sharing" class="link-btn" target="_blank">📓 Notebook 9_matching</a>
+                <span class="link-btn pending">🌐 Web Link 7 Harris (Pendiente)</span>
+                <span class="link-btn pending">🌐 Web Link 9 Matching (Pendiente)</span>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Modelo RGB y HSV</h2>
+                <span class="week-number">Week 08</span>
+            </div>
+            <p class="no-activity">8.2 Estudiar - No hay actividades para entregar</p>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Métodos de Segmentación</h2>
+                <span class="week-number">Week 09</span>
+            </div>
+            <p class="activity-title">9.6 Comparación de métodos de segmentación (Demo en Google Colab)</p>
+            <p class="due-date">Fecha de entrega: 16 de nov a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/08%20-%20Actividad%209.6%20Comparaci%C3%B3n%20de%20m%C3%A9todos%20de%20segmentaci%C3%B3n/Equipo%2013_Actividad_9.6_Graph%20Cuts%20Arti%CC%81culo_vDraft.docx?d=wa2b64a9b1bf94cf6b65e4c094e0a3741&csf=1&web=1&e=lehHhI" class="link-btn" target="_blank">📄 Documento Word</a>
+                <a href="https://www.overleaf.com/7264989662bjyjpfpzvmfg#1bb1db" class="link-btn" target="_blank">📝 Latex Code</a>
+                <span class="link-btn pending">📓 Notebook Colab (Pendiente)</span>
+                <span class="link-btn pending">🌐 Web Link (Pendiente)</span>
+                <span class="link-btn pending">📺 YouTube (Pendiente)</span>
+                <span class="link-btn pending">🎨 Canva (Pendiente)</span>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Presentación Comparativa - Video</h2>
+                <span class="week-number">Week 10</span>
+            </div>
+            <p class="activity-title">10.3 Presentación Comparativa de métodos de segmentación</p>
+            <p class="due-date">Fecha de entrega: 16 de nov a las 23:59</p>
+            <div class="links">
+                <span class="link-btn pending">📺 YouTube (Pendiente)</span>
+                <span class="link-btn pending">🎨 Canva (Pendiente)</span>
+            </div>
+        </div>
+        
+        <div class="week-card">
+            <div class="week-header">
+                <h2 class="week-title">Flujo Óptico</h2>
+                <span class="week-number">Week 10</span>
+            </div>
+            <p class="activity-title">10.5 Investigación sobre aplicaciones del flujo óptico</p>
+            <p class="due-date">Fecha de entrega: 16 de nov a las 23:59</p>
+            <div class="links">
+                <a href="https://tecmx.sharepoint.com/:w:/r/sites/Violinistas-Vision/Shared%20Documents/General/10%20-%20Actividad%2010.5%20Investigaci%C3%B3n%20sobre%20aplicaciones%20del%20flujo%20%C3%B3ptico/Equipo%2013_Actividad%2010.5_Flujo%20O%CC%81ptico_vDraft.docx?d=w3be0112369ee49df92982ec0997bb4fd&csf=1&web=1&e=KO7wd9" class="link-btn" target="_blank">📄 Documento Word</a>
+                <span class="link-btn pending">🌐 Web Link (Pendiente)</span>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Team 13 - Maestría en Inteligencia Artificial Aplicada</p>
+            <p>Tec de Monterrey © 2025</p>
+        </footer>
+    </div>
+</body>
+</html>
