@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLOps Team 24 - Pipeline Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1d3a 0%, #1e2139 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: #252b4a;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            padding: 30px;
+            border: 1px solid #3a4266;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #b8d4f1;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(184, 212, 241, 0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #a8c5e0;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: #2a3150;
+            border-left: 4px solid #6b9bd1;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .info-box h3 {
+            margin-top: 0;
+            color: #b8d4f1;
+        }
+        
+        .info-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .info-box li {
+            margin: 5px 0;
+            color: #e8eef5;
+        }
+        
+        .info-box strong {
+            color: #a8c5e0;
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #2a3150;
+            border-radius: 5px;
+            border: 1px solid #3a4266;
+            transition: all 0.2s ease;
+        }
+        
+        .legend-item:hover {
+            border-color: #6b9bd1;
+            box-shadow: 0 2px 8px rgba(107, 155, 209, 0.2);
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin-right: 10px;
+            border: 2px solid;
+        }
+        
+        .legend-text {
+            font-weight: 500;
+            color: #e8eef5;
+        }
+        
+        #diagram {
+            background: #2a3150;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid #3a4266;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #3a4266;
+            color: #a8c5e0;
+        }
+        
+        .footer strong {
+            color: #b8d4f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Turkish Music Emotion Recognition</h1>
+        <div class="subtitle">MLOps Team 24 - Complete Pipeline Architecture</div>
+        
+        <div class="info-box">
+            <h3>📊 Proyecto: Sistema de Reconocimiento de Emociones en Música Turca</h3>
+            <ul>
+                <li><strong>Equipo:</strong> David Cruz Beltrán, Javier Augusto Rebull Saucedo, Sandra Luz Cervantes Espinoza</li>
+                <li><strong>Objetivo:</strong> Clasificar emociones (Happy, Sad, Angry, Relax) en música turca</li>
+                <li><strong>Accuracy:</strong> 80.17% con modelo optimizado Random Forest</li>
+                <li><strong>MLOps Stack:</strong> DVC + MLflow + scikit-learn + Streamlit + FastAPI</li>
+            </ul>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4a6fa5; border-color: #6b9bd1;"></div>
+                <div class="legend-text">📊 Data Layer</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #5a8fc4; border-color: #7ba8d4;"></div>
+                <div class="legend-text">🔧 Feature Engineering</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #6b9bd1; border-color: #8bb4dc;"></div>
+                <div class="legend-text">🤖 Model Training</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #7ba8d4; border-color: #9bc2e4;"></div>
+                <div class="legend-text">🔬 MLflow Experiments</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #8bb4dc; border-color: #a8c5e0;"></div>
+                <div class="legend-text">📦 Model Versioning</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #9bc2e4; border-color: #b8d4f1;"></div>
+                <div class="legend-text">🧪 Testing & Validation</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #a8c5e0; border-color: #c5ddf5;"></div>
+                <div class="legend-text">🚀 Production Deployment</div>
+            </div>
+        </div>
+        
+        <div id="diagram" class="mermaid">
+graph TB
+    %% ============================================
+    %% MLOPS TEAM 24 - TURKISH MUSIC EMOTION RECOGNITION
+    %% Pipeline Visual Architecture
+    %% ============================================
+    
+    subgraph DATA["📊 DATA LAYER"]
+        direction TB
+        RAW[("🎵 Raw Data<br/>data/raw/<br/>turkish_music_emotion_*.csv")]
+        PROC[("✨ Processed Data<br/>data/processed/<br/>X_train.csv, X_test.csv<br/>y_train.csv, y_test.csv")]
+        DVC_DATA[("☁️ DVC Storage<br/>AWS S3<br/>mlops24-haowei-bucket")]
+        
+        RAW -->|"dataset.py<br/>DatasetManager.load_raw()"| PROC
+        PROC -.->|"data.dvc<br/>dvc push/pull"| DVC_DATA
+    end
+    
+    subgraph FEATURES["🔧 FEATURE ENGINEERING"]
+        direction TB
+        FP_START["🔹 Feature Pipeline Start"]
+        
+        NUMERIC["NumericFeatureSelector<br/>features.py<br/>Selecciona columnas numéricas"]
+        POWER["PowerFeatureTransformer<br/>features.py<br/>Yeo-Johnson transform"]
+        SCALER["FeatureScaler<br/>features.py<br/>RobustScaler (default)"]
+        
+        FP_START --> NUMERIC
+        NUMERIC --> POWER
+        POWER --> SCALER
+        
+        PIPELINE["create_full_pipeline()<br/>features.py<br/>sklearn.pipeline.Pipeline"]
+        SCALER --> PIPELINE
+    end
+    
+    subgraph MODELING["🤖 MODEL TRAINING"]
+        direction TB
+        SKL_PIPE["SklearnMLPipeline<br/>sklearn_pipeline.py<br/>Pipeline end-to-end"]
+        
+        MODEL_CONFIG["ModelConfig<br/>train.py<br/>{name, model_class, hyperparams}"]
+        TRAIN_CONFIG["TrainingConfig<br/>train.py<br/>{cv_folds, scoring, mlflow_uri}"]
+        
+        TRAINER["BaseModelTrainer<br/>train.py<br/>fit(X, y) + LabelEncoder"]
+        
+        MODELS["🎯 Modelos Soportados<br/>━━━━━━━━━━━━━━<br/>RandomForestClassifier<br/>GradientBoostingClassifier<br/>LogisticRegression<br/>SVC"]
+        
+        MODEL_CONFIG --> TRAINER
+        TRAIN_CONFIG --> TRAINER
+        SKL_PIPE --> TRAINER
+        TRAINER --> MODELS
+    end
+    
+    subgraph EXPERIMENTS["🔬 MLFLOW EXPERIMENTS"]
+        direction TB
+        MLFLOW_RUNNER["MLflowRunner<br/>run_mlflow_experiments.py"]
+        
+        EXP_LOOP["Experimentos Loop:<br/>1️⃣ RandomForest<br/>2️⃣ GradientBoosting<br/>3️⃣ LogisticRegression"]
+        
+        METRICS["📊 Metrics Logging<br/>━━━━━━━━━━━━━━<br/>accuracy, precision<br/>recall, f1_score"]
+        
+        ARTIFACTS["📁 Artifacts<br/>━━━━━━━━━━━━━━<br/>confusion_matrix.png<br/>classification_report.txt<br/>model signatures"]
+        
+        MLFLOW_UI[("🌐 MLflow UI<br/>mlruns/<br/>localhost:5001")]
+        
+        MLFLOW_RUNNER --> EXP_LOOP
+        EXP_LOOP --> METRICS
+        EXP_LOOP --> ARTIFACTS
+        METRICS --> MLFLOW_UI
+        ARTIFACTS --> MLFLOW_UI
+    end
+    
+    subgraph VERSIONING["📦 MODEL VERSIONING"]
+        direction TB
+        BASELINE[("⚡ Baseline Models<br/>models/baseline/<br/>random_forest_baseline.pkl<br/>gradient_boosting_baseline.pkl")]
+        
+        OPTIMIZED[("🏆 Optimized Models<br/>models/optimized/<br/>production_model.pkl<br/>80.17% accuracy")]
+        
+        DVC_MODELS[("☁️ DVC Model Registry<br/>models/baseline.dvc<br/>models/optimized.dvc<br/>S3 Storage")]
+        
+        BASELINE -.->|"dvc add + push"| DVC_MODELS
+        OPTIMIZED -.->|"dvc add + push"| DVC_MODELS
+    end
+    
+    subgraph TESTING["🧪 TESTING & VALIDATION"]
+        direction TB
+        TESTS["tests/<br/>━━━━━━━━━━━━━━<br/>test_sklearn_pipeline.py<br/>test_full_integration.py<br/>test_api.py"]
+        
+        VALIDATION["scripts/validation/<br/>━━━━━━━━━━━━━━<br/>validate_sklearn_pipeline.py<br/>validate_dataset.py<br/>validate_features.py"]
+        
+        COOKIECUTTER["monitoring/dashboard/<br/>━━━━━━━━━━━━━━<br/>validate_cookiecutter.py<br/>Streamlit Dashboard<br/>95.2% compliance"]
+    end
+    
+    subgraph PRODUCTION["🚀 PRODUCTION DEPLOYMENT"]
+        direction TB
+        STREAMLIT["🎨 Streamlit App<br/>turkish_music_app/<br/>━━━━━━━━━━━━━━<br/>app.py<br/>Real-time predictions<br/>Audio feature extraction"]
+        
+        API["⚡ FastAPI<br/>app/<br/>━━━━━━━━━━━━━━<br/>main.py<br/>endpoints.py<br/>model_service.py"]
+        
+        DOCKER["🐳 Docker<br/>docker-compose.yml<br/>Containerized deployment"]
+    end
+    
+    %% ============================================
+    %% MAIN FLOW CONNECTIONS
+    %% ============================================
+    
+    PROC -->|"DatasetManager<br/>load_train_test_split()"| FP_START
+    
+    PIPELINE -->|"X_transformed"| SKL_PIPE
+    
+    MODELS -->|"trained model"| MLFLOW_RUNNER
+    
+    MLFLOW_UI -.->|"best model selection"| OPTIMIZED
+    
+    OPTIMIZED -->|"production_model.pkl"| STREAMLIT
+    OPTIMIZED -->|"production_model.pkl"| API
+    
+    API --> DOCKER
+    STREAMLIT --> DOCKER
+    
+    TESTS -.->|"pytest"| MODELING
+    VALIDATION -.->|"checks"| FEATURES
+    COOKIECUTTER -.->|"compliance"| DATA
+    
+    %% ============================================
+    %% STYLING - BLUE PALETTE
+    %% ============================================
+    
+    classDef dataStyle fill:#4a6fa5,stroke:#6b9bd1,stroke-width:2px,color:#fff
+    classDef featureStyle fill:#5a8fc4,stroke:#7ba8d4,stroke-width:2px,color:#fff
+    classDef modelStyle fill:#6b9bd1,stroke:#8bb4dc,stroke-width:2px,color:#fff
+    classDef mlflowStyle fill:#7ba8d4,stroke:#9bc2e4,stroke-width:2px,color:#fff
+    classDef versionStyle fill:#8bb4dc,stroke:#a8c5e0,stroke-width:2px,color:#fff
+    classDef testStyle fill:#9bc2e4,stroke:#b8d4f1,stroke-width:2px,color:#000
+    classDef prodStyle fill:#a8c5e0,stroke:#c5ddf5,stroke-width:2px,color:#000
+    
+    class RAW,PROC,DVC_DATA dataStyle
+    class FP_START,NUMERIC,POWER,SCALER,PIPELINE featureStyle
+    class SKL_PIPE,MODEL_CONFIG,TRAIN_CONFIG,TRAINER,MODELS modelStyle
+    class MLFLOW_RUNNER,EXP_LOOP,METRICS,ARTIFACTS,MLFLOW_UI mlflowStyle
+    class BASELINE,OPTIMIZED,DVC_MODELS versionStyle
+    class TESTS,VALIDATION,COOKIECUTTER testStyle
+    class STREAMLIT,API,DOCKER prodStyle
+        </div>
+        
+        <div class="footer">
+            <p><strong>MLOps Team 24</strong> | Tecnológico de Monterrey | Applied AI Master's Program</p>
+            <p>Fase 2 - Octubre 2025</p>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>
