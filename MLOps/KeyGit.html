@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Git Branching - Solutions Cheatsheet</title>
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #f43f5e;
+            --accent-hover: #e11d48;
+            --code-bg: #0f1117;
+            --code-text: #a5b3ce;
+            --border: #334155;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header & Warning */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #f43f5e, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .warning-box {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid var(--accent);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .tip-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            color: #6ee7b7;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Section Headings */
+        h2 {
+            font-size: 1.8rem;
+            margin: 3rem 0 1.5rem 0;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            padding: 1rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .card-body {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Code Blocks */
+        .code-wrapper {
+            position: relative;
+            margin-top: auto;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+            margin: 0;
+            white-space: pre; 
+        }
+
+        .note {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background 0.2s;
+            opacity: 0;
+        }
+
+        .code-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+        }
+
+        .tags span {
+            display: inline-block;
+            background: #334155;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin: 0 4px;
+            font-size: 0.7rem;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Learning Git Branching</h1>
+        
+        <div class="warning-box">
+            <strong>⚠️ Disclaimer:</strong> Please do not continue if you have not learned the content covered in these assignments. It is important to learn the material. However, if you find yourself needing to complete arbitrary tasks for classes you are capable of testing out of, please continue...
+        </div>
+
+        <div class="tip-box">
+            <span>💡</span>
+            <div>
+                <strong>Quick Use:</strong> Copy and paste the entire block of code in the console. You do not need to copy each line one-by-one.
+            </div>
+        </div>
+    </header>
+
+    <h2>Main (Local)</h2>
+    <div class="grid">
+        <div class="card">
+            <div class="card-header"><span class="badge">1.1</span> Intro to Commits</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git commit;
+git commit;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.2</span> Branching</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git branch bugFix;
+git checkout bugFix;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.3</span> Merging</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout -b bugFix;
+git commit;
+git checkout main;
+git commit;
+git merge bugFix;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.4</span> Rebase Intro</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout -b bugFix;
+git commit;
+git checkout main;
+git commit;
+git checkout bugFix;
+git rebase main;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.1</span> Detach HEAD</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout C4;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.2</span> Relative refs (^)</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout C4^;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.3</span> Relative refs #2</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git branch -f main C6;
+git branch -f bugFix C0;
+git checkout C1;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.4</span> Reversing Changes</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git reset local~1;
+git checkout pushed;
+git revert pushed;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">3.1</span> Cherry-pick Intro</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git cherry-pick C3 C4 C7;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">3.2</span> Interactive Rebase</div>
+            <div class="card-body">
+                <p class="note">Order commits: C3, C5, C4. Omit/pick as needed.</p>
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git rebase -i main~4 --aboveAll;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">4.1</span> Grabbing Just 1 Commit</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout main;
+git cherry-pick C4;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">4.2</span> Juggling Commits</div>
+            <div class="card-body">
+                <p class="note">1) Order: C3, C2.<br>2) Order: C2'', C3'.</p>
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git rebase -i caption~2 --aboveAll;
+git commit --amend;
+git rebase -i caption~2 --aboveAll;
+git branch -f main caption;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">4.3</span> Juggling Commits #2</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout main;
+git cherry-pick C2;
+git commit --amend;
+git cherry-pick C3;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">4.4</span> Git Tags</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git tag v0 C1;
+git tag v1 C2;
+git checkout C2;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">4.5</span> Git Describe</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git commit;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">5.1</span> Rebasing over 9000 times</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git rebase main bugFix;
+git rebase bugFix side;
+git rebase side another;
+git rebase another main;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">5.2</span> Multiple parents</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git branch bugWork main~^2~;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">5.3</span> Branch Spaghetti</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout one;
+git cherry-pick C4 C3 C2;
+git checkout two;
+git cherry-pick C5 C4 C3 C2;
+git branch -f three C2;</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Remote</h2>
+    <div class="grid">
+        <div class="card">
+            <div class="card-header"><span class="badge">1.1</span> Clone Intro</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git clone;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.2</span> Remote Branches</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git commit;
+git checkout o/main;
+git commit;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.3</span> Git Fetchin’</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git fetch;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.4</span> Git Pullin’</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git pull;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.5</span> Fakeing Teamwork</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git clone;
+git fakeTeamwork main 2;
+git commit;
+git pull;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.6</span> Git Pushin’</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git clone;
+git commit;
+git commit;
+git push;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">1.7</span> Diverged History</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git clone;
+git fakeTeamwork;
+git commit;
+git pull --rebase;
+git push;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.1</span> Push main!</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git fetch;
+git rebase o/main side1;
+git rebase side1 side2;
+git rebase side2 side3;
+git rebase side3 main;
+git push;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.2</span> Merging with remotes</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout main;
+git pull;
+git merge side1;
+git merge side2;
+git merge side3;
+git push;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.3</span> Remoting Tracking</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git checkout -b side o/main;
+git commit;
+git pull --rebase;
+git push;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.4</span> Push arguments</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git push origin main;
+git push origin foo;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.5</span> Push arguments (Expanded)</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git push origin main~1:foo;
+git push origin foo:main;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.6</span> Fetch arguments</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git fetch origin main~1:foo;
+git fetch origin foo:main;
+git checkout foo;
+git merge main;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.7</span> Source of nothing</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git push origin :foo;
+git fetch origin :bar;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><span class="badge">2.8</span> Pull arguments</div>
+            <div class="card-body">
+                <div class="code-wrapper">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git pull origin bar:foo;
+git pull origin main:side;</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <span>learn-git-branching-solution</span>
+            <span>learn-git-branching-main</span>
+            <span>learn-git-branching-remote</span>
+        </div>
+    </footer>
+</div>
+
+<script>
+    function copyCode(btn) {
+        const pre = btn.nextElementSibling;
+        const code = pre.innerText;
+        
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#10b981";
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "";
+            }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
