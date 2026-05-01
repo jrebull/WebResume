@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Design Interview · Hub · Google</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-2: #0f172a;
+      --card: #111827;
+      --card-2: #1e293b;
+      --text: #e5e7eb;
+      --text-bright: #f8fafc;
+      --muted: #94a3b8;
+      --dim: #64748b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --google-blue: #4285f4;
+      --google-red: #ea4335;
+      --google-yellow: #fbbc04;
+      --google-green: #34a853;
+      --border: rgba(255, 255, 255, 0.10);
+      --border-bright: rgba(255, 255, 255, 0.18);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(66, 133, 244, 0.16), transparent 45%),
+        radial-gradient(circle at 100% 0%, rgba(167, 139, 250, 0.12), transparent 45%),
+        radial-gradient(circle at 50% 100%, rgba(52, 168, 83, 0.10), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ============ TOPBAR ============ */
+    .topbar {
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand .dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--google-blue), var(--google-green));
+      box-shadow: 0 0 14px rgba(66, 133, 244, 0.6);
+    }
+
+    .topbar-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ============ MAIN ============ */
+    .page {
+      width: min(1280px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 20px 0 80px;
+    }
+
+    /* ============ HERO ============ */
+    .hero {
+      padding: 56px 48px 48px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.92), rgba(30, 41, 59, 0.65));
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      right: -100px;
+      top: -100px;
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(circle, rgba(66, 133, 244, 0.22), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: -120px;
+      bottom: -120px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(52, 168, 83, 0.16), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid rgba(52, 168, 83, 0.4);
+      border-radius: 999px;
+      color: var(--google-green);
+      background: rgba(52, 168, 83, 0.1);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 18px 0 14px;
+      font-size: clamp(36px, 6vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+      max-width: 880px;
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--google-blue), var(--google-green) 50%, var(--google-yellow));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero .subtitle {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      max-width: 720px;
+    }
+
+    .hero-stats {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 28px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hero-stat .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-bright);
+    }
+
+    .hero-stat .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    /* ============ SECTION HEADER ============ */
+    .section {
+      margin-top: 40px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin: 0 0 20px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-header .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--google-blue), var(--google-green));
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .section-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* ============ SHEET CARDS GRID ============ */
+    .sheets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 18px;
+    }
+
+    .sheet {
+      display: flex;
+      flex-direction: column;
+      padding: 28px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.85), rgba(30, 41, 59, 0.6));
+      border-radius: 20px;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 280px;
+    }
+
+    .sheet::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-color, var(--accent)), var(--accent-color-2, var(--accent-2)));
+      opacity: 0.7;
+      transition: opacity 0.25s;
+    }
+
+    .sheet::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, var(--accent-glow, rgba(56, 189, 248, 0.18)), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+
+    .sheet:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-color, var(--accent));
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--accent-color, var(--accent));
+    }
+
+    .sheet:hover::before { opacity: 1; }
+    .sheet:hover::after { transform: scale(1.4); }
+    .sheet:hover .sheet-cta { gap: 12px; color: var(--text-bright); }
+    .sheet:hover .sheet-icon { transform: scale(1.05) rotate(-3deg); }
+
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sheet-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-color, var(--accent));
+      letter-spacing: 0.12em;
+    }
+
+    .sheet-icon {
+      font-size: 28px;
+      transition: transform 0.3s;
+      filter: grayscale(0.1);
+    }
+
+    .sheet h3 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-bright);
+      position: relative;
+      z-index: 1;
+    }
+
+    .sheet-desc {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+
+    .sheet-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sheet-tag {
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .sheet-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-color, var(--accent));
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.2s;
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sheet-cta-arrow {
+      transition: transform 0.2s;
+      font-size: 18px;
+    }
+
+    /* Color variants per sheet */
+    .sheet--cloud {
+      --accent-color: #34a853;
+      --accent-color-2: #4285f4;
+      --accent-glow: rgba(52, 168, 83, 0.22);
+    }
+
+    .sheet--apis {
+      --accent-color: #fbbc04;
+      --accent-color-2: #ea4335;
+      --accent-glow: rgba(251, 188, 4, 0.22);
+    }
+
+    .sheet--databases {
+      --accent-color: #a78bfa;
+      --accent-color-2: #38bdf8;
+      --accent-glow: rgba(167, 139, 250, 0.22);
+    }
+
+    .sheet--patterns {
+      --accent-color: #38bdf8;
+      --accent-color-2: #a78bfa;
+      --accent-glow: rgba(56, 189, 248, 0.22);
+    }
+
+    /* Coming soon placeholder */
+    .sheet--soon {
+      border-style: dashed;
+      background: rgba(17, 24, 39, 0.5);
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .sheet--soon:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border);
+    }
+
+    .sheet--soon::before {
+      background: var(--border-bright);
+      opacity: 0.4;
+    }
+
+    .sheet--soon .sheet-cta {
+      color: var(--dim);
+      font-style: italic;
+    }
+
+    /* ============ TIPS / RECORDATORIOS ============ */
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .tip {
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.7), rgba(30, 41, 59, 0.45));
+      border-radius: 14px;
+      border-left: 3px solid var(--google-blue);
+    }
+
+    .tip:nth-child(2) { border-left-color: var(--google-yellow); }
+    .tip:nth-child(3) { border-left-color: var(--google-green); }
+
+    .tip-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .tip h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-bright);
+    }
+
+    .tip p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    /* ============ FOOTER ============ */
+    .footer {
+      margin-top: 60px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .footer kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      margin: 0 2px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-bright);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-bright);
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 760px) {
+      .topbar { padding: 14px 20px; }
+      .hero { padding: 36px 28px; }
+      .hero-stats { gap: 20px; }
+      .sheets-grid { grid-template-columns: 1fr; }
+      .tips-grid { grid-template-columns: 1fr; }
+      .sheet { padding: 22px; min-height: 240px; }
+    }
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero, .section { animation: fadeUp 0.5s ease-out backwards; }
+    .section:nth-of-type(1) { animation-delay: 0.05s; }
+    .section:nth-of-type(2) { animation-delay: 0.1s; }
+    .section:nth-of-type(3) { animation-delay: 0.15s; }
+  </style>
+</head>
+<body>
+
+  <!-- ============ TOPBAR ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>System Design · Interview Hub</span>
+    </div>
+    <div class="topbar-meta">GOOGLE PREP</div>
+  </header>
+
+  <main class="page">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <span class="hero-badge">★ Tu hub de preparación</span>
+      <h1>Cheat sheets para tu <span class="grad">System Design Interview</span></h1>
+      <p class="subtitle">
+        Todas las hojas de referencia que necesitas en un solo lugar. Optimizadas para usar <strong>durante</strong> la entrevista, no solo para estudiar.
+      </p>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="num" id="stat-sheets">2</div>
+          <div class="label">Cheat Sheets</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">/</div>
+          <div class="label">Buscar (en cada hoja)</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">★</div>
+          <div class="label">Servicios Google-native</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SHEETS ============ -->
+    <section class="section">
+      <div class="section-header">
+        <h2><span class="num">1</span> Cheat Sheets disponibles</h2>
+        <p>Click en cualquier tarjeta para abrir.</p>
+      </div>
+
+      <div class="sheets-grid">
+
+        <!-- Cloud Services -->
+        <a href="AWSGCP.html" class="sheet sheet--cloud">
+          <div class="sheet-header">
+            <span class="sheet-num">SHEET · 01</span>
+            <span class="sheet-icon">☁️</span>
+          </div>
+          <h3>Cloud · GCP vs AWS</h3>
+          <p class="sheet-desc">
+            Equivalencias entre servicios, framework de la entrevista, capacity estimation, latency numbers de Jeff Dean, patrones comunes y arquitecturas de ejemplo.
+          </p>
+          <div class="sheet-tags">
+            <span class="sheet-tag">GCP</span>
+            <span class="sheet-tag">AWS</span>
+            <span class="sheet-tag">Patterns</span>
+            <span class="sheet-tag">Capacity</span>
+            <span class="sheet-tag">Latency</span>
+            <span class="sheet-tag">DBs</span>
+          </div>
+          <span class="sheet-cta">
+            Abrir cheat sheet
+            <span class="sheet-cta-arrow">→</span>
+          </span>
+        </a>
+
+        <!-- APIs -->
+        <a href="APIs.html" class="sheet sheet--apis">
+          <div class="sheet-header">
+            <span class="sheet-num">SHEET · 02</span>
+            <span class="sheet-icon">🔌</span>
+          </div>
+          <h3>API Design</h3>
+          <p class="sheet-desc">
+            Diseño de APIs para system design: REST, gRPC, GraphQL. Endpoints, versionado, paginación, autenticación, rate limiting y mejores prácticas.
+          </p>
+          <div class="sheet-tags">
+            <span class="sheet-tag">REST</span>
+            <span class="sheet-tag">gRPC</span>
+            <span class="sheet-tag">GraphQL</span>
+            <span class="sheet-tag">Auth</span>
+            <span class="sheet-tag">Versioning</span>
+          </div>
+          <span class="sheet-cta">
+            Abrir cheat sheet
+            <span class="sheet-cta-arrow">→</span>
+          </span>
+        </a>
+
+        <!-- Coming soon: Databases -->
+        <div class="sheet sheet--soon sheet--databases">
+          <div class="sheet-header">
+            <span class="sheet-num">SHEET · 03</span>
+            <span class="sheet-icon">🗄️</span>
+          </div>
+          <h3>Databases Deep Dive</h3>
+          <p class="sheet-desc">
+            Próximamente: SQL vs NoSQL, indexing, sharding, replication, transactions, isolation levels, CAP/PACELC, MVCC.
+          </p>
+          <div class="sheet-tags">
+            <span class="sheet-tag">SQL</span>
+            <span class="sheet-tag">NoSQL</span>
+            <span class="sheet-tag">Sharding</span>
+            <span class="sheet-tag">CAP</span>
+          </div>
+          <span class="sheet-cta">Coming soon</span>
+        </div>
+
+        <!-- Coming soon: Patterns -->
+        <div class="sheet sheet--soon sheet--patterns">
+          <div class="sheet-header">
+            <span class="sheet-num">SHEET · 04</span>
+            <span class="sheet-icon">🧩</span>
+          </div>
+          <h3>Distributed Patterns</h3>
+          <p class="sheet-desc">
+            Próximamente: consensus (Raft, Paxos), distributed transactions, saga, CDC, event sourcing, leader election.
+          </p>
+          <div class="sheet-tags">
+            <span class="sheet-tag">Raft</span>
+            <span class="sheet-tag">Saga</span>
+            <span class="sheet-tag">CDC</span>
+            <span class="sheet-tag">Consensus</span>
+          </div>
+          <span class="sheet-cta">Coming soon</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ TIPS ============ -->
+    <section class="section">
+      <div class="section-header">
+        <h2><span class="num">2</span> Recordatorios clave</h2>
+        <p>Lo que no debes olvidar el día de la entrevista.</p>
+      </div>
+
+      <div class="tips-grid">
+        <div class="tip">
+          <div class="tip-label">ANTES DE EMPEZAR</div>
+          <h4>Clarifica primero, diseña después</h4>
+          <p>Los primeros 5 minutos son para preguntas: DAU, read/write ratio, latencia, consistencia, scope. Si saltas a la solución, pierdes puntos.</p>
+        </div>
+        <div class="tip">
+          <div class="tip-label">DURANTE EL DISEÑO</div>
+          <h4>Verbaliza trade-offs</h4>
+          <p>Por cada decisión, di "podría usar X o Y, elijo X porque...". Google quiere ver razonamiento, no servicios memorizados.</p>
+        </div>
+        <div class="tip">
+          <div class="tip-label">AL CERRAR</div>
+          <h4>Bottlenecks y monitoring</h4>
+          <p>Termina mencionando: ¿qué falla primero?, ¿cómo lo detecto? (logs, métricas, traces), ¿qué cambiaría con 10× más tráfico?</p>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">
+      System Design Interview Hub · Preparación Google ·
+      Cada cheat sheet tiene búsqueda con <kbd>/</kbd>
+    </p>
+  </main>
+
+  <script>
+    // Auto-update sheet counter based on real (non-soon) sheets
+    const realSheets = document.querySelectorAll('.sheet:not(.sheet--soon)').length;
+    const stat = document.getElementById('stat-sheets');
+    if (stat) stat.textContent = realSheets;
+
+    // Smooth keyboard nav: number keys 1-9 open corresponding sheet
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const num = parseInt(e.key, 10);
+      if (!isNaN(num) && num >= 1 && num <= 9) {
+        const sheets = document.querySelectorAll('.sheet:not(.sheet--soon)');
+        if (sheets[num - 1]) {
+          window.location.href = sheets[num - 1].href;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
