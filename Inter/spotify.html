@@ -144,8 +144,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -456,6 +471,90 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “Separo catálogo, búsqueda, playlists y recomendaciones en servicios distintos. El audio nunca toca mi app: vive en object storage y se entrega por CDN, con manifiesto firmado por región para respetar licencias. La búsqueda usa un search engine dedicado, las recomendaciones se calculan offline y se sirven online desde un feature store, y los eventos de listen alimentan el pipeline analítico para mejorar el ranking.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>El catálogo es relativamente pequeño (~2 PB) pero el listen log crece eternamente. Tiering apropiado define el costo a largo plazo.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · CDN + RAM</div>
+          <div class="tier-desc">Top tracks (long-tail invertido), DRM tokens, search index calientes, feature store online.</div>
+          <div class="tier-svc">CDN regional + Redis + Elasticsearch hot tier</div>
+          <div class="tier-cost">~$0.02–0.08/GB egress · ~$36/GB RAM</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · object storage Standard</div>
+          <div class="tier-desc">Catálogo completo de audio (todos los bitrates), metadata DB, playlists.</div>
+          <div class="tier-svc">S3 Standard + Postgres / Cassandra</div>
+          <div class="tier-cost">~$0.023/GB/mes audio</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage IA</div>
+          <div class="tier-desc">Tracks sin plays &gt; 90 días, podcasts viejos, listen events archivados (analytics warehouse).</div>
+          <div class="tier-svc">S3 Standard-IA / GCS Nearline</div>
+          <div class="tier-cost">~$0.0125/GB/mes</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · archive</div>
+          <div class="tier-desc">Royalty audit logs &gt; 7 años (legal), tracks delistados pero retenidos por contrato.</div>
+          <div class="tier-svc">S3 Glacier Deep Archive</div>
+          <div class="tier-cost">~$0.001/GB/mes · retrieval 12 h</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>Long tail invertido en audio.</b> A diferencia de YouTube, en Spotify <em>todos</em> los tracks deben estar disponibles bajo demanda — un usuario buscando un track raro espera respuesta inmediata. Por eso el catálogo permanece en Standard, no en IA. Lo que sí va a IA: listen events archivados, royalty calculations históricos, tracks delistados.</p>
+        <p><b>Royalty pipeline obligatorio en archive.</b> Por contrato con labels, debes mantener listen events anonimizados &gt; 7 años para auditorías de royalties. Glacier Deep Archive a $0.001/GB/mes vs $0.023/GB/mes en Standard salva millones al año a esa escala.</p>
+        <p><b>Frase clave:</b> "Audio caliente vive en CDN porque latency, catálogo en Standard porque acceso bajo demanda, listen events en IA porque agregaciones diarias, audit logs en Glacier porque legal-retention pero rara consulta."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Spotify tiene público (Web API, partners) y privado (apps oficiales). LB+Gateway juntos es lo común en producción.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["App / Web / Speaker / Car"] --> LB["L7 Load Balancer<br/>NGINX / GCLB<br/>TLS + region routing"]
+    LB --> Pod["API Pods<br/>+ JWT/OAuth middleware<br/>+ Rate limit"]
+    Pod --> Cat["Catalog Service"]
+    Cat --> CatDB[("Catalog DB")]
+    Pod --> Search["Search Service"]
+    Search --> SIdx[("Elasticsearch")]
+    Pod --> Reco["Reco Service"]
+    Reco --> FS[("Feature Store")]
+    Pod --> Stream["Stream Service<br/>token signer"]
+    Stream --> CDN["CDN POPs"]
+    CDN -->|miss| AudioStore[("Object Storage")]
+    Client -. listen events .-> Pipe[("Kafka")]
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>Spotify usa los dos.</b> Web API pública con quotas a developers (Spotify for Developers) → Gateway. Tráfico de las apps oficiales y smart speakers → LB. La apps móvil hace ~150 requests por sesión; pasar todo por Gateway sería costoso y agregaría latencia inútil.</p>
+        <p><b>Frase clave:</b> "Para Web API pública uso Gateway con OAuth y rate limits por client_id. Para tráfico de apps oficiales uso LB porque el auth es propio (JWT firmado por Spotify), las rate limits las hago en pod, y la latencia la cuido para skip/seek instantáneos."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>Spotify for Developers Web API</b> con OAuth y quotas por client_id.</li>
+            <li><b>Partner integrations</b> (smart speakers, integradores).</li>
+            <li><b>API monetization</b> con plans por tier.</li>
+            <li><b>Centralizar OAuth flows</b> con scopes granulares.</li>
+            <li><b>Centralizar versioning</b> (<code>/v1/</code>, deprecation <code>Sunset</code> headers).</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>Apps oficiales</b> (móvil, web, desktop, speaker) con auth propio.</li>
+            <li><b>Latency-sensitive</b>: skip/seek en &lt; 50 ms requiere round-trip mínimo.</li>
+            <li><b>Listen events ingest</b>: 60K/s avg requiere endpoint barato.</li>
+            <li><b>Service mesh</b> con sidecar para observability.</li>
+            <li><b>Stream Service</b> firma URLs y devuelve manifest — pure compute, no necesita features de gateway.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 4 de 10 · System Design Interview Playbook</p>

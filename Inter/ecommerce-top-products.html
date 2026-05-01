@@ -145,8 +145,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -446,6 +461,89 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “Trato la creación de orden como recurso REST con <code>POST /api/orders</code>, pero emito un evento al stream para que un agregador mantenga sorted sets en Redis con buckets de 1 minuto. La API <code>GET /api/products/top?window=...</code> sólo lee de Redis, no de la DB transaccional. Pongo TTL corto en edge para absorber tráfico, idempotency por <code>orderId</code> para no contar dos veces, y mido p99 más tasa de cache hit.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>Dónde vive cada tipo de dato según frecuencia de acceso. Mover data fría a tiers baratos baja el costo 5–20×.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · in-memory</div>
+          <div class="tier-desc">Top sorted sets de las 3 ventanas, productos calientes con metadata ligera.</div>
+          <div class="tier-svc">Redis (ElastiCache / Memorystore)</div>
+          <div class="tier-cost">~$0.05/GB/h · ~$36/GB/mes</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · SSD operacional</div>
+          <div class="tier-desc">Órdenes recientes (~12 meses), catálogo de productos, índices de Postgres.</div>
+          <div class="tier-svc">RDS / Cloud SQL gp3 SSD</div>
+          <div class="tier-cost">~$0.10–0.20/GB/mes</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage IA</div>
+          <div class="tier-desc">Órdenes 1–7 años (compliance retention), eventos archivados de Kafka.</div>
+          <div class="tier-svc">S3 Standard-IA / GCS Nearline</div>
+          <div class="tier-cost">~$0.0125/GB/mes · retrieval $0.01/GB</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · archive</div>
+          <div class="tier-desc">Órdenes &gt; 7 años (retención legal), históricos para forensia.</div>
+          <div class="tier-svc">S3 Glacier Deep Archive / GCS Archive</div>
+          <div class="tier-cost">~$0.001/GB/mes · retrieval ~12 h</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>Lifecycle policy automática.</b> Configuro S3 lifecycle rules: orders en Standard los primeros 90 días → Standard-IA tras 90 días → Glacier Instant Retrieval tras 1 año → Glacier Deep Archive tras 5 años. Esto pasa sin intervención manual y baja el costo total ~10× para data fría.</p>
+        <p><b>Trade-off de retrieval.</b> Standard-IA es 60% más barato pero cobra $0.01/GB al leer y tiene latencia ~100ms. Glacier Deep Archive es ~30× más barato pero retrieval tarda 12 h. Para órdenes consultadas raramente (auditoría, resolución de disputas) ese delay es aceptable.</p>
+        <p><b>Frase clave:</b> "Data caliente vive en RAM (Redis) porque la consulto cada segundo. Data tibia en SSD (Postgres) porque la consulto diariamente. Data fría en S3-IA porque la consulto mensualmente. Data archive en Glacier porque solo la toco ante incidente o auditoría."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Si te preguntan "¿y si no usas API Gateway?", esta es la versión equivalente y los tradeoffs.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["Cliente Web/Móvil"] --> Edge["CDN / Edge Cache<br/>TTL 5–30s"]
+    Edge --> LB["L7 Load Balancer<br/>NGINX / ALB / Cloud LB<br/>TLS + path routing"]
+    LB --> Pod["API Pods<br/>+ Auth Middleware (JWT)<br/>+ Rate Limit (Redis token bucket)"]
+    Pod -->|read top| Cache[("Redis<br/>Sorted Sets")]
+    Pod -->|POST /orders| Order["Order Service"]
+    Order --> DB[("Orders DB Postgres")]
+    Order -->|emit| Stream[("Kafka order_events")]
+    Stream --> Agg["Aggregator"]
+    Agg --> Cache
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>El cambio principal:</b> el LB <em>solo</em> hace TLS termination y routing por path/host. Auth y rate limit se vuelven middleware en los API pods (o sidecars con Envoy/Istio). El LB es L7 (NGINX, ALB, Google Cloud LB) si necesito routing por path; L4 (NLB) si solo distribuyo TCP.</p>
+        <p><b>Frase clave:</b> "Para este e-commerce me quedo con API Gateway si el catálogo expone APIs públicas a partners (B2B con quotas y plans). Si es solo para el frontend propio y la app móvil, el LB es más barato y rápido — auth y rate limit van en código de la app."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>APIs públicas / B2B</b> con developer keys, quotas, plans monetizados.</li>
+            <li><b>Múltiples consumidores</b> (web, móvil, partners, internos) con políticas distintas.</li>
+            <li><b>Per-route config</b>: rate limit distinto en <code>/orders</code> vs <code>/search</code>.</li>
+            <li><b>Request transformation</b> (versionado de schemas, mapping de campos).</li>
+            <li><b>Centralizar observability</b>: latency/error rate por endpoint sin instrumentar cada servicio.</li>
+            <li><b>Caching managed</b> de respuestas comunes a nivel gateway.</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>Latencia crítica</b> — LB ahorra ~5–30 ms por request al saltar el gateway.</li>
+            <li><b>Costo a alta escala</b>: API Gateway cobra por request; LB por LCU u hora.</li>
+            <li><b>Tráfico interno</b> entre microservicios: gateway es overkill.</li>
+            <li><b>Throughput masivo</b> (M+ QPS) — NLB L4 es más rápido y barato.</li>
+            <li><b>Stack ya tiene service mesh</b> (Istio/Linkerd) que cubre auth/rate limit por sidecar.</li>
+            <li><b>Auth simple</b> (JWT con verificador local en pod) sin necesidad de OAuth flows complejos.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 1 de 10 · System Design Interview Playbook</p>

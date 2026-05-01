@@ -144,8 +144,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -459,6 +474,90 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “Separo metadata (árbol jerárquico, ACL, versiones) del almacenamiento de blobs (object storage en chunks). El upload es chunked y resumable con pre-signed URLs; deduplico por hash. El move/rename es una operación transaccional sólo en metadata. El sync usa un cursor que devuelve deltas. Cachea decisiones de permisos heredados y agrega GC para chunks huérfanos.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>Caso clásico de tiering — lifecycle policies por último access. Definen el modelo de costo del producto.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · object storage Standard</div>
+          <div class="tier-desc">Chunks accedidos último mes, archivos de carpetas activas, thumbs.</div>
+          <div class="tier-svc">S3 Standard / GCS Standard</div>
+          <div class="tier-cost">~$0.023/GB/mes</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · IA / Nearline</div>
+          <div class="tier-desc">Chunks 30–90 días sin acceso, versions viejas pero recuperables.</div>
+          <div class="tier-svc">S3 Standard-IA / GCS Nearline</div>
+          <div class="tier-cost">~$0.0125/GB/mes · retrieval $0.01/GB</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · Glacier Instant Retrieval</div>
+          <div class="tier-desc">Chunks 90 días – 1 año, archivos de usuarios menos activos.</div>
+          <div class="tier-svc">S3 Glacier Instant Retrieval / GCS Coldline</div>
+          <div class="tier-cost">~$0.004/GB/mes · retrieval ms</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · Deep Archive</div>
+          <div class="tier-desc">Chunks &gt; 1 año sin access, backups corporativos, compliance retention.</div>
+          <div class="tier-svc">S3 Glacier Deep Archive / GCS Archive</div>
+          <div class="tier-cost">~$0.001/GB/mes · retrieval 12 h</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>Lifecycle por último access, no por edad.</b> Un archivo de hace 5 años que aún se abre semanalmente debe quedarse en Standard. Lifecycle policy con <code>last_access_time</code> es lo correcto, no <code>creation_time</code>. S3 Intelligent-Tiering lo automatiza.</p>
+        <p><b>Glacier Instant Retrieval es el sweet spot.</b> $0.004/GB/mes (~85% off vs Standard) con retrieval en milisegundos. Para chunks que casi nunca tocas pero "no quiero esperar 12 h cuando los necesite", es el tier ideal.</p>
+        <p><b>Re-promotion al primer access.</b> Cuando user abre un archivo en cold/frozen, se promueve a hot. Primera apertura tiene latencia extra; siguientes son normales. Esto evita que tiers cold maten UX.</p>
+        <p><b>Frase clave:</b> "Esto es Dropbox 101: tiers automáticos por access pattern. La mayoría de archivos en cuentas viejas nunca se abren — Glacier baja el costo total ~10×. Hot tier sirve el 95% del tráfico desde el 5% del storage."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Para file system el upload va directo a object storage; el LB solo gestiona metadata.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["App / Sync Daemon"] --> LB["L7 Load Balancer<br/>NGINX / ALB"]
+    LB --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit (Redis)"]
+    Pod --> Meta[("Metadata DB<br/>Spanner / Postgres")]
+    Pod --> Dedup["Dedup<br/>chunk hash check"]
+    Client -->|chunks pre-signed URL| Store[("Object Storage<br/>S3 / GCS")]
+    Pod -. eventos .-> Sync[("Sync Stream")]
+    Sync --> Notify["Sync Notification Svc"]
+    Notify --> Client
+    Pod --> ACL["Permissions Service<br/>Zanzibar"]
+    Store --> GC["GC chunks huérfanos"]
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>Para apps oficiales: LB.</b> Tu sync daemon en laptop/móvil es código tuyo — auth con JWT propio, sin necesidad de OAuth flows complejos. Con 1B uploads/día, gateway-per-request explotaría el costo. LB simple + auth en pod es claramente mejor.</p>
+        <p><b>Para Public API: Gateway.</b> Si ofreces Dropbox API a third-parties (apps que se integran con Dropbox), Gateway aporta: OAuth, quotas, plans, observability per-developer-key. Path separado <code>api.dropbox.com/v2/</code> con Gateway, sync interno con LB.</p>
+        <p><b>Frase clave:</b> "Sync daemon usa LB porque es propio y high-throughput. Public API usa Gateway porque third-party necesita features de developer experience. En la práctica coexisten."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>Public Dropbox/Drive API</b> con OAuth y quotas por developer.</li>
+            <li><b>Business API</b> con plans por organización.</li>
+            <li><b>Third-party integrations</b> (Slack, Zapier, Office) con scopes granulares.</li>
+            <li><b>Versioning</b> en path (<code>/v1/</code>, <code>/v2/</code>) con sunset headers.</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>Sync daemon</b> oficial (high throughput, auth propio).</li>
+            <li><b>App móvil oficial</b>: ~10 requests/sesión, latency critical.</li>
+            <li><b>Pre-signed URL flow</b>: bytes nunca tocan tu API, gateway no aporta.</li>
+            <li><b>Sync events ingest</b>: 120K/s, fire-and-forget.</li>
+            <li><b>Service mesh</b> con sidecar para mTLS.</li>
+            <li><b>Internal microservices</b> (chunk service, dedup, GC) entre sí.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 9 de 10 · System Design Interview Playbook</p>

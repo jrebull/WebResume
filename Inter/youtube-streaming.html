@@ -144,8 +144,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -457,6 +472,91 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “El upload va directo al object storage usando una URL pre-firmada que entrega mi API. Cuando el cliente confirma, encolo un job de transcoding que produce HLS con varias renditions. La metadata vive en una DB; los segmentos los entrega un CDN. La reproducción consume el manifest desde edge, así mi backend no toca el blob nunca.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>Aquí los tiers son <em>todo</em>: long-tail de videos puede vivir frozen indefinidamente. Esto define el costo total del negocio.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · CDN + RAM</div>
+          <div class="tier-desc">Top 1% de videos (trending, virales) cacheados en CDN POPs y manifests en Redis.</div>
+          <div class="tier-svc">CloudFront / Cloud CDN + Redis</div>
+          <div class="tier-cost">~$0.02–0.08/GB egress + ~$36/GB RAM</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · object storage Standard</div>
+          <div class="tier-desc">Videos populares (último mes), todos los renditions HLS, thumbnails activos.</div>
+          <div class="tier-svc">S3 Standard / GCS Standard</div>
+          <div class="tier-cost">~$0.023/GB/mes</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage IA</div>
+          <div class="tier-desc">Long-tail (videos sin views &gt; 90 días), renditions no comunes (4K, codec avanzados poco usados).</div>
+          <div class="tier-svc">S3 Standard-IA / GCS Nearline</div>
+          <div class="tier-cost">~$0.0125/GB/mes · retrieval $0.01/GB</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · archive</div>
+          <div class="tier-desc">Master files originales (raw upload), videos &gt; 5 años sin views, archive de creators inactivos.</div>
+          <div class="tier-svc">S3 Glacier / GCS Coldline · Glacier Deep Archive para masters</div>
+          <div class="tier-cost">~$0.004/GB/mes (Glacier) · ~$0.001 (Deep)</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>Long-tail es el rey aquí.</b> 99% de los videos en YouTube tienen &lt; 100 views/mes. Mantenerlos en S3 Standard es gastar millones extra al mes. Lifecycle a IA tras 30 días sin views los baja al 50% del costo.</p>
+        <p><b>Master files siempre frozen.</b> El upload original (4K master) se guarda por si necesito re-encode con un codec mejor (AV1, HEVC). Pero ese master se toca casi nunca → Glacier Deep Archive desde día 1. Si necesito re-encode, pago 12 h de retrieval (es batch process anyway).</p>
+        <p><b>Re-promotion automática.</b> Si un video viejo de pronto recibe views (alguien lo enlazó), un trigger lo promueve de IA → Standard. Sin esto, el primer view sufre 100 ms extra de latencia.</p>
+        <p><b>Frase clave:</b> "Sin storage tiering el sistema no es viable económicamente. Los tiers reducen el costo total ~10× y los lifecycle policies hacen que sea automático. CDN + Hot tier sirven el 95% del tráfico desde el 1% del storage."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Para video, la latencia importa pero el bytes mismo va por CDN; el LB solo gestiona metadata.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["Cliente Web/Móvil"] --> Edge["CDN POPs (segments)"]
+    Client --> LB["L7 Load Balancer<br/>ALB / Cloud LB"]
+    LB --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit Redis"]
+    Pod --> Meta[("Metadata DB")]
+    Pod -->|complete-upload| Stream[("Pub/Sub video.uploaded")]
+    Stream --> Trans["Transcoder Workers"]
+    Trans --> Store[("Object Storage")]
+    Edge -->|miss| Store
+    Client -->|pre-signed URL| Store
+    Client -. events .-> Analytics[("Pipeline analítico")]
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>YouTube tiene público y privado.</b> La API pública (Data API v3) con developer keys, quotas, plans → Gateway encaja perfecto. La API interna entre tu frontend y backend → LB es más simple y rápido. En producción, ambos coexisten (Gateway en path <code>/v3/</code>, LB en path interno).</p>
+        <p><b>Frase clave:</b> "Para Data API pública necesito Gateway: developer keys, monetización, quotas, métricas por endpoint. Para el playback y dashboard de creators (frontend propio), LB con auth en pod es más rápido y barato. En la práctica YouTube usa ambos en paralelo."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>Data API pública</b> (developer keys, quotas, monetización por tier).</li>
+            <li><b>Multiple SDKs</b> (web, móvil, smart TV, partners) con políticas distintas.</li>
+            <li><b>OAuth flows</b> para "Sign in with YouTube".</li>
+            <li><b>Rate limits granulares</b> por endpoint (uploads vs lookups).</li>
+            <li><b>Centralizar versioning</b> (<code>/v3/</code>, <code>/v4/</code>).</li>
+            <li><b>WAF y bot detection</b> integrados.</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>API interna</b> entre tu frontend y backend.</li>
+            <li><b>Latencia crítica</b> en endpoints de hot path (manifest fetch, watch events).</li>
+            <li><b>Throughput masivo</b> (~300K events/s) — gateway sería caro.</li>
+            <li><b>Auth simple</b>: cookie de sesión propia o JWT verificado local.</li>
+            <li><b>Service mesh</b> ya cubre auth/observability con sidecar.</li>
+            <li><b>Eventos analíticos</b>: ingest endpoint masivo, no necesita features de gateway.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 3 de 10 · System Design Interview Playbook</p>

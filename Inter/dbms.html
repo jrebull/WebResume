@@ -144,8 +144,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -459,6 +474,90 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “El query entra, se parsea, el planner elige índices y join order, el executor itera el plan. Las páginas viven en buffer pool; toda escritura va primero al WAL antes de modificar la página, así garantizo durabilidad. Para concurrencia uso MVCC para leer sin bloquear y 2PL en escrituras críticas. La replicación va por WAL shipping; recovery sigue ARIES. Mido p99, lock wait, replication lag y cache hit ratio.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>Un DBMS tiene su propia jerarquía: RAM → SSD local → SSD remoto → archive. Cada tier define latencia y costo.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · RAM (buffer pool)</div>
+          <div class="tier-desc">Páginas activas en buffer pool, lock table, transaction table, undo log activo.</div>
+          <div class="tier-svc">Process memory · target hit ratio &gt; 99%</div>
+          <div class="tier-cost">~$5–10/GB compute · sub-µs latency</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · SSD local (data + WAL)</div>
+          <div class="tier-desc">Páginas de tablas e índices, WAL activo, temp space para sorting/hashing grandes.</div>
+          <div class="tier-svc">Local NVMe SSD / EBS gp3</div>
+          <div class="tier-cost">~$0.10–0.20/GB/mes · ~100 µs latency</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage WAL archive</div>
+          <div class="tier-desc">WAL rotated &gt; 7 días, backups incrementales, tablespace archivado de tablas históricas.</div>
+          <div class="tier-svc">S3 Standard / GCS Standard</div>
+          <div class="tier-cost">~$0.023/GB/mes</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · backup archive</div>
+          <div class="tier-desc">Snapshots completos &gt; 30 días, point-in-time recovery archives, compliance retention.</div>
+          <div class="tier-svc">S3 Glacier / GCS Coldline</div>
+          <div class="tier-cost">~$0.004/GB/mes · retrieval para PITR ~h</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>Buffer pool es el tier más caliente y más caro.</b> 64 GB de buffer pool en un nodo es ~$5K/mes en cloud (~25–50% del nodo). Ese tier ahorra millones en latencia: con hit ratio &lt;99%, el sistema thrasha y queries que deberían ser ms se vuelven s.</p>
+        <p><b>WAL en SSD local, archive en S3.</b> WAL activo necesita fsync &lt;10 ms (SSD local). WAL rotado (ya aplicado a páginas y a réplicas) puede ir a S3 — sirve para PITR y replication catch-up de réplicas que estuvieron desconectadas.</p>
+        <p><b>Backups con retention escalonado.</b> Daily backups en Standard 7 días → IA 30 días → Glacier 1 año. Esto da Recovery Point Objective (RPO) granular en hot tier y compliance retention en cold a costo mínimo.</p>
+        <p><b>Frase clave:</b> "Cada tier del DBMS está justificado por el patrón físico: RAM porque cada query toca páginas, SSD porque WAL fsync, S3 porque WAL archive y backups, Glacier porque PITR mensual o anual. Tier wrong = costo o performance perdidos."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Para un DBMS, lo típico es exponer puerto TCP directo al driver. LB L4 es lo natural.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["Cliente / driver SQL"] --> LB["L4 Load Balancer (NLB)<br/>TCP 5432<br/>health check + failover"]
+    LB --> Primary["Primary Node<br/>+ pgbouncer connection pool"]
+    LB -.read replicas.-> Replica1["Read Replica 1"]
+    LB -.read replicas.-> Replica2["Read Replica 2"]
+    Primary --> Parser["Parser → Planner → Executor"]
+    Executor --> Buffer["Buffer Pool"]
+    Buffer <--> Storage[("Storage Engine")]
+    Primary --> WAL[("WAL append-only")]
+    WAL --> Replica1
+    WAL --> Replica2
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>El DBMS habla protocolo binario nativo</b> (PostgreSQL wire protocol, MySQL protocol). API Gateway es L7 HTTP-aware — no entiende el protocolo. Por eso lo natural es L4 NLB que solo enruta TCP. Para read/write split (writes al primary, reads a réplicas) puedes usar pgbouncer/HAProxy intermedio, no Gateway.</p>
+        <p><b>Si expusieras una "REST API DB" (PostgREST, Hasura)</b> que traduce HTTP a SQL, ahí sí Gateway hace sentido por delante: auth, rate limit, transformations. Pero la DB nativa siempre va por LB.</p>
+        <p><b>Frase clave:</b> "Para SQL nativo uso L4 NLB; el protocolo binario no es ruteable por Gateway. Si pones una capa REST encima (PostgREST, Hasura, Supabase), entonces Gateway sí encaja para esa capa, pero el DB sigue detrás de LB."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>REST API encima del DB</b> (PostgREST, Hasura, Supabase).</li>
+            <li><b>DBaaS managed</b> con auth y quotas por tenant.</li>
+            <li><b>GraphQL frontend</b> con schemas y rate limits por field.</li>
+            <li><b>Multi-tenant SaaS</b> con isolation por organización.</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>SQL nativo</b> (puerto 5432 / 3306): protocolo binario, gateway no entiende.</li>
+            <li><b>Connection pooling</b> con PgBouncer / ProxySQL detrás del LB.</li>
+            <li><b>Read/write split</b> con LB-aware (HAProxy con backend selection).</li>
+            <li><b>Latencia mínima</b> en queries OLTP (sub-50 ms p99).</li>
+            <li><b>Failover</b> automático del primary con health checks del LB.</li>
+            <li><b>Throughput masivo</b> (10K+ QPS por instancia): NLB L4 es lo más rápido.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 10 de 10 · System Design Interview Playbook</p>

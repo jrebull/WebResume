@@ -162,8 +162,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .reco-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .reco-grid, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -586,6 +601,90 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “Diseño un pipeline de dos etapas: recall (con ANN sobre embeddings) y ranking (modelo offline servido online). Las features viven en un feature store compartido entre training y serving para evitar skew. Los eventos van por stream y alimentan el ciclo de re-entrenamiento. Manejo experimentos con asignación sticky por user, mido CTR, conversion, diversidad y exploro un porcentaje del tráfico.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>Feature store online es caro per-byte; events viejos pueden vivir muy frío sin perder valor.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · in-memory + ANN</div>
+          <div class="tier-desc">Feature store online (user/item features), ANN index en RAM/SSD-NVMe, hot embeddings.</div>
+          <div class="tier-svc">Bigtable + Redis + FAISS/HNSW node memory</div>
+          <div class="tier-cost">~$0.25/GB/h Bigtable · ~$36/GB Redis</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · object storage Standard</div>
+          <div class="tier-desc">Eventos recientes (last 7–30 días), modelos servidos actuales, training partitions hot.</div>
+          <div class="tier-svc">S3 Standard + BigQuery active partitions</div>
+          <div class="tier-cost">~$0.023/GB/mes</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage IA</div>
+          <div class="tier-desc">Eventos &gt; 30 días para training (offline), modelos viejos para rollback, embeddings de versiones N-2.</div>
+          <div class="tier-svc">S3 Standard-IA / BigQuery long-term storage</div>
+          <div class="tier-cost">~$0.0125/GB/mes (BQ long-term auto a 90 días)</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · archive</div>
+          <div class="tier-desc">Raw event archive &gt; 1 año (compliance, reentrenamiento histórico, análisis longitudinal).</div>
+          <div class="tier-svc">S3 Glacier / Glacier Deep Archive</div>
+          <div class="tier-cost">~$0.001–0.004/GB/mes · retrieval horas</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>BigQuery long-term automático.</b> Particiones de tabla en BigQuery sin acceso por 90 días bajan automáticamente a long-term storage (50% off). No requires lifecycle manual — el warehouse lo hace solo. Hot queries siguen funcionando sin cambio.</p>
+        <p><b>Modelos viejos como artifacts.</b> Cada modelo entrenado se versiona en S3 con tag <code>model_version</code>. Mantengo los últimos 2 en Standard (rollback rápido); &gt; 6 meses van a IA. Si un modelo de hace 2 años falla auditoría, puedo retrievear (12 h) para investigar.</p>
+        <p><b>Frase clave:</b> "Online serving está en RAM/Bigtable porque sub-30ms es no-negociable. Training data en S3 / BigQuery con tiering automático: hot recents, cold &gt; 30 d, frozen para audit. Esto reduce el costo de storage del pipeline ML ~5×."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Para reco serving la latencia es product feature. LB es lo natural; Gateway no aporta valor.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["Cliente"] --> LB["L7 Load Balancer<br/>region routing"]
+    LB --> Pod["Reco API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit (token bucket)"]
+    Pod --> Recall["Candidate Generation"]
+    Recall --> Embed[("Embeddings ANN")]
+    Pod --> Rank["Ranker Online"]
+    Rank --> FS[("Feature Store")]
+    Pod --> Filter["Policy / Diversity Filter"]
+    Pod --> Exp["A/B Assignment"]
+    Client -. impressions/clicks/conv .-> Stream[("Kafka events")]
+    Stream --> FS
+    Stream --> Train["Training Pipeline"]
+    Train --> Rank
+    Train --> Embed
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>Reco serving es interno.</b> El cliente típicamente es tu propio app o frontend, no un third-party. Auth con JWT verificado local en pod, rate limit con Redis. Gateway agrega latencia que el SLO p99 &lt; 100 ms no aguanta.</p>
+        <p><b>Frase clave:</b> "Reco serving usa LB porque es interno, latency-sensitive y high-QPS. Si expongo recos como producto (e.g., Reco-as-a-Service para terceros), agrego Gateway en el path externo manteniendo el LB para internal."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>Reco-as-a-Service</b> ofrecido a clientes externos.</li>
+            <li><b>Multi-tenant</b> con quotas distintas por cliente.</li>
+            <li><b>API monetization</b> con plans por requests/mes.</li>
+            <li><b>Auth via OAuth</b> con scopes granulares.</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>Reco interno</b> para tu propio frontend (caso típico).</li>
+            <li><b>SLO p99 &lt; 100 ms</b> — gateway agrega latencia inaceptable.</li>
+            <li><b>High QPS</b> (12K+/s) — costo gateway prohibitivo.</li>
+            <li><b>Eventos ingest</b>: 10K/s, fire-and-forget, no necesita gateway features.</li>
+            <li><b>Service mesh</b> con sidecar para mTLS y observability.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 7 de 10 · System Design Interview Playbook</p>

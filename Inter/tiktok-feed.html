@@ -144,8 +144,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -450,6 +465,88 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “Separo el feed en candidate generation, ranking y post-procesamiento de diversidad. Los candidatos vienen de trending, follow-graph y vecinos cercanos en embeddings. El ranker es un modelo online sirviendo desde un feature store; los eventos van por stream para alimentar features y métricas. El cursor es opaco para sobrevivir a cambios de ranking. Mido p95, completion rate y tasa de exploración.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>El feed depende de un feature store sub-30 ms; los videos viejos pueden bajarse a tiers baratos sin afectar UX.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · in-memory + CDN</div>
+          <div class="tier-desc">Feature store online (user/item features), <code>recent_seen</code> set, ANN index en RAM, videos trending en CDN POPs.</div>
+          <div class="tier-svc">Bigtable + Redis + CDN</div>
+          <div class="tier-cost">~$0.25/GB/h Bigtable · ~$36/GB Redis</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · object storage Standard</div>
+          <div class="tier-desc">Videos uploads último mes, embeddings actuales del modelo, eventos warehouse hot partition.</div>
+          <div class="tier-svc">S3 Standard + BigQuery active partitions</div>
+          <div class="tier-cost">~$0.023/GB/mes</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage IA</div>
+          <div class="tier-desc">Videos &gt; 30 días con bajo engagement, embeddings de versiones de modelo viejas, training data archivado.</div>
+          <div class="tier-svc">S3 Standard-IA / BigQuery long-term</div>
+          <div class="tier-cost">~$0.0125/GB/mes</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · archive</div>
+          <div class="tier-desc">Videos &gt; 1 año sin views, raw event archive (auditoría, reentrenamiento histórico).</div>
+          <div class="tier-svc">S3 Glacier / Glacier Deep Archive</div>
+          <div class="tier-cost">~$0.001–0.004/GB/mes</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>Pareto en videos.</b> El 99% del watch time está en el 1% top de videos (siempre fresh / trending). Mantener el long-tail en S3 Standard es desperdicio. Lifecycle a IA tras 30 días sin views → ahorro masivo.</p>
+        <p><b>Embeddings versiones viejas en cold.</b> Cada release del modelo regenera embeddings. Las versiones N-2 quedan disponibles pero raras (rollback, A/B). Cold storage hasta que se necesiten.</p>
+        <p><b>Frase clave:</b> "Feature store en RAM porque path crítico, videos hot en CDN porque latencia, long-tail en IA porque acceso bajo demanda OK con +100ms, archive raw events en Glacier porque solo training histórico ocasional."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>TikTok prioriza latencia brutal. LB es el default; Gateway solo para integraciones externas.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["App / Móvil"] --> LB["L7 Load Balancer<br/>NGINX / ALB<br/>region routing"]
+    LB --> Pod["Feed API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit Redis"]
+    Pod --> CG["Candidate Gen"]
+    CG --> ANN[("Embeddings ANN")]
+    Pod --> Rank["Online Ranker"]
+    Rank --> FS[("Feature Store")]
+    Pod --> Diverse["Diversity Filter"]
+    Client -. eventos .-> Stream[("Kafka watch/like/share")]
+    Stream --> FS
+    Client -- video bytes --> CDN["CDN POPs"]
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>TikTok aprieta latencia hasta el límite.</b> Cada milisegundo en el feed pesa: 600K QPS × 5 ms extra = recursos de cómputo enormes. El JWT lo verifico local en pod (con public key cacheada, sin llamar a auth service); rate limit con Redis (sliding window log). Gateway agregaría latencia y no aporta valor.</p>
+        <p><b>Frase clave:</b> "Para feed serving uso LB con auth en pod — la latencia es product feature. Para Creator API y Open Platform (third-party apps) sí uso Gateway porque necesito quotas y observability por developer key."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>Open Platform / Developer API</b> con quotas y plans.</li>
+            <li><b>Brand integrations</b> con rate limits especiales.</li>
+            <li><b>Multiple consumer types</b> con políticas distintas.</li>
+            <li><b>OAuth complejo</b> con scopes granulares (third-party login).</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>Feed serving</b>: 600K QPS, p99 &lt; 200 ms — gateway agrega latencia inaceptable.</li>
+            <li><b>Eventos ingest</b> (watch/like/share): masivo, fire-and-forget.</li>
+            <li><b>Auth simple</b>: JWT con verifier local (public key cached).</li>
+            <li><b>App propia</b>: no hay third-party que justifique gateway features.</li>
+            <li><b>Service mesh</b> ya cubre auth/observability con Envoy sidecar.</li>
+            <li><b>Cost</b>: a 600K QPS, gateway-per-request es prohibitivo.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 5 de 10 · System Design Interview Playbook</p>

@@ -144,8 +144,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -449,6 +464,86 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “Modelo el documento como un append-only op log con OT o CRDT. El editor envía operaciones por WebSocket contra una sticky session por docId; el servidor las transforma contra ops concurrentes y replica el resultado a todos los clientes. Snapshots periódicos aceleran la carga inicial; permisos por ACL controlan acceso. Presence va por el mismo canal. Mido latencia de propagación, conflictos y tasa de revert.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>Docs activos en RAM/SSD; el long-tail (docs nunca tocados) puede archivarse barato.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · in-memory</div>
+          <div class="tier-desc">Estado en memoria del Doc Service para docs activos, op log buffer, presence map, permission cache.</div>
+          <div class="tier-svc">Process memory + Redis</div>
+          <div class="tier-cost">~$36/GB RAM</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · SSD operacional</div>
+          <div class="tier-desc">Op logs, snapshots recientes (último mes), metadata DB, ACL store.</div>
+          <div class="tier-svc">Spanner / Postgres + S3 Standard para snapshots</div>
+          <div class="tier-cost">~$0.10–0.30/GB/mes</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage IA</div>
+          <div class="tier-desc">Docs sin edición &gt; 30 días, op logs compactados, snapshots viejos.</div>
+          <div class="tier-svc">S3 Standard-IA / GCS Nearline</div>
+          <div class="tier-cost">~$0.0125/GB/mes</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · archive</div>
+          <div class="tier-desc">Docs &gt; 1 año sin acceso, audit logs históricos, copias para compliance.</div>
+          <div class="tier-svc">S3 Glacier / Coldline</div>
+          <div class="tier-cost">~$0.004/GB/mes</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>Re-promotion al abrir.</b> Cuando user abre un doc que está en cold/frozen, se promueve automáticamente a warm (lo cargamos en SSD). Primera apertura tiene latencia extra (~1–5 s), las siguientes son normales. Aceptable porque docs viejos rara vez se abren.</p>
+        <p><b>Op log compactado vs raw.</b> El op log raw puede tener millones de pequeñas ops. Periódicamente compacto en snapshots y archivo el log raw a IA — si necesito reconstruir un estado intermedio, retrieval lento es OK.</p>
+        <p><b>Frase clave:</b> "Docs activos viven en memoria del pod (sticky); recientes en Spanner/SSD; viejos en IA con re-promotion lazy; archives sin acceso en Glacier. La distribución de acceso es Pareto extremo, los tiers monetizan eso."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Para Docs el WS sticky por <code>documentId</code> manda. LB cumple, Gateway agrega lo que ya tienes.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Editor["Editor Web/Móvil"] --> LB["L7 Load Balancer<br/>sticky by documentId<br/>(consistent hashing)"]
+    LB --> Doc["Doc Service Pod<br/>+ Auth (Google SSO / JWT)<br/>+ OT/CRDT engine"]
+    Doc --> Log[("Op Log")]
+    Doc --> Snap[("Snapshot Store")]
+    Doc --> Bcast["Pub/Sub broadcast"]
+    Bcast --> Editor
+    Doc --> Auth["Permissions Service<br/>Zanzibar"]
+    Auth --> AuthDB[("ACL store")]
+    Editor -. presence .-> Pres["Presence Service"]
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>El sticky es el punto crítico.</b> Cualquiera de los dos puede hacer sticky por header (cookie de sesión que codifica documentId). LB con consistent hashing por documentId es más simple operativamente. El Gateway aporta poco aquí — auth ya viene de Google SSO, rate limit por user es trivial, transformations no hacen falta.</p>
+        <p><b>Frase clave:</b> "Docs es un caso donde LB con sticky-by-documentId es más limpio. Los pods son stateful (transformer OT vive ahí), el SSO es Google, rate limits son por user no por endpoint. Gateway sería overkill."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>Drive API pública</b> para apps third-party con OAuth scopes.</li>
+            <li><b>Apps Script integrations</b> con rate limits.</li>
+            <li><b>Multi-tenant SaaS</b> con quotas por organización.</li>
+            <li><b>Versioning API</b> para clientes externos legacy.</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>WebSocket sticky</b> por documentId — consistent hashing simple.</li>
+            <li><b>Auth simple</b> (Google SSO / JWT verificado en pod).</li>
+            <li><b>Latency-sensitive</b>: ops a 100ms p99 no toleran +20ms de gateway.</li>
+            <li><b>Service mesh</b> ya cubre observability.</li>
+            <li><b>Apps oficiales</b>: no hay third-party que justifique gateway features.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 6 de 10 · System Design Interview Playbook</p>

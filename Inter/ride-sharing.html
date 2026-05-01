@@ -145,8 +145,23 @@
     .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
     .cloud-item .alt-line b { color: #fb7185; }
 
+    .storage-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .tier { padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); }
+    .tier-hot { background: rgba(251,113,133,.08); border-color: rgba(251,113,133,.25); }
+    .tier-warm { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.25); }
+    .tier-cold { background: rgba(56,189,248,.08); border-color: rgba(56,189,248,.25); }
+    .tier-frozen { background: rgba(167,139,250,.08); border-color: rgba(167,139,250,.25); }
+    .tier .tier-name { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .tier-hot .tier-name { color: #fb7185; }
+    .tier-warm .tier-name { color: #fbbf24; }
+    .tier-cold .tier-name { color: #38bdf8; }
+    .tier-frozen .tier-name { color: #a78bfa; }
+    .tier .tier-desc { color: var(--text); font-size: 13px; margin: 8px 0 6px; line-height: 1.5; }
+    .tier .tier-svc { color: var(--muted); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 6px; line-height: 1.45; }
+    .tier .tier-cost { color: var(--muted); font-size: 11px; margin-top: 6px; font-style: italic; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .storage-tiers { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -453,6 +468,91 @@ flowchart LR
 
     <section class="section script">
       <p><strong>Script de respuesta:</strong> “Modelaría Ride como recurso REST y los location updates como canal WebSocket. El matching es un servicio que consume eventos del stream y consulta un índice geoespacial (geohash) en Redis. El accept es una operación CAS para prevenir doble asignación. Particionaría por ciudad/región y usaría push notifications para drivers en background. Mediría p95 de tiempo desde request hasta match.”</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tiers de almacenamiento</h2><p>Posiciones live en RAM, rides recientes en SSD, históricos baratos en object storage.</p></div>
+      <div class="storage-tiers">
+        <div class="tier tier-hot">
+          <div class="tier-name">Hot · in-memory</div>
+          <div class="tier-desc">Geo set de drivers vivos, locks de rides en accept, sesiones WS, ETA cache.</div>
+          <div class="tier-svc">Redis GEO + ElastiCache / Memorystore</div>
+          <div class="tier-cost">~$36/GB/mes · TTL 30 s en posiciones</div>
+        </div>
+        <div class="tier tier-warm">
+          <div class="tier-name">Warm · SSD operacional</div>
+          <div class="tier-desc">Rides últimos 90 días, drivers, vehicles, ratings activos.</div>
+          <div class="tier-svc">RDS Postgres con PostGIS / Cloud SQL</div>
+          <div class="tier-cost">~$0.10–0.20/GB/mes</div>
+        </div>
+        <div class="tier tier-cold">
+          <div class="tier-name">Cold · object storage IA</div>
+          <div class="tier-desc">Rides 90 d – 7 años para legal/compliance, GPS traces archivadas.</div>
+          <div class="tier-svc">S3 Standard-IA / GCS Nearline</div>
+          <div class="tier-cost">~$0.0125/GB/mes</div>
+        </div>
+        <div class="tier tier-frozen">
+          <div class="tier-name">Frozen · archive</div>
+          <div class="tier-desc">Rides &gt; 7 años (anonimizados), recibos, evidencia para disputas legales.</div>
+          <div class="tier-svc">S3 Glacier Deep Archive</div>
+          <div class="tier-cost">~$0.001/GB/mes · retrieval 12 h</div>
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defenderlo en la entrevista</h4>
+        <p><b>El truco con GPS traces.</b> Cada ride genera ~100 KB de location updates (lat/lng cada 3–5 s × 15 min). A 5M rides/día son ~500 GB/día. Mantenerlas en SSD es muy caro. Las muevo a S3 IA tras 30 días y a Glacier tras 1 año.</p>
+        <p><b>Lifecycle automático.</b> S3 lifecycle rule por prefijo: <code>rides/2024/</code> → IA tras 90 días → Glacier tras 365 días. Postgres parte solo orders &lt; 90 días; archive tablespace con foreign data wrappers a S3.</p>
+        <p><b>Frase clave:</b> "Las posiciones live cuestan caro en RAM pero son sub-ms; rides recientes en SSD por ACID; historiales en S3 IA por compliance; archive en Glacier porque solo el regulador o un investigador los toca."</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Versión alternativa: con Load Balancer (no API Gateway)</h2><p>Para ride-sharing es relevante: el WS sticky y la latencia low define mucho del diseño.</p></div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    R["Rider App"] --> NLB["L4 NLB sticky<br/>WebSocket-friendly"]
+    D["Driver App"] --> NLB
+    NLB --> Pod["API Pods<br/>+ JWT verifier middleware<br/>+ Rate limit (Redis)"]
+    Pod --> Ride["Ride Service<br/>state machine"]
+    Pod --> Loc["Location Service"]
+    Loc --> Geo[("Redis GEO")]
+    Ride --> Match["Matcher"]
+    Match --> Geo
+    Match --> Push["FCM / APNs"]
+    Push --> D
+    Ride --> RDB[("Rides DB Postgres")]
+    Ride -. eventos .-> Stream[("Kafka ride_events")]
+        </div>
+      </div>
+      <div class="flow-explain">
+        <h4>API Gateway vs Load Balancer: cómo defender cada uno</h4>
+        <p><b>El WebSocket cambia las reglas.</b> Necesito sticky sessions porque el state del ride/driver vive en memoria del pod. Tanto API Gateway como L7 LB pueden hacer sticky, pero L4 NLB tiene <em>menor latencia</em> y mayor throughput. Para 250K location updates/s, los ~10 ms extra del Gateway compounded son costosos.</p>
+        <p><b>Frase clave:</b> "Para ride-sharing me inclino por NLB: el WebSocket de los drivers tiene 1M conexiones concurrentes y location updates a 250K/s; un API Gateway agrega latencia y costo por evento que no necesito. Auth lo hago con JWT verificado en el pod (verificación local con public key, no llamada externa)."</p>
+      </div>
+      <div class="tradeoffs">
+        <div class="bottleneck" style="background: rgba(56,189,248,.05); border-color: rgba(56,189,248,.22);">
+          <h4 style="color: #38bdf8">Cuándo elegir API Gateway</h4>
+          <ul>
+            <li><b>Driver/partner API pública</b> con rate limits por developer key.</li>
+            <li><b>API monetizada</b> con cuotas para integradores third-party.</li>
+            <li><b>Multiple consumer types</b> con políticas distintas (riders vs drivers vs ops).</li>
+            <li><b>Centralizar OAuth flows</b> para login con Google/Apple.</li>
+            <li><b>Per-route caching</b> para endpoints como <code>/cities</code> o <code>/pricing</code>.</li>
+          </ul>
+        </div>
+        <div class="improve" style="background: rgba(251,191,36,.05); border-color: rgba(251,191,36,.22);">
+          <h4 style="color: #fbbf24">Cuándo elegir Load Balancer</h4>
+          <ul>
+            <li><b>WebSocket masivo</b> con 1M+ conexiones — NLB sticky lo maneja mejor.</li>
+            <li><b>Latencia crítica</b> en location updates (250K/s, cada 3–5 s).</li>
+            <li><b>Costo</b> a esta escala — gateway por evento dispara el costo.</li>
+            <li><b>Auth simple</b>: JWT con verifier en pod, sin OAuth complejo.</li>
+            <li><b>Service mesh</b> (Envoy/Istio) ya cubre auth/observability por sidecar.</li>
+            <li><b>Mobile-first</b>: la app móvil es propia, no hay third-party que justifique gateway.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <p class="footer">Caso 2 de 10 · System Design Interview Playbook</p>
