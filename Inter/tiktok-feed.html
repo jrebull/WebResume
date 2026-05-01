@@ -244,6 +244,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>Cursor opaco es la decisión clave.</b> No expongo offset numérico — el cursor codifica sesión, experiment_id, recent_seen y posición lógica. Si re-deploy del ranker o cambio de experimento entre requests, el cursor sobrevive. Si el cliente lo manipula, lo invalido y arranco fresh.</p>
+        <p><b>Eventos como fire-and-forget.</b> <code>POST /events/watch</code> devuelve <code>202</code> inmediato — no bloquea el feed scrolling. Cliente bufferea localmente y batchea cada 5 s o 10 events. Backend ack rápido y la analytics se procesa async.</p>
+        <p><b>Detalle del video bajo demanda.</b> El feed devuelve solo <code>videoId</code> + score; el cliente pide <code>GET /videos/{id}</code> en lazy load mientras hace scroll. Esto mantiene el feed payload pequeño (~1 KB para 10 items vs ~100 KB con metadata completa).</p>
+        <p><b>Frase clave:</b> "Las APIs son ligeras: feed devuelve IDs rankeados con cursor, eventos van fire-and-forget, detalles se hidratan lazy. Un GET de feed son ~30ms de network round-trip."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -396,6 +403,14 @@ flowchart LR
           <div class="tbl-idx">Tópico Kafka particionado por <code>user_id</code><br/>Sink: feature store + ML training</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>Tres dominios, tres stores.</b> Catálogo (videos, follows) en relacional para joins; feature store online (Redis/Bigtable) para sub-30ms feature lookup; embeddings en ANN index para retrieval. Mezclarlos sería ineficiente: la DB no escala a 600K QPS de feature lookups, y el ANN no puede joinear con users.</p>
+        <p><b>Follows con índice reverso.</b> Para fan-out reverso ("qué creators sigue este user → qué videos nuevos hay"), el índice <code>(followee_id, follower_id)</code> permite query rápida. Tabla bidireccional con denormalización si los reads son extremos.</p>
+        <p><b>Feature store con TTL.</b> <code>recent_seen:{user}</code> es SET con TTL 4 h — al expirar, los videos vuelven a ser candidates (importante para sesiones largas). <code>user_features</code> sin TTL pero invalidated por watch events; <code>item_features</code> actualizado incremental por engagement.</p>
+        <p><b>Eventos al stream con dedup.</b> Eventos llevan <code>event_id</code> único; consumidores deduplican antes de actualizar features. Esto evita double-counting cuando hay retries de cliente.</p>
+        <p><b>Frase clave:</b> "El schema reconoce que el feed es un join entre user state, item state y model output. Cada uno vive en el storage que mejor lo sirve."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -412,6 +427,15 @@ flowchart LR
             <tr><td>Cold start</td><td>Onboarding guiado + popularidad regional.</td><td>Sin historial, popularidad gana al modelo.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Constraint: feed p99 &lt; 200 ms con 600K QPS.</b> No puedo entrenar online; no puedo hacer DB joins en path crítico; no puedo hacer model serving sin batching. Cada decisión sale de este budget.</p>
+        <p><b>Two-stage retrieval.</b> Recall barato (~500 candidates en 30 ms) + rank fino (~100 ms). Si rankearas 100M items con DLRM, irías a horas por request. Recall + rank es la única forma de escalar.</p>
+        <p><b>Cursor opaco para resilience.</b> Si me deployan un ranker nuevo entre dos requests, el cursor opaco no se rompe (el server lo reinterpreta). Si fuera offset, todos los users verían duplicados o gaps tras deploy.</p>
+        <p><b>Métricas que validan.</b> Feed p99 (target &lt; 200 ms). Completion rate (% de videos vistos &gt; 50%). Diversity score (cuántos creators distintos en N items). Cold start retention D1 (target similar a D1 de existing users).</p>
+        <p><b>Cuándo cambio de opinión.</b> Long-form content → cambio scoring de "completion rate" a "watch time normalized". Live streams en feed → agrego pipeline de signals en vivo. Multi-region active-active → particiono feature store por geo y serving regional.</p>
+        <p><b>Frase clave:</b> "Cada decisión es un trade entre relevancia, diversidad y latencia. Mi modelo es solo uno de muchos signals; las business rules y diversity filters son tan importantes como el ranker."</p>
       </div>
     </section>
 

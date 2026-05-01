@@ -262,6 +262,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>Una API simple esconde un sistema complejo.</b> <code>GET /recommendations</code> parece trivial — pero detrás hay candidate generation, feature lookup, ranker, diversity filter, A/B assignment. Mantengo la API estable; los detalles cambian con cada release del modelo.</p>
+        <p><b>Eventos separados por tipo.</b> <code>impression</code>, <code>click</code>, <code>conversion</code> en endpoints distintos para que el cliente no envíe payloads enormes. Cada uno con <code>event_id</code> para dedup en el stream.</p>
+        <p><b>Explainability como first-class.</b> <code>GET /recommendations/explain?recId=...</code> devuelve la razón ("similar a tu listening history" o "popular en tu cohort"). Esto sube confianza del usuario y ayuda a debuggear el sistema.</p>
+        <p><b>Frase clave:</b> "La API es contract estable; el sistema atrás itera con A/B continuo. <code>experiment_id</code> en cada response permite atribuir métricas a la variante correcta."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -413,6 +420,13 @@ flowchart LR
           <div class="tbl-idx">Tópico Kafka con dedup por <code>event_id</code><br/>Sink: feature store + warehouse</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>Cuatro storages, un solo dato lógico.</b> Items en relacional para joins; embeddings en ANN para retrieval; features en KV low-latency para serving; events en stream para feedback. Cada uno representa una "vista" del mismo data lifecycle.</p>
+        <p><b>Train/serve consistency es no-negociable.</b> El feature store online (serving) y el feature store offline (training) deben tener idéntico código de transformación. Si el modelo se entrena con <code>user.click_rate_7d</code> calculado de una manera y serving lo calcula distinto, el modelo miente sobre datos que nunca vió.</p>
+        <p><b>Embeddings actualizables.</b> HNSW soporta inserts incrementales; cuando hay un item nuevo, generamos su embedding y lo agregamos sin rebuild completo. Re-train completo es nocturno; updates incrementales son sub-minuto.</p>
+        <p><b>Frase clave:</b> "El sistema tiene un feature store que vive en el centro: training lee de él, serving lee de él, eventos lo updatean. Sin esa unificación, hay train/serve skew que destruye la accuracy."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -551,6 +565,13 @@ flowchart LR
             <tr><td>Experimentos</td><td>Asignación stickyness por hash del userId.</td><td>Resultados consistentes en sesión.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Constraint principal: p99 &lt; 100 ms con 6M req/s en peak.</b> Esto fuerza two-stage retrieval (no puedes rankear millones), modelo offline (no entrenas en path crítico), feature store low-latency (no queries SQL), y model serving optimizado (no flask + torch.load).</p>
+        <p><b>Métricas que validan.</b> Online: CTR, conversion, watch time. Offline: nDCG, recall@K. Operacional: p99, feature staleness, model staleness, A/B sample size. Guardrail: diversity, exploration rate, feature lookup error rate.</p>
+        <p><b>Cuándo cambio de opinión.</b> Latencia presupuesto sube a 500 ms → modelo más complejo (sequence transformers, graph attention). Items super dinámicos → embeddings actualizables vs reindex completo. Cold start crítico → bandit prominent en el blend.</p>
+        <p><b>Frase clave:</b> "Cada decisión es trade entre latencia, accuracy, freshness, complejidad operacional. El sistema mejor no es el con mejor modelo — es el que da el mejor número en producción con el budget que tienes."</p>
       </div>
     </section>
 

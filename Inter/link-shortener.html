@@ -243,6 +243,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>Dos paths fundamentalmente distintos.</b> El path de creación (<code>POST /links</code>) es complejo: validación, ID generation, blocklist check, persist. El path de redirect (<code>GET /{shortCode}</code>) es trivial: lookup + 302. Estoy diseñando el redirect para que sea brutal de simple porque es el que aguanta 100B/año.</p>
+        <p><b>302 vs 301.</b> Uso 302 (temporary). 301 (permanent) sería más eficiente para browsers (cachean para siempre) pero pierdo control: si el destino se vuelve malicioso, no puedo redirigir nuevos clicks. 302 me deja invalidar siempre.</p>
+        <p><b>Soft delete con DELETE.</b> No borro físicamente — pongo flag <code>deleted=true</code>. Esto preserva analytics, permite undelete y evita reusar el short_code (que podría llegar como link en algún sitio guardado).</p>
+        <p><b>Frase clave:</b> "El redirect es el corazón. <code>GET /{code}</code> debe tardar &lt; 10 ms en p95 con 99% cache hit. La creación puede tardar más — es 1000× menos común."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -400,6 +407,14 @@ flowchart LR
           <div class="tbl-idx">Bloom filter para safe browsing<br/>Hot cache con LRU + TTL refresh</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>KV store, no relacional.</b> El patrón es 100% lookup por <code>short_code</code>. No hay joins, no hay range scans. Postgres puede hacerlo pero un KV (DynamoDB / Cassandra / Bigtable) lo hace más barato a 100M rows porque está diseñado exactamente para este patrón.</p>
+        <p><b>ID generation con range allocation.</b> Workers reservan bloques de 100K IDs en una tabla <code>id_ranges</code>. Esto evita coordinación por request (cada worker usa su rango local) y previene colisiones. Cuando un worker acaba su rango, pide otro.</p>
+        <p><b>Click events fuera de la KV.</b> Lookups dummy de la KV son ~1 ms; agregar writes a la misma KV mata el path de lectura. Eventos van a Kafka, sink en BigQuery / ClickHouse para analytics OLAP.</p>
+        <p><b>Bloom filter para anti-malware.</b> Un Bloom de 1B URLs maliciosas con 0.1% false positive rate ocupa ~1.5 GB. Si Bloom dice "maybe malicious", verifico con la API real (cache result). Si dice "definitely not", redirigo sin más checks. Reduce calls externas en 99%.</p>
+        <p><b>Frase clave:</b> "Read-heavy con power-law: top 1% recibe 80% del tráfico. Por eso tres tiers de cache (CDN edge, Redis hot, KV cold). Para writes, ID range allocation evita el bottleneck de un counter centralizado."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -416,6 +431,14 @@ flowchart LR
             <tr><td>Idempotency</td><td>Misma URL larga puede mapearse al mismo short.</td><td>Optimización opcional, controlable por user.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Constraint: redirect &lt; 50 ms con 99.99% disponibilidad.</b> Define todo: edge cache para latencia y carga, KV para O(1) lookup, async analytics para no bloquear, bloom filter para validación rápida.</p>
+        <p><b>Counter base62 vs hashing.</b> Counter (Snowflake-style) garantiza no-colisiones por construcción y es predictible. Hashing requiere collision check en cada insert (lookup + write). A escala, counter es más simple y rápido.</p>
+        <p><b>Métricas que validan.</b> Cache hit ratio CDN (target &gt; 99%, alerta a &lt; 95% — costo se dispara). Redirect p95 (target &lt; 50 ms). Click event drop rate (target 0%; sampling al 100% en peak es OK temporal). Malware redirect rate (target 0; cualquier &gt; 0 es incidente).</p>
+        <p><b>Cuándo cambio de opinión.</b> Custom domains (vanity URLs) → necesito virtual hosting con cert management automático (Let's Encrypt). Stats real-time obligatorias → Redis HyperLogLog para approximate counts. Multi-region active-active → KV con replicación geo.</p>
+        <p><b>Frase clave:</b> "El sistema parece trivial pero tiene tres patrones críticos: power-law en reads (cache aggressive), análisis async (no bloquees el redirect), y safety (bloom filter + signed URLs en uploads)."</p>
       </div>
     </section>
 

@@ -245,6 +245,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>REST + WebSocket es la combinación correcta.</b> Para acciones discretas con state transitions (crear ride, accept, cancel) uso HTTP REST porque me da idempotencia, retry semantics y status codes claros. Para flujos continuos (location updates del driver, ride offers, tracking en vivo) uso WebSocket porque mantiene una conexión persistente y evita la sobrecarga de re-handshake.</p>
+        <p><b>Idempotencia donde duele.</b> <code>POST /rides</code> exige <code>Idempotency-Key</code> — sin esto, un timeout en el cliente puede cobrarte dos rides. <code>POST /rides/{id}/accept</code> es naturalmente idempotente (si ya aceptaste, devuelvo <code>200</code> con el estado actual; si otro driver ya aceptó, devuelvo <code>409 Conflict</code>).</p>
+        <p><b>Status codes que importan.</b> <code>201</code> al crear ride, <code>202</code> si el match es async, <code>409</code> en doble accept, <code>410 Gone</code> si el ride expiró, <code>429</code> con <code>Retry-After</code> si rate limit.</p>
+        <p><b>Frase clave:</b> "Las APIs siguen state machine del ride: pending → matched → in_progress → completed. Cada transición es una operación HTTP idempotente; las posiciones y notificaciones van por el canal WS persistente."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -401,6 +408,13 @@ flowchart LR
           <div class="tbl-idx">GEOADD / GEORADIUS para nearby<br/>SETNX para CAS en accept (TTL 30 s)</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>Tres datos, tres herramientas.</b> Postgres para entidades estables (rides, drivers, vehicles) con foreign keys y ACID — el state machine del ride no admite errores. Redis GEO para posiciones (alta frecuencia, TTL natural, primitivas geoespaciales nativas) — un Postgres con PostGIS no aguanta 250K updates/s. Kafka para eventos del ride (downstream consumers: payment, rating, analytics).</p>
+        <p><b>Particionado por ciudad.</b> Drivers, rides, geo set — todo particionado por <code>city</code>. El matching siempre ocurre dentro de una ciudad; cross-city no existe. Esto da scale lineal: agrega una ciudad, agrega capacidad, sin coordinar globalmente.</p>
+        <p><b>Índices y types específicos.</b> En <code>rides</code>: <code>(rider_id, created_at DESC)</code> para "mis rides recientes", <code>(driver_id, status)</code> para "rides activos del driver". Tipo <code>GEOGRAPHY</code> para pickup/dropoff aprovecha PostGIS para queries de área. Redis sorted set <code>geo:drivers:{city}</code> hace <code>GEOADD</code> y <code>GEORADIUS</code> en O(log N).</p>
+        <p><b>Frase clave:</b> "El ciclo de vida del ride vive en Postgres porque ACID; las posiciones en Redis porque latencia y TTL; los eventos en Kafka porque desacople. Cada decisión está justificada por el patrón de acceso."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -417,6 +431,14 @@ flowchart LR
             <tr><td>Notificaciones</td><td>Push provider externo + WebSocket fallback.</td><td>Cobertura cuando la app está en background.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Cada decisión está atada a un constraint.</b> Match &lt; 5 s p95 → broadcast paralelo + push (no espero a que el primero responda). Strong consistency en accept → SETNX atómico, no 2PC distribuido. 250K location updates/s → WebSocket con pseudo-binary protocol, no HTTP. 1M conexiones concurrentes → sticky LB con scaling horizontal.</p>
+        <p><b>Tradeoffs explícitos.</b> Geohash da partition natural pero zonas calientes saturan un bucket — tradeoff aceptado a cambio de simplicidad operativa. WebSocket sticky requiere migration cuando un pod falla, pero la complejidad de stateless con state externo es peor. Push providers externos agregan dependencia, pero son la única forma de despertar app cerrada.</p>
+        <p><b>Métricas que validan cada decisión.</b> Tiempo desde request → match (target p95 &lt; 5 s). Tasa de doble-accept (debe ser 0; alerta a &gt; 0.01%). Stale location rate (drivers que parecen disponibles pero no responden — alerta a &gt; 5%). Push delivery rate (target &gt; 95%). WebSocket reconnection storm tras deploy.</p>
+        <p><b>Cuándo cambio de opinión.</b> Si el SLA es match &lt; 1 s → pre-asigno pool de drivers a zonas calientes. Si voy multi-region active-active → S2 cells en lugar de geohash, con consensus para cross-region drivers. Si caigo en alta contención de accept → uso lease + handoff explícito en lugar de SETNX puro.</p>
+        <p><b>Frase clave:</b> "Cada decisión balanced contra un trade. Sticky LB cuesta complejidad de failover pero gana en latencia. Geohash cuesta hot regions pero gana en simplicidad. Un sistema sin tradeoffs explícitos es un sistema sin defensa en la entrevista."</p>
       </div>
     </section>
 

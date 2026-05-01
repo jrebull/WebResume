@@ -243,6 +243,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>El upload no toca mi backend.</b> Es la decisión más importante de las APIs: <code>POST /videos/upload-url</code> devuelve URLs pre-firmadas; el cliente hace PUT directamente al object storage. Mi servicio solo gestiona metadata. Sin esto, sería imposible mantener 500 horas de uploads/min con un app server.</p>
+        <p><b>Async by default para work pesado.</b> <code>complete-upload</code> devuelve <code>202 Accepted</code> con un job ID, no <code>200</code> con video listo. El transcoding tarda minutos — no puedo dejar al cliente colgado. El playback usa <code>GET /videos/{id}/manifest.m3u8</code> que va a CDN; otra vez, mi backend no toca bytes.</p>
+        <p><b>Versionado y observabilidad.</b> URL path <code>/v1</code>. Status codes específicos: <code>201</code> al crear video metadata, <code>202</code> al disparar transcoding, <code>423 Locked</code> si video bajo DMCA review, <code>410 Gone</code> si fue removido. Cada response trae <code>correlation-id</code> en header para tracing.</p>
+        <p><b>Frase clave:</b> "El upload va por pre-signed URL — el cliente sube directo al storage. El playback va por CDN — los bytes nunca tocan mi backend. Mi API solo orquesta metadata y eventos."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -404,6 +411,13 @@ flowchart LR
           <div class="tbl-idx">Tópico Kafka particionado por <code>video_id</code><br/>Sink: BigQuery / data lake</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>Separación radical: metadata vs blobs vs events.</b> Tres stores distintos: una DB transaccional para video metadata (joins, indexes), object storage para los blobs, stream para events. Esta separación es la que hace que el sistema escale a EB de storage y miles de millones de horas vistas/día.</p>
+        <p><b>Schema mínimo en metadata.</b> En <code>videos</code>: campos de búsqueda y display, <em>no</em> los bytes. <code>video_assets</code> separado guarda referencias a las renditions en object storage — el cliente pide la rendition adaptive, mi DB solo dice "vive en S3://bucket/path". Index <code>(channel_id, created_at DESC)</code> para "videos del canal", <code>(status)</code> para filtrar processing/ready.</p>
+        <p><b>Eventos a stream, no a la DB.</b> View events son ~300K/s — cualquier DB tradicional muere intentando escribir eso. Stream particionado por <code>video_id</code> mantiene orden por video; el sink agrega en BigQuery para analytics. La DB solo se entera de un view via batch que actualiza counters cada minuto.</p>
+        <p><b>Frase clave:</b> "Mi DB de metadata es small (PB), el object storage es huge (EB), y el stream es high-throughput. Cada uno hace lo suyo; la falla de uno no rompe los otros."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -420,6 +434,15 @@ flowchart LR
             <tr><td>Eventos de play</td><td>Stream a un pipeline analítico.</td><td>Para recomendaciones, billing y trending.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Decisión #1: pre-signed URL para upload.</b> El constraint es 500 h/min de uploads. Si pasaran por mi backend, necesitaría miles de servidores solo para recibir bytes. Pre-signed URL: el cliente sube directo a S3, mi backend solo entrega credenciales con expiración corta (15 min).</p>
+        <p><b>Decisión #2: transcoding async con cola.</b> El constraint es duración variable del transcoding (10 s para Shorts, 30 min para 4K largo). Sync mata UX. Cola con autoscaling: workers procesan según backlog, el cliente recibe <code>202</code> y consulta estado o usa webhook al completar.</p>
+        <p><b>Decisión #3: HLS/DASH con segmentos cortos.</b> El constraint es adaptive bitrate y caching. Segmentos de 2–10 s son cacheables por CDN, soportan adaptive (cliente cambia bitrate por segmento), y permiten failover de un POP a otro mid-playback.</p>
+        <p><b>Métricas que validan.</b> Cache hit ratio del CDN &gt; 95% (define costo de egress). Encoding queue lag &lt; 5 min (a 60 min, los uploads parecen rotos). TTFB &lt; 500 ms global. Buffer ratio (re-buffering events / play events) &lt; 1%.</p>
+        <p><b>Cuándo cambio de opinión.</b> Live streaming → cambio HLS por LL-HLS (low latency) y agrego ingest server. Free tier explosivo → más agresivo el archive a cold storage. Si llega 4K mainstream → más renditions, más codec efficiency (AV1).</p>
+        <p><b>Frase clave:</b> "Cada decisión es un trade entre latencia, costo y simplicidad. Pre-signed URL costa una llamada extra pero ahorra petabits/s de bandwidth. Transcoding async cuesta UX inicial pero hace que el sistema sea operable."</p>
       </div>
     </section>
 

@@ -242,6 +242,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>Recursos primero, luego operaciones.</b> Identifico dos sustantivos: <code>products</code> (con sub-recurso <code>top</code>) y <code>orders</code>. Los expongo en plural y kebab-case, IDs en path. La acción "obtener top" es <code>GET</code> idempotente — cacheable en CDN. El checkout es <code>POST /orders</code>, que crea recurso → respuesta <code>201</code> con <code>Location</code> header.</p>
+        <p><b>Idempotencia y status codes.</b> El <code>POST /orders</code> exige <code>Idempotency-Key</code> en header — si el cliente reintenta tras timeout, no duplico la orden. Si la key ya existe con mismo body devuelvo la respuesta cacheada; con body distinto devuelvo <code>409 Conflict</code>. <code>429</code> con <code>Retry-After</code> si cae rate limit; <code>503</code> en circuit breaker abierto.</p>
+        <p><b>Versionado y pagination.</b> Versiono en URL path (<code>/v1</code>) — explícito, fácil de debuggear, lo que usa Stripe y Google Cloud. Para listados de órdenes uso cursor opaco (no offset) porque escala mejor con miles de órdenes y no se rompe con inserts concurrentes.</p>
+        <p><b>Frase clave:</b> "Las APIs siguen patrón resource-oriented. <code>GET /products/top</code> nunca toca la DB transaccional; va directo a Redis. <code>POST /orders</code> es ACID en Postgres + emit a Kafka — el cliente cierra el request en milisegundos sin esperar a que el ranking se actualice."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -394,6 +401,13 @@ flowchart LR
           <div class="tbl-idx">score = count, member = product_id<br/>ZRANGEBYSCORE / ZREVRANGE para top-K en O(log N)</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>La regla de oro: la herramienta correcta para cada job.</b> Postgres para órdenes porque necesito ACID (no puedo perder un checkout); Redis sorted sets para el top porque top-K en O(log N) sin escanear; Kafka para eventos porque desacopla; BigQuery para análisis porque columnar serverless. Tres data stores, cada uno haciendo lo que mejor sabe.</p>
+        <p><b>Índices justificados por queries.</b> En <code>orders</code> indexo <code>(user_id, created_at DESC)</code> para "mis órdenes recientes" y <code>(status, created_at)</code> para queries de ops/dashboard. En <code>order_items</code> indexo <code>product_id</code> para análisis por SKU. No agrego índices "por si acaso" — cada índice cuesta en write throughput.</p>
+        <p><b>Particionado y consistency.</b> <code>orders</code> particionada por <code>created_at</code> (range partitioning mensual) — los archivos viejos son fríos, los recientes calientes. Redis sorted set por <code>region</code> (<code>top:1h:LATAM</code>, <code>top:1h:NA</code>) para no mezclar regiones. Postgres es strong consistency; Redis es eventually consistent (segundos OK para ranking).</p>
+        <p><b>Frase clave:</b> "El diseño separa el path transaccional (Postgres ACID) del path analítico (sorted sets pre-agregados). Si me pides top global combinaría sorted sets por región con un merge en O(K log K)."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -410,6 +424,14 @@ flowchart LR
             <tr><td>Hidratación</td><td>Cliente pide detalles en lote a <code>/api/products/{id}</code>.</td><td>El ranking se queda ligero y no se invalida si cambia el catálogo.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Cada decisión sale de un constraint del problema.</b> Lecturas ≫ escrituras (~1000:1) → cache agresivo en edge + Redis pre-agregado. Black Friday → desacoplar checkout de ranking, escalar productores y consumidores independientemente. Hot products → sharding por <code>productId hash</code> y replicación de reads. Cancelaciones → eventos de compensación al mismo bucket, no al sorted set en vivo.</p>
+        <p><b>Tradeoffs explícitos.</b> Cache TTL 5–30 s sacrifica frescura por carga al origen — el negocio acepta segundos de delay en el ranking. Idempotency-Key añade ~1 ms por request pero previene doble cobro (worth it). Sliding window con buckets de 1 min sacrifica precisión sub-minuto por memoria fija (<code>O(1)</code> per window).</p>
+        <p><b>Métricas que validan cada decisión.</b> Cache hit ratio &gt; 95% (si baja, costo se dispara). p99 lectura del top &lt; 100 ms. Stream lag &lt; 30 s para que el ranking refleje realidad. Idempotency duplicate rate (debe ser ~0). Drop rate de eventos en aggregator (debe ser 0; alerta a 1%).</p>
+        <p><b>Cuándo cambio de opinión.</b> Si hay strong consistency requirement en el ranking → quito cache, sirvo directo desde sorted set + lectura síncrona. Si entran categorías muy desbalanceadas → sharding por <code>(category, region)</code> en vez de region sola. Si volumen baja a &lt;100 órdenes/min → simplifico a un cron sobre Postgres y olvido Kafka.</p>
+        <p><b>Frase clave:</b> "Cada decisión está atada a una métrica: cache hit ratio para costos, p99 para experiencia, stream lag para frescura, duplicate rate para correctness. Si alguna métrica se degrada, sé exactamente qué decisión revisitar."</p>
       </div>
     </section>
 

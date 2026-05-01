@@ -245,6 +245,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>Recursos plurales, sub-recursos para acciones.</b> <code>/tracks/{id}</code> es metadata (idempotente, cacheable globalmente); <code>/tracks/{id}/stream</code> es signing endpoint que devuelve manifest URL firmada. Las playlists son recurso con sub-recurso <code>/tracks</code> para añadir/quitar.</p>
+        <p><b>Tokens cortos para licencias.</b> El stream URL incluye un token con expiración 15 min y geo claim. Si el user cancela mid-month, el token actual expira solo. Cliente refresca silenciosamente antes de expirar. <code>403</code> si la región no tiene licencia para ese track.</p>
+        <p><b>Search con filtros, no recursos separados.</b> <code>GET /search?q=...&amp;type=track,artist,album</code> en vez de tres endpoints — una sola query a Elasticsearch. Pagination con cursor opaco. <code>GET /recommendations</code> es lectura idempotente, sticky por user para A/B consistency.</p>
+        <p><b>Frase clave:</b> "Catalog reads son cacheables globalmente. Streaming reads requieren signed URL con geo + expiración. Listen events son fire-and-forget al stream. Cada endpoint encaja en un patrón consistente."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -403,6 +410,14 @@ flowchart LR
           <div class="tbl-idx">Tópico Kafka particionado por <code>user_id</code><br/>Sink: feature store + analytics</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>Catálogo en relacional, audio en object storage, search en engine dedicado.</b> Cada uno por una razón: catálogo necesita joins (track → album → artist), audio son blobs (no caben en DB), search requiere full-text con synonyms y BM25. Mezclarlos sería ineficiente en tres dimensiones.</p>
+        <p><b>Licencias como first-class data.</b> El campo <code>licensed_regions</code> en <code>tracks</code> es array de country codes — la query de stream verifica antes de firmar. Esto evita que un usuario en X país acceda a contenido no licenciado, requisito legal duro.</p>
+        <p><b>Playlists como JSONB con orden.</b> En lugar de tabla N:M con <code>position</code> column, guardo <code>tracks</code> como JSONB array — preserva orden, edición es write-once, lecturas son single row. Si edits granulares fueran frecuentes, tabla N:M con index sería mejor; en Spotify la mayoría son pocos edits.</p>
+        <p><b>Listen events particionados por user_id.</b> Esto mantiene orden de sesión (importante para reco y skipping rate), permite rebuild por usuario, y distribuye carga entre brokers. Sink dual: feature store (rápido, hot) y warehouse (lento, frío).</p>
+        <p><b>Frase clave:</b> "El schema reconoce que tracks/albums son data fría con muchas lecturas, listens son data caliente con muchas escrituras, y playlists son data tibia con writes esporádicos. Cada una tiene su storage."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -419,6 +434,14 @@ flowchart LR
             <tr><td>Licencias</td><td>Geo-fencing en el firmado del manifiesto.</td><td>Bloquear contenido no licenciado por región.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Constraint fundamental: licencias por región.</b> No es solo un detalle — define la arquitectura. CDN regional con signed manifest geo-fenced, base de datos con <code>licensed_regions</code>, royalty pipeline alimentado por listen events. Si fallo aquí, hay demanda de Universal Music.</p>
+        <p><b>Recomendaciones offline + serving online.</b> Discover Weekly se entrena offline con todo el corpus de listens; el modelo se deploya a serving online que sirve recos en sub-100ms via feature store. Train/serve consistency es el camino — ambos usan el mismo código de transformación de features.</p>
+        <p><b>Métricas que validan.</b> Time-to-first-byte (target &lt; 200 ms global). Skip rate (alto = recos malos). Cache hit ratio CDN (afecta egress cost directamente). Token refresh storm rate (si bursts, agrego jitter en client). License compliance audit (legal-grade).</p>
+        <p><b>Cuándo cambio de opinión.</b> Hi-Fi mainstream → más bitrates, más storage, más bandwidth. Live concerts → ingest server con LL-HLS. Podcasts dominantes → reconsider catalog DB schema (los podcasts son episodios de show, modelo distinto).</p>
+        <p><b>Frase clave:</b> "Cada decisión está atada a un constraint duro: licencias (legal), latencia (UX), costo egress (negocio). El sistema no es elegante, es una composición justificada de tradeoffs."</p>
       </div>
     </section>
 

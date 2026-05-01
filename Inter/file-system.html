@@ -246,6 +246,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>Upload chunked es la decisión clave.</b> <code>POST /files/upload-url</code> devuelve N URLs (una por chunk de 8 MB) más un upload session ID. El cliente sube en paralelo, retoma si se cae la red, dedup por hash antes de subir. Sin esto, un GB tomaría minutos sin posibilidad de resume.</p>
+        <p><b>Move/rename atómico vía PATCH.</b> <code>PATCH /files/{id}/move</code> con body <code>{ "newParentId": "..." }</code>. Atómico en la metadata DB (transacción). Renombrar = PATCH también.</p>
+        <p><b>Sync con cursor.</b> <code>GET /sync/changes?since={cursor}</code> es el endpoint que cada device chequea cada minuto. Devuelve deltas más nuevo cursor; el cliente actualiza local. Idempotent — si el cliente pierde la respuesta, repite con el cursor anterior.</p>
+        <p><b>Frase clave:</b> "Las APIs separan path control (metadata: HTTP rápido) de path data (chunks: pre-signed URLs al storage). Sync es polling con cursor — simple, sobrevive a desconexiones largas, scale horizontal trivial."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -407,6 +414,14 @@ flowchart LR
           <div class="tbl-idx">Permisos heredados; cache decisiones<br/>Cursor de sync incremental por device</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>Metadata vs blobs vs permissions.</b> Tres dominios independientes: metadata transaccional (jerarquía + versions), blobs (chunks en object storage), permissions (Zanzibar-style separado). Esta separación permite escalar cada uno independientemente.</p>
+        <p><b>Tree con parent_id, no path.</b> Storing the path string (<code>/users/alice/docs/file.pdf</code>) sería simple pero rename/move se vuelve N×update. Con <code>parent_id</code>, mover una carpeta es un solo update; los hijos heredan automáticamente.</p>
+        <p><b>Versioning como append-only.</b> <code>file_versions</code> nunca se modifica — cada save crea una nueva fila. <code>files.current_version</code> apunta a la actual. Restore es trivial: cambiar el pointer.</p>
+        <p><b>Chunks con ref counting.</b> El mismo chunk puede ser referenciado por miles de archivos (dedup). <code>ref_count</code> se incrementa al asignar y decrementa al borrar versión. GC nocturno borra chunks con <code>ref_count=0</code> &gt; 5 días (margen de seguridad).</p>
+        <p><b>Frase clave:</b> "El schema reconoce que metadata y blobs viven en mundos distintos: metadata es small + transaccional (Spanner/Postgres), blobs son massive + duraderos (object storage), permissions son granulares + read-heavy (Zanzibar). Tres tools, una semántica unificada."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -423,6 +438,13 @@ flowchart LR
             <tr><td>Permisos</td><td>ACL por nodo + herencia.</td><td>Granular pero performante con cache.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Constraint: 1 EB de storage, 12K uploads/s, sync &lt; 5 s.</b> Define todo: blobs en object storage (no caben en DB), chunks (resume + dedup), metadata transaccional (atomic moves), sync con cursor (incremental).</p>
+        <p><b>Métricas que validan.</b> Upload completion rate (target &gt; 99%; failures = retry), dedup ratio (target ~30%), sync delta latency (target p95 &lt; 5 s), permission resolution latency (target &lt; 50 ms con cache), GC reclaim rate (chunks recovered/día).</p>
+        <p><b>Cuándo cambio de opinión.</b> Edición colaborativa en línea (como Drive Docs) → agrego op log + WebSocket layer separado. Compliance HIPAA → encryption client-side, audit log granular. Multi-region → Spanner para metadata, replicated buckets para blobs.</p>
+        <p><b>Frase clave:</b> "Es un trade entre simplicidad y features. El sistema simple es solo storage durable. Cada feature (sharing, sync, versioning) agrega complejidad — la mantengo justificada por uso real."</p>
       </div>
     </section>
 

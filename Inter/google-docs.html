@@ -245,6 +245,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>HTTP para CRUD, WebSocket para edición en vivo.</b> Crear, listar, compartir, ver historial → REST (idempotente, cacheable, fácil de debuggear). Editar texto en tiempo real → WebSocket porque necesito latencia &lt; 100ms y bidireccional. Esta separación es estándar en Notion, Figma, Quip.</p>
+        <p><b>Operations-based, no document-based.</b> No envío "el documento entero" en cada save — envío <em>operations</em> incrementales (insert pos 27 "rapid"). Cada op tiene <code>baseVersion</code>; el server transforma contra ops concurrentes (OT) y appendea con nueva version. Esto permite collab real sin lost updates.</p>
+        <p><b>Permissions explícito.</b> <code>POST /documents/{id}/permissions</code> con body que define subject (user/group), relation (viewer/editor) y opciones (link sharing, expiration). El check de acceso ocurre al conectar al WS y al hacer save — cache para evitar lookup recursivo en cada op.</p>
+        <p><b>Frase clave:</b> "El doc es un append-only op log. El cliente envía ops; el server transforma y broadcastea. HTTP cubre CRUD y permisos; WebSocket cubre la conversación en tiempo real."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -396,6 +403,14 @@ flowchart LR
           <div class="tbl-idx">idx <code>(object, relation)</code><br/>cache por user para evitar lookup recursivo</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de base de datos</h4>
+        <p><b>Op log es la fuente de verdad, snapshots son optimización.</b> Si pierdo todos los snapshots, puedo reconstruir cualquier estado replayeando el op log. Si pierdo el op log, perdí audit y revert. Por eso el op log se replica con consensus, los snapshots solo con WAL shipping.</p>
+        <p><b>Composite PK <code>(document_id, version)</code>.</b> No solo da unicidad — permite particionar la tabla por <code>document_id</code> directamente. Cada doc es un range continuo de versions; queries de "ops desde v100" son range scan eficiente.</p>
+        <p><b>Permissions estilo Zanzibar.</b> Tuplas <code>(object, relation, subject)</code> permiten modelar herencia (folder → docs), grupos, y compartir por link en un mismo modelo. Un check es: encuentra cualquier path que conecte user → relation → object. Cache agresiva con TTL e invalidation por path al cambiar herencia.</p>
+        <p><b>Snapshots cada 5 min.</b> Trade-off: snapshots más frecuentes = load inicial más rápido pero más overhead de escritura; menos frecuentes = replay más largo. 5 min balancea bien para docs con &lt; 1K ops/min.</p>
+        <p><b>Frase clave:</b> "El op log resuelve consistency con OT/CRDT; los snapshots resuelven performance de load; las permissions resuelven el access control granular. Cada estructura existe por una razón distinta."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -412,6 +427,14 @@ flowchart LR
             <tr><td>Offline</td><td>Cliente guarda ops y reenvía.</td><td>Resincroniza al volver, OT/CRDT lo absorbe.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Constraint clave: edición concurrente sin lost updates.</b> Esta sola línea define el sistema. OT (Operational Transform) o CRDT son las dos respuestas válidas. OT es lo que Google Docs usa originalmente; CRDT es más moderno y distribuido.</p>
+        <p><b>Sticky session por docId.</b> Sin esto, dos pods aplicarían ops del mismo doc en paralelo y los logs divergirían. La complejidad de coordinar entre pods (consensus) es peor que la complejidad de manejar sticky con failover.</p>
+        <p><b>Métricas que validan.</b> Latencia de propagación de op (p99 &lt; 100 ms entre clientes). Conflict rate (% de ops que requieren transformación). Reconnect storm rate tras deploy. Permission lookup latency (target &lt; 5 ms con cache).</p>
+        <p><b>Cuándo cambio de opinión.</b> Multi-region active-active → CRDT en lugar de OT (no necesita coordinador único). Edición offline-first crítica → CRDT con sync diferido. Docs &gt; 1M ops → compactación más agresiva con snapshots cada minuto.</p>
+        <p><b>Frase clave:</b> "El sistema balancea consistencia (OT garantiza convergencia), latencia (sticky + WS), durabilidad (op log replicado) y escalabilidad (sharding por docId). Cada decisión es defendible mostrando qué propiedad protege."</p>
       </div>
     </section>
 

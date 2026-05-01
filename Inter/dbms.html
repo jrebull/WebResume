@@ -244,6 +244,13 @@
           </tbody>
         </table>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas APIs en la entrevista</h4>
+        <p><b>El protocolo real es binario, REST es solo una vista.</b> En producción los DBs usan protocolos custom optimizados (PostgreSQL wire protocol, MySQL protocol). Pero exponer REST en una entrevista hace los conceptos visibles: transactions como recursos con state, queries como POST con body SQL.</p>
+        <p><b>Transacciones como recursos con state.</b> <code>POST /transactions</code> crea una tx, devuelve <code>txId</code>. <code>POST /transactions/{id}/execute</code> con body SQL ejecuta dentro de esa tx. <code>commit</code> y <code>rollback</code> son endpoints separados — cada uno con state machine claro.</p>
+        <p><b>EXPLAIN como herramienta de debug.</b> <code>GET /explain?sql=...</code> devuelve el plan estimado por el optimizer. Crítico para entender por qué un query es lento. En producción esto es <code>EXPLAIN ANALYZE</code> en SQL.</p>
+        <p><b>Frase clave:</b> "El DBMS expone APIs simples (query, tx, commit) pero atrás hay parser, planner, executor, buffer pool, WAL, lock manager. La API es la fachada; la complejidad está en cómo se ejecuta."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -407,6 +414,14 @@ flowchart LR
           <div class="tbl-idx">MVCC: cada tx ve un snapshot<br/>Wait-for graph para abortar deadlocks</div>
         </div>
       </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo este diseño de estructuras internas</h4>
+        <p><b>Page como unidad atómica.</b> Todo se organiza en páginas de 4–16 KB porque el OS lee del disco en bloques. Una página tiene LSN (último log que la modificó), checksum (detectar corrupción), tuples organizados con free space map. El buffer pool maneja páginas, no rows.</p>
+        <p><b>B+Tree índice por su disk locality.</b> Las hojas están encadenadas (next_leaf pointer), lo que hace range scans muy rápidos. La altura logarítmica garantiza I/Os predictibles. Para inserts, splits balancean el árbol.</p>
+        <p><b>WAL records = source of truth.</b> Cada modificación a una página primero genera un WAL record con before/after image. La page modificada en RAM queda "dirty" y eventualmente se flushea. Si crashea antes del flush, el WAL replay reconstruye.</p>
+        <p><b>MVCC con xmin/xmax.</b> Cada row tiene <code>xmin</code> (tx que la creó) y <code>xmax</code> (tx que la borró). Una tx con snapshot ID ve solo rows donde <code>xmin &lt;= snapshot &lt; xmax</code>. Reads no bloquean writes; writes nuevas crean nuevas versiones.</p>
+        <p><b>Frase clave:</b> "Todo está organizado en páginas porque el disco lee en bloques. El WAL es secuencial porque random writes son lentos. MVCC mantiene snapshot consistency sin bloquear. Cada estructura existe por una razón física del hardware."</p>
+      </div>
     </section>
 
     <section class="section">
@@ -423,6 +438,13 @@ flowchart LR
             <tr><td>Recovery</td><td>ARIES (analysis, redo, undo).</td><td>Patrón clásico para volver a un estado consistente.</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="flow-explain">
+        <h4>Cómo defiendo estas decisiones técnicas</h4>
+        <p><b>Constraints físicos definen las decisiones.</b> Disco es lento (random ~10 ms, secuencial ~50 MB/s); RAM es rápida pero finita; CPU es muy rápida. Cada decisión maximiza uso de RAM y secuencial, minimiza random reads.</p>
+        <p><b>Métricas que validan.</b> Buffer hit ratio (target &gt; 99% en hot working set; baja → thrashing). Commit throughput (limitado por fsync; group commit lo amortiza). Lock wait time (alta contención → revisar isolation level). Replication lag (sync vs async tradeoff). Recovery time post-crash (target &lt; 30 s).</p>
+        <p><b>Cuándo cambio de opinión.</b> Workload write-heavy → LSM-tree en lugar de B+Tree (Cassandra-style). Multi-region strong consistency → consensus protocol (Raft/Paxos) reemplaza WAL shipping single-master. Time-series con high write throughput → Druid/InfluxDB con compression columnar.</p>
+        <p><b>Frase clave:</b> "Un DBMS es un montón de tradeoffs físicos: WAL es secuencial porque disco; buffer pool es LRU porque RAM finita; B+Tree porque range scans; MVCC porque snapshot isolation. Cada decisión sigue de un constraint físico."</p>
       </div>
     </section>
 
