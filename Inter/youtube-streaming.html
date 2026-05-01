@@ -291,16 +291,44 @@
         <div class="mermaid">
 flowchart LR
     Client["Cliente Web/Móvil"] -->|pre-signed URL| API["API Service"]
-    Client -->|chunks directo| Store[("Object Storage<br/>S3 / GCS")]
-    API --> Meta[("Metadata DB<br/>tracks, status, ACL")]
-    API -->|complete-upload| Stream[("Pub/Sub<br/>video.uploaded")]
+    Client -->|chunks directo| Store
+    API --> Meta
+    API -->|complete-upload| Stream
     Stream --> Trans["Transcoder Workers<br/>FFmpeg async"]
     Trans --> Store
     Trans --> Meta
     Trans --> Thumb["Thumbnail Generator"]
     Client -- playback request --> Edge["CDN Edge POPs"]
     Edge -->|miss| Store
-    Client -. events .-> Analytics[("Analytics Pipeline<br/>BigQuery")]
+    Client -. events .-> Analytics
+
+    subgraph Store["Object Storage · S3 / GCS"]
+      direction TB
+      s1["videos/raw"]
+      s2["videos/hls"]
+      s3["thumbnails"]
+    end
+
+    subgraph Meta["Metadata DB · Postgres / Spanner"]
+      direction TB
+      m1["videos"]
+      m2["video_assets"]
+      m3["channels"]
+      m4["comments"]
+      m5["subscriptions"]
+    end
+
+    subgraph Stream["Pub/Sub"]
+      direction TB
+      k1["video.uploaded"]
+      k2["video.transcoded"]
+    end
+
+    subgraph Analytics["Analytics · BigQuery"]
+      direction TB
+      a1["view_events"]
+      a2["watch_time_daily"]
+    end
         </div>
       </div>
 
@@ -519,13 +547,38 @@ flowchart LR
     Client["Cliente Web/Móvil"] --> Edge["CDN POPs (segments)"]
     Client --> LB["L7 Load Balancer<br/>ALB / Cloud LB"]
     LB --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit Redis"]
-    Pod --> Meta[("Metadata DB")]
-    Pod -->|complete-upload| Stream[("Pub/Sub video.uploaded")]
+    Pod --> Meta
+    Pod -->|complete-upload| Stream
     Stream --> Trans["Transcoder Workers"]
-    Trans --> Store[("Object Storage")]
+    Trans --> Store
     Edge -->|miss| Store
     Client -->|pre-signed URL| Store
-    Client -. events .-> Analytics[("Pipeline analítico")]
+    Client -. events .-> Analytics
+
+    subgraph Store["Object Storage · S3 / GCS"]
+      direction TB
+      s1["videos/raw"]
+      s2["videos/hls"]
+      s3["thumbnails"]
+    end
+
+    subgraph Meta["Metadata DB"]
+      direction TB
+      m1["videos"]
+      m2["video_assets"]
+      m3["channels"]
+      m4["comments"]
+    end
+
+    subgraph Stream["Pub/Sub"]
+      direction TB
+      k1["video.uploaded"]
+    end
+
+    subgraph Analytics["Pipeline analítico · BigQuery"]
+      direction TB
+      a1["view_events"]
+    end
         </div>
       </div>
       <div class="flow-explain">

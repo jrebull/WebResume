@@ -288,16 +288,42 @@
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["fa:fa-user Cliente Web/Móvil"] --> Edge["CDN / Edge Cache<br/>TTL 5–30s"]
+    Client["Cliente Web/Móvil"] --> Edge["CDN / Edge Cache<br/>TTL 5–30s"]
     Edge -->|GET top| GW["API Gateway<br/>Auth + Rate Limit"]
-    GW -->|read| Cache[("Redis<br/>Sorted Sets<br/>top:1h / 4h / 24h")]
+    GW -->|read| Cache
     GW -->|POST /orders| Order["Order Service"]
-    Order --> DB[("Orders DB<br/>Postgres")]
-    Order -->|emit event| Stream[("Kafka<br/>order_events")]
+    Order --> DB
+    Order -->|emit event| Stream
     Stream --> Agg["Aggregator<br/>1-min buckets<br/>sliding window"]
     Agg --> Cache
-    Agg --> Cold[("Cold Storage<br/>BigQuery / S3")]
+    Agg --> Cold
     Cache -. cache miss .-> Agg
+
+    subgraph Cache["Redis · Sorted Sets"]
+      direction TB
+      rs1["top:1h:region"]
+      rs2["top:4h:region"]
+      rs3["top:24h:region"]
+      rs4["bucket:1m:ts"]
+    end
+
+    subgraph DB["Orders DB · Postgres"]
+      direction TB
+      d1["orders"]
+      d2["order_items"]
+      d3["products"]
+    end
+
+    subgraph Stream["Kafka"]
+      direction TB
+      k1["order_events"]
+    end
+
+    subgraph Cold["Cold Storage · BigQuery / S3"]
+      direction TB
+      c1["orders_archive"]
+      c2["events_archive"]
+    end
         </div>
       </div>
 
@@ -507,12 +533,31 @@ flowchart LR
     Client["Cliente Web/Móvil"] --> Edge["CDN / Edge Cache<br/>TTL 5–30s"]
     Edge --> LB["L7 Load Balancer<br/>NGINX / ALB / Cloud LB<br/>TLS + path routing"]
     LB --> Pod["API Pods<br/>+ Auth Middleware (JWT)<br/>+ Rate Limit (Redis token bucket)"]
-    Pod -->|read top| Cache[("Redis<br/>Sorted Sets")]
+    Pod -->|read top| Cache
     Pod -->|POST /orders| Order["Order Service"]
-    Order --> DB[("Orders DB Postgres")]
-    Order -->|emit| Stream[("Kafka order_events")]
+    Order --> DB
+    Order -->|emit| Stream
     Stream --> Agg["Aggregator"]
     Agg --> Cache
+
+    subgraph Cache["Redis · Sorted Sets"]
+      direction TB
+      rs1["top:1h:region"]
+      rs2["top:4h:region"]
+      rs3["top:24h:region"]
+    end
+
+    subgraph DB["Orders DB · Postgres"]
+      direction TB
+      d1["orders"]
+      d2["order_items"]
+      d3["products"]
+    end
+
+    subgraph Stream["Kafka"]
+      direction TB
+      k1["order_events"]
+    end
         </div>
       </div>
       <div class="flow-explain">

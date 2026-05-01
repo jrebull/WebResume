@@ -293,16 +293,57 @@ Authorization: Bearer ...
 flowchart LR
     Client["App / Web / Speaker"] --> GW["API Gateway<br/>Auth + Region routing"]
     GW --> Cat["Catalog Service"]
-    Cat --> CatDB[("Catalog DB<br/>Tracks/Albums/Artists")]
+    Cat --> CatDB
     GW --> Search["Search Service"]
-    Search --> SIdx[("Search Index<br/>Elasticsearch")]
+    Search --> SIdx
     GW --> Reco["Recommendation Service"]
-    Reco --> FS[("Feature Store")]
-    Reco --> Embed[("Embeddings ANN")]
+    Reco --> FS
+    Reco --> Embed
     GW --> Stream["Stream Service<br/>token signer"]
     Stream --> CDN["CDN POPs"]
-    CDN -->|miss| AudioStore[("Object Storage<br/>audio segments")]
-    Client -. listen events .-> Pipe[("Kafka<br/>analytics + reco loop")]
+    CDN -->|miss| AudioStore
+    Client -. listen events .-> Pipe
+
+    subgraph CatDB["Catalog DB · Postgres / Cassandra"]
+      direction TB
+      c1["tracks"]
+      c2["albums"]
+      c3["artists"]
+      c4["playlists"]
+      c5["users"]
+    end
+
+    subgraph SIdx["Search Index · Elasticsearch"]
+      direction TB
+      e1["tracks_index"]
+      e2["artists_index"]
+      e3["albums_index"]
+    end
+
+    subgraph FS["Feature Store · Bigtable / Redis"]
+      direction TB
+      f1["user:id"]
+      f2["item:id"]
+      f3["cohort:id"]
+    end
+
+    subgraph Embed["Embeddings ANN · FAISS / ScaNN"]
+      direction TB
+      v1["track_vectors"]
+      v2["user_vectors"]
+    end
+
+    subgraph AudioStore["Object Storage · S3 / GCS"]
+      direction TB
+      a1["audio/96kbps"]
+      a2["audio/160kbps"]
+      a3["audio/320kbps"]
+    end
+
+    subgraph Pipe["Kafka · analytics + reco loop"]
+      direction TB
+      p1["listen_events"]
+    end
         </div>
       </div>
 
@@ -517,15 +558,47 @@ flowchart LR
     Client["App / Web / Speaker / Car"] --> LB["L7 Load Balancer<br/>NGINX / GCLB<br/>TLS + region routing"]
     LB --> Pod["API Pods<br/>+ JWT/OAuth middleware<br/>+ Rate limit"]
     Pod --> Cat["Catalog Service"]
-    Cat --> CatDB[("Catalog DB")]
+    Cat --> CatDB
     Pod --> Search["Search Service"]
-    Search --> SIdx[("Elasticsearch")]
+    Search --> SIdx
     Pod --> Reco["Reco Service"]
-    Reco --> FS[("Feature Store")]
+    Reco --> FS
     Pod --> Stream["Stream Service<br/>token signer"]
     Stream --> CDN["CDN POPs"]
-    CDN -->|miss| AudioStore[("Object Storage")]
-    Client -. listen events .-> Pipe[("Kafka")]
+    CDN -->|miss| AudioStore
+    Client -. listen events .-> Pipe
+
+    subgraph CatDB["Catalog DB"]
+      direction TB
+      c1["tracks"]
+      c2["albums"]
+      c3["artists"]
+      c4["playlists"]
+    end
+
+    subgraph SIdx["Elasticsearch"]
+      direction TB
+      e1["tracks_index"]
+      e2["artists_index"]
+    end
+
+    subgraph FS["Feature Store"]
+      direction TB
+      f1["user:id"]
+      f2["item:id"]
+    end
+
+    subgraph AudioStore["Object Storage"]
+      direction TB
+      a1["audio/96"]
+      a2["audio/160"]
+      a3["audio/320"]
+    end
+
+    subgraph Pipe["Kafka"]
+      direction TB
+      p1["listen_events"]
+    end
         </div>
       </div>
       <div class="flow-explain">

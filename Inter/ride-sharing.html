@@ -296,15 +296,36 @@ flowchart LR
     D["Driver App"] -- WS --> GW
     GW --> Ride["Ride Service<br/>state machine"]
     GW --> Loc["Location Service"]
-    Loc --> Geo[("Redis GEO<br/>geohash / S2")]
+    Loc --> Geo
     Ride --> Match["Matcher<br/>candidate ranking"]
     Match --> Geo
     Match --> Push["Push Service<br/>FCM / APNs"]
     Push --> D
-    Ride --> RDB[("Rides DB<br/>Postgres")]
-    Ride -. eventos .-> Stream[("Kafka<br/>ride_events")]
+    Ride --> RDB
+    Ride -. eventos .-> Stream
     Stream --> Pay["Payment Service"]
     Stream --> Rate["Rating Service"]
+
+    subgraph Geo["Redis GEO · geohash / S2"]
+      direction TB
+      g1["geo:drivers:city"]
+      g2["lock:ride:id"]
+      g3["session:driver:id"]
+    end
+
+    subgraph RDB["Rides DB · Postgres + PostGIS"]
+      direction TB
+      r1["rides"]
+      r2["drivers"]
+      r3["vehicles"]
+      r4["users"]
+      r5["ratings"]
+    end
+
+    subgraph Stream["Kafka"]
+      direction TB
+      k1["ride_events"]
+    end
         </div>
       </div>
 
@@ -516,13 +537,34 @@ flowchart LR
     NLB --> Pod["API Pods<br/>+ JWT verifier middleware<br/>+ Rate limit (Redis)"]
     Pod --> Ride["Ride Service<br/>state machine"]
     Pod --> Loc["Location Service"]
-    Loc --> Geo[("Redis GEO")]
+    Loc --> Geo
     Ride --> Match["Matcher"]
     Match --> Geo
     Match --> Push["FCM / APNs"]
     Push --> D
-    Ride --> RDB[("Rides DB Postgres")]
-    Ride -. eventos .-> Stream[("Kafka ride_events")]
+    Ride --> RDB
+    Ride -. eventos .-> Stream
+
+    subgraph Geo["Redis GEO"]
+      direction TB
+      g1["geo:drivers:city"]
+      g2["lock:ride:id"]
+      g3["session:driver:id"]
+    end
+
+    subgraph RDB["Rides DB · Postgres"]
+      direction TB
+      r1["rides"]
+      r2["drivers"]
+      r3["vehicles"]
+      r4["users"]
+      r5["ratings"]
+    end
+
+    subgraph Stream["Kafka"]
+      direction TB
+      k1["ride_events"]
+    end
         </div>
       </div>
       <div class="flow-explain">

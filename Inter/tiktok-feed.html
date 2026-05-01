@@ -292,17 +292,49 @@
 flowchart LR
     Client["App / Móvil"] -->|GET /feed| Feed["Feed API<br/>cursor token"]
     Feed --> CG["Candidate Generation<br/>trending + follow + ANN"]
-    CG --> Trend[("Trending Cache")]
-    CG --> Graph[("Follow Graph")]
-    CG --> ANN[("Embeddings ANN<br/>HNSW / FAISS")]
+    CG --> Trend
+    CG --> Graph
+    CG --> ANN
     Feed --> Rank["Online Ranker<br/>~100 ms p99"]
-    Rank --> FS[("Feature Store<br/>user + item")]
+    Rank --> FS
     Feed --> Diverse["Diversity Filter<br/>creator/topic mix"]
-    Client -. eventos .-> Stream[("Kafka<br/>watch/like/share")]
+    Client -. eventos .-> Stream
     Stream --> FS
     Stream --> Train["Training Pipeline<br/>model refresh"]
     Train --> Rank
     Client -- video bytes --> CDN["CDN POPs"]
+
+    subgraph Trend["Trending Cache · Redis"]
+      direction TB
+      t1["trending:region"]
+      t2["trending:topic"]
+    end
+
+    subgraph Graph["Follow Graph · Cassandra"]
+      direction TB
+      g1["follows"]
+      g2["videos"]
+    end
+
+    subgraph ANN["Embeddings ANN · HNSW / FAISS"]
+      direction TB
+      v1["video_vectors"]
+      v2["user_vectors"]
+    end
+
+    subgraph FS["Feature Store · Bigtable / Redis"]
+      direction TB
+      f1["user_features:id"]
+      f2["item_features:id"]
+      f3["recent_seen:id"]
+    end
+
+    subgraph Stream["Kafka · watch/like/share"]
+      direction TB
+      k1["watch_events"]
+      k2["like_events"]
+      k3["share_events"]
+    end
         </div>
       </div>
 
@@ -511,13 +543,33 @@ flowchart LR
     Client["App / Móvil"] --> LB["L7 Load Balancer<br/>NGINX / ALB<br/>region routing"]
     LB --> Pod["Feed API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit Redis"]
     Pod --> CG["Candidate Gen"]
-    CG --> ANN[("Embeddings ANN")]
+    CG --> ANN
     Pod --> Rank["Online Ranker"]
-    Rank --> FS[("Feature Store")]
+    Rank --> FS
     Pod --> Diverse["Diversity Filter"]
-    Client -. eventos .-> Stream[("Kafka watch/like/share")]
+    Client -. eventos .-> Stream
     Stream --> FS
     Client -- video bytes --> CDN["CDN POPs"]
+
+    subgraph ANN["Embeddings ANN · HNSW / FAISS"]
+      direction TB
+      v1["video_vectors"]
+      v2["user_vectors"]
+    end
+
+    subgraph FS["Feature Store · Bigtable / Redis"]
+      direction TB
+      f1["user_features:id"]
+      f2["item_features:id"]
+      f3["recent_seen:id"]
+    end
+
+    subgraph Stream["Kafka · watch/like/share"]
+      direction TB
+      k1["watch_events"]
+      k2["like_events"]
+      k3["share_events"]
+    end
         </div>
       </div>
       <div class="flow-explain">

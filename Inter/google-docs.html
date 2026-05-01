@@ -294,14 +294,37 @@
 flowchart LR
     Editor["Editor Web/Móvil<br/>local OT/CRDT"] -- WS --> GW["Gateway<br/>sticky by docId"]
     GW --> Doc["Doc Service<br/>OT/CRDT engine"]
-    Doc --> Log[("Op Log<br/>append-only")]
-    Doc --> Snap[("Snapshot Store<br/>cada 5 min")]
+    Doc --> Log
+    Doc --> Snap
     Doc --> Bcast["Broadcast<br/>Pub/Sub"]
     Bcast --> Editor
     GW --> Auth["Permissions Service<br/>ACL / Zanzibar"]
-    Auth --> AuthDB[("ACL store")]
-    Doc --> Search[("Search Index<br/>full-text")]
+    Auth --> AuthDB
+    Doc --> Search
     Editor -. presence .-> Pres["Presence Service"]
+
+    subgraph Log["Op Log · Spanner / Postgres (append-only)"]
+      direction TB
+      l1["operations"]
+      l2["documents"]
+    end
+
+    subgraph Snap["Snapshot Store · S3"]
+      direction TB
+      sn1["snapshots/doc_id/v"]
+    end
+
+    subgraph AuthDB["ACL Store · Spanner / Zanzibar"]
+      direction TB
+      a1["permissions"]
+      a2["groups"]
+      a3["users"]
+    end
+
+    subgraph Search["Search Index · Elasticsearch"]
+      direction TB
+      s1["docs_fts"]
+    end
         </div>
       </div>
 
@@ -509,13 +532,30 @@ flowchart LR
 flowchart LR
     Editor["Editor Web/Móvil"] --> LB["L7 Load Balancer<br/>sticky by documentId<br/>(consistent hashing)"]
     LB --> Doc["Doc Service Pod<br/>+ Auth (Google SSO / JWT)<br/>+ OT/CRDT engine"]
-    Doc --> Log[("Op Log")]
-    Doc --> Snap[("Snapshot Store")]
+    Doc --> Log
+    Doc --> Snap
     Doc --> Bcast["Pub/Sub broadcast"]
     Bcast --> Editor
     Doc --> Auth["Permissions Service<br/>Zanzibar"]
-    Auth --> AuthDB[("ACL store")]
+    Auth --> AuthDB
     Editor -. presence .-> Pres["Presence Service"]
+
+    subgraph Log["Op Log · Spanner"]
+      direction TB
+      l1["operations"]
+      l2["documents"]
+    end
+
+    subgraph Snap["Snapshot Store · S3"]
+      direction TB
+      sn1["snapshots"]
+    end
+
+    subgraph AuthDB["ACL Store · Zanzibar"]
+      direction TB
+      a1["permissions"]
+      a2["groups"]
+    end
         </div>
       </div>
       <div class="flow-explain">

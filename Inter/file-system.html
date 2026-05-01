@@ -295,15 +295,40 @@ POST /api/files/fi_72/complete
         <div class="mermaid">
 flowchart LR
     Client["App / Sync Daemon"] -->|pre-signed| API["API Service"]
-    Client -->|chunks directo| Store[("Object Storage<br/>S3 / GCS")]
-    API --> Meta[("Metadata DB<br/>Spanner / Postgres<br/>tree + ACL")]
+    Client -->|chunks directo| Store
+    API --> Meta
     API --> Dedup["Dedup<br/>chunk hash check"]
     Dedup --> Store
-    API -. eventos .-> Sync[("Sync Stream<br/>change events")]
+    API -. eventos .-> Sync
     Sync --> Notify["Sync Notification Svc"]
     Notify --> Client
-    Meta --> ACL["Permissions<br/>Zanzibar-style"]
+    Meta --> ACL
     Store --> GC["GC<br/>chunks huérfanos"]
+
+    subgraph Store["Object Storage · S3 / GCS"]
+      direction TB
+      s1["chunks/sha256"]
+      s2["thumbnails"]
+    end
+
+    subgraph Meta["Metadata DB · Spanner / Postgres"]
+      direction TB
+      m1["files"]
+      m2["file_versions"]
+      m3["chunks"]
+      m4["folders"]
+    end
+
+    subgraph Sync["Sync Stream · Pub/Sub"]
+      direction TB
+      k1["sync_events"]
+    end
+
+    subgraph ACL["Permissions · Zanzibar"]
+      direction TB
+      a1["permissions"]
+      a2["sync_cursor"]
+    end
         </div>
       </div>
 
@@ -520,14 +545,33 @@ flowchart LR
 flowchart LR
     Client["App / Sync Daemon"] --> LB["L7 Load Balancer<br/>NGINX / ALB"]
     LB --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit (Redis)"]
-    Pod --> Meta[("Metadata DB<br/>Spanner / Postgres")]
+    Pod --> Meta
     Pod --> Dedup["Dedup<br/>chunk hash check"]
-    Client -->|chunks pre-signed URL| Store[("Object Storage<br/>S3 / GCS")]
-    Pod -. eventos .-> Sync[("Sync Stream")]
+    Client -->|chunks pre-signed URL| Store
+    Pod -. eventos .-> Sync
     Sync --> Notify["Sync Notification Svc"]
     Notify --> Client
     Pod --> ACL["Permissions Service<br/>Zanzibar"]
     Store --> GC["GC chunks huérfanos"]
+
+    subgraph Store["Object Storage · S3 / GCS"]
+      direction TB
+      s1["chunks/sha256"]
+      s2["thumbnails"]
+    end
+
+    subgraph Meta["Metadata DB · Spanner / Postgres"]
+      direction TB
+      m1["files"]
+      m2["file_versions"]
+      m3["chunks"]
+      m4["folders"]
+    end
+
+    subgraph Sync["Sync Stream · Pub/Sub"]
+      direction TB
+      k1["sync_events"]
+    end
         </div>
       </div>
       <div class="flow-explain">

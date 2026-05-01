@@ -309,16 +309,36 @@
 flowchart LR
     Client["Cliente"] --> Reco["Reco API"]
     Reco --> Recall["Candidate Generation<br/>ANN + popular + cohort"]
-    Recall --> Embed[("Embeddings ANN<br/>HNSW / FAISS")]
+    Recall --> Embed
     Reco --> Rank["Ranker Online<br/>p99 ≈ 100 ms"]
-    Rank --> FS[("Feature Store<br/>user + item")]
+    Rank --> FS
     Reco --> Filter["Policy / Diversity Filter"]
     Reco --> Exp["A/B Assignment<br/>sticky hash"]
-    Client -. impressions / clicks / conv .-> Stream[("Kafka<br/>events")]
+    Client -. impressions / clicks / conv .-> Stream
     Stream --> FS
     Stream --> Train["Training Pipeline<br/>offline batch + incremental"]
     Train --> Rank
     Train --> Embed
+
+    subgraph Embed["Embeddings ANN · HNSW / FAISS"]
+      direction TB
+      v1["item_vectors"]
+      v2["user_vectors"]
+    end
+
+    subgraph FS["Feature Store · Bigtable / Redis"]
+      direction TB
+      f1["user:id"]
+      f2["item:id"]
+      f3["cohort:id"]
+    end
+
+    subgraph Stream["Kafka · events"]
+      direction TB
+      k1["impressions"]
+      k2["clicks"]
+      k3["conversions"]
+    end
         </div>
       </div>
 
@@ -647,16 +667,35 @@ flowchart LR
     Client["Cliente"] --> LB["L7 Load Balancer<br/>region routing"]
     LB --> Pod["Reco API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit (token bucket)"]
     Pod --> Recall["Candidate Generation"]
-    Recall --> Embed[("Embeddings ANN")]
+    Recall --> Embed
     Pod --> Rank["Ranker Online"]
-    Rank --> FS[("Feature Store")]
+    Rank --> FS
     Pod --> Filter["Policy / Diversity Filter"]
     Pod --> Exp["A/B Assignment"]
-    Client -. impressions/clicks/conv .-> Stream[("Kafka events")]
+    Client -. impressions/clicks/conv .-> Stream
     Stream --> FS
     Stream --> Train["Training Pipeline"]
     Train --> Rank
     Train --> Embed
+
+    subgraph Embed["Embeddings ANN"]
+      direction TB
+      v1["item_vectors"]
+      v2["user_vectors"]
+    end
+
+    subgraph FS["Feature Store"]
+      direction TB
+      f1["user:id"]
+      f2["item:id"]
+    end
+
+    subgraph Stream["Kafka events"]
+      direction TB
+      k1["impressions"]
+      k2["clicks"]
+      k3["conversions"]
+    end
         </div>
       </div>
       <div class="flow-explain">

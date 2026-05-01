@@ -295,12 +295,52 @@ flowchart LR
     Client["Cliente / driver"] -->|SQL| Parser["Parser<br/>SQL → AST"]
     Parser --> Planner["Planner / Optimizer<br/>AST → plan + costos"]
     Planner --> Executor["Executor<br/>itera op-tree"]
-    Executor --> TxMgr["Tx Manager<br/>locks / MVCC"]
-    Executor --> Buffer["Buffer Pool<br/>páginas en RAM"]
-    Buffer <--> Storage[("Storage Engine<br/>B+Tree / LSM")]
-    TxMgr --> WAL[("WAL<br/>append-only<br/>fsync en commit")]
-    Storage --> Disk[("Disk pages")]
-    WAL --> Replica[("Read Replicas<br/>WAL shipping")]
+    Executor --> TxMgr
+    Executor --> Buffer
+    Buffer <--> Storage
+    TxMgr --> WAL
+    Storage --> Disk
+    WAL --> Replica
+
+    subgraph TxMgr["Tx Manager · locks / MVCC"]
+      direction TB
+      t1["tx_table"]
+      t2["lock_table"]
+      t3["wait_for_graph"]
+    end
+
+    subgraph Buffer["Buffer Pool · RAM"]
+      direction TB
+      b1["heap_pages"]
+      b2["index_pages"]
+      b3["dirty_list (LRU/Clock)"]
+    end
+
+    subgraph Storage["Storage Engine · B+Tree / LSM"]
+      direction TB
+      s1["heap"]
+      s2["btree_indexes"]
+      s3["catalog (system tables)"]
+    end
+
+    subgraph WAL["WAL · append-only · fsync en commit"]
+      direction TB
+      w1["wal_records (LSN, txid, op)"]
+      w2["checkpoints"]
+    end
+
+    subgraph Disk["Disk pages"]
+      direction TB
+      d1["data files"]
+      d2["index files"]
+      d3["temp files"]
+    end
+
+    subgraph Replica["Read Replicas · WAL shipping"]
+      direction TB
+      r1["replica_1"]
+      r2["replica_2"]
+    end
         </div>
       </div>
 
@@ -523,11 +563,30 @@ flowchart LR
     LB -.read replicas.-> Replica1["Read Replica 1"]
     LB -.read replicas.-> Replica2["Read Replica 2"]
     Primary --> Parser["Parser → Planner → Executor"]
-    Executor --> Buffer["Buffer Pool"]
-    Buffer <--> Storage[("Storage Engine")]
-    Primary --> WAL[("WAL append-only")]
+    Parser --> Buffer
+    Buffer <--> Storage
+    Primary --> WAL
     WAL --> Replica1
     WAL --> Replica2
+
+    subgraph Buffer["Buffer Pool · RAM"]
+      direction TB
+      b1["heap_pages"]
+      b2["index_pages"]
+    end
+
+    subgraph Storage["Storage Engine · B+Tree / LSM"]
+      direction TB
+      s1["heap"]
+      s2["btree_indexes"]
+      s3["catalog"]
+    end
+
+    subgraph WAL["WAL · append-only"]
+      direction TB
+      w1["wal_records"]
+      w2["checkpoints"]
+    end
         </div>
       </div>
       <div class="flow-explain">
