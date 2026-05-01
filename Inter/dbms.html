@@ -111,8 +111,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -230,6 +253,58 @@ flowchart LR
     TxMgr --> WAL[("WAL<br/>append-only<br/>fsync en commit")]
     Storage --> Disk[("Disk pages")]
     WAL --> Replica[("Read Replicas<br/>WAL shipping")]
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Query entra.</b> Cliente envía SQL. El <b>Parser</b> tokeniza y construye un AST. Si hay error de sintaxis, devuelve error 4xx — no malgastes recursos en queries malformadas.</p>
+        <p><b>Plan + cost.</b> El <b>Planner / Optimizer</b> toma el AST. Consulta el catalog (estadísticas: <code>cardinality</code>, <code>selectivity</code>, índices disponibles, distribución) y enumera planes posibles: nested loop join vs hash join vs merge join, qué índice usar, qué orden de joins. Calcula costo estimado de cada plan y elige el mínimo. Output: árbol de operadores físicos.</p>
+        <p><b>Execute con buffer pool.</b> El <b>Executor</b> itera el plan. Cada operador (scan, filter, hash) pide tuples al hijo. Cuando necesita una página, pregunta al Buffer Pool. Hit en RAM → bien. Miss → lee del disco y la mete al pool, evictando con LRU/Clock. El buffer pool típicamente es 25–50% de la RAM.</p>
+        <p><b>Write path con WAL.</b> Para INSERT/UPDATE/DELETE: el Executor coordina con el Tx Manager. <em>Antes</em> de modificar la página en RAM, escribe un WAL record con before/after image. El WAL es append-only: secuencial es ~100× más rápido que random. La página queda dirty y se flushea al disco eventualmente.</p>
+        <p><b>Commit = durabilidad.</b> En commit, fsync del WAL hasta esa LSN. <em>Antes del fsync, el commit no es ack al cliente</em>. Esto es lo que da la D de ACID. Sin fsync, un crash perdería commits ya prometidos.</p>
+        <p><b>Recovery (ARIES).</b> Tras crash: (1) <em>analysis</em> lee WAL desde último checkpoint para reconstruir tx_table y dirty_page_table; (2) <em>redo</em> reaplica todo lo committed; (3) <em>undo</em> deshace lo no committed. Estado consistente, garantizado matemáticamente.</p>
+        <p><b>Replicación.</b> El primary stream del WAL a réplicas. Sync espera ack de quorum (penaliza p99 pero garantiza durabilidad cross-node), async no espera (rápido pero puede perder en failover).</p>
+        <p><b>Frase clave:</b> el truco está en separar memoria (rápida pero volátil) del WAL (lento pero durable). Las páginas viven en buffer pool; el WAL es la fuente de verdad para recovery.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">Parser → AST</span><span class="reason">Garantiza syntax válida antes de cómputo costoso. Errores rápidos.</span></div>
+        <div class="why-item"><span class="comp">Planner con stats</span><span class="reason">Un buen plan vs uno malo es 100× en latencia. Estadísticas frescas son críticas.</span></div>
+        <div class="why-item"><span class="comp">Buffer Pool</span><span class="reason">Disco es 100K× más lento que RAM. Sin buffer pool, cada query es lenta.</span></div>
+        <div class="why-item"><span class="comp">B+Tree vs LSM</span><span class="reason">B+Tree para read-balanced (Postgres, MySQL). LSM para write-heavy (Cassandra, RocksDB).</span></div>
+        <div class="why-item"><span class="comp">WAL append-only</span><span class="reason">Secuencial es ~100× más rápido que random. Single point para durabilidad y recovery.</span></div>
+        <div class="why-item"><span class="comp">fsync at commit</span><span class="reason">Da la D de ACID. Sin esto, "commit" es solo un log entry en RAM.</span></div>
+        <div class="why-item"><span class="comp">MVCC</span><span class="reason">Reads no bloquean writes. Cada tx ve un snapshot consistente del momento que empezó.</span></div>
+        <div class="why-item"><span class="comp">2PL strict</span><span class="reason">Garantiza serializable. Se usa en escrituras críticas combinado con MVCC para reads.</span></div>
+        <div class="why-item"><span class="comp">ARIES recovery</span><span class="reason">Algoritmo probado. Analysis-Redo-Undo garantiza consistency tras crash.</span></div>
+        <div class="why-item"><span class="comp">WAL shipping</span><span class="reason">Réplicas leen el mismo WAL del primary. Trade sync vs async según necesidad de durabilidad.</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Lock contention</b> en hot rows con muchas escrituras concurrentes.</li>
+            <li><b>Buffer pool too small</b> → thrashing constante, queries 100× más lentas.</li>
+            <li><b>WAL fsync latency</b> (~10 ms en SSD) define el commit throughput máximo.</li>
+            <li><b>Long-running tx</b> con undo log enorme — bloquea VACUUM y vaciado.</li>
+            <li><b>Bad plan choice</b> por estadísticas viejas o sesgadas.</li>
+            <li><b>Replication lag</b> en async cuando primary está bajo carga.</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>MVCC</b> en lugar de 2PL puro para que reads largos no bloqueen.</li>
+            <li><b>Group commit</b> (fsync N tx juntas) — amortiza el costo de fsync.</li>
+            <li><b>ANALYZE periódico</b> y auto-vacuum agresivo para stats frescas.</li>
+            <li><b>Adaptive buffer pool</b> con feedback (warm-up tras restart).</li>
+            <li><b>Read replicas</b> para escalar reads (eventualmente consistente).</li>
+            <li><b>Sharding</b> por clave natural (user_id, tenant_id) cuando un nodo no alcanza.</li>
+            <li><b>Connection pooling</b> (PgBouncer) — abrir conexiones es caro.</li>
+          </ul>
         </div>
       </div>
     </section>

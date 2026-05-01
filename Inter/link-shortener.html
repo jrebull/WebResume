@@ -111,8 +111,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -229,6 +252,51 @@ flowchart LR
     Creator --> Block["Block / Safe Browsing"]
     User -. click event .-> Stream[("Kafka<br/>click_events")]
     Stream --> Stats[("Analytics DB<br/>BigQuery")]
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Redirect (read path).</b> Cliente clickea <code>https://x.co/abc123</code>. El navegador hace GET. El edge CDN intercepta — si tiene esa entrada cacheada (&gt;99% hit ratio), responde 302 con la URL larga sin contactar al origen. Latencia &lt;10 ms. Esto es lo que hace que el sistema escale a billones de redirects/año.</p>
+        <p><b>Cache miss → KV lookup.</b> Si miss en CDN, va al Redirect Service. Lookup en Redis primero (~1 ms). Si miss, query al KV store (DynamoDB / Cassandra) por <code>short_code</code>, lookup O(1). Verifica blocklist (bloom filter en Redis) para no servir phishing. Devuelve 302 al cliente y popula la cache.</p>
+        <p><b>Analytics async.</b> En paralelo emite un <code>click_event</code> al Kafka stream con timestamp, user-agent, geo, referrer. Esto va a BigQuery / ClickHouse. <em>No bloquea el redirect</em> — si analytics está caído, el redirect sigue funcionando.</p>
+        <p><b>Crear (write path).</b> Cliente autenticado hace <code>POST /api/links</code> con la URL larga. ID Generator entrega un base62 de 7 chars (counter centralizado o range-based). Validamos el destino contra Safe Browsing API. Guardamos en KV. Cache opcional. Devolvemos el short URL.</p>
+        <p><b>Frase clave:</b> el sistema es 99% read-heavy, así que el secreto está en tener tres tiers de cache (edge CDN, Redis, in-memory) y un KV store con O(1) lookup. Las escrituras son raras y no necesitan optimización agresiva.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">CDN edge</span><span class="reason">99%+ del tráfico nunca llega al origen. Latencia &lt;10 ms global.</span></div>
+        <div class="why-item"><span class="comp">302 vs 301</span><span class="reason">302 mantiene control: si el destino cambia o se desactiva, puedo invalidar. 301 lo cachea el browser para siempre.</span></div>
+        <div class="why-item"><span class="comp">Redis cache (tier 2)</span><span class="reason">Segundo nivel para misses del CDN. Sub-ms y permite expiración fina.</span></div>
+        <div class="why-item"><span class="comp">KV store (Dynamo / Cassandra)</span><span class="reason">O(1) por hash, escala lineal. SQL no aporta nada cuando solo es lookup por short_code.</span></div>
+        <div class="why-item"><span class="comp">Counter base62</span><span class="reason">7 chars = 62⁷ ≈ 3.5 trillones IDs. Sin colisiones por construcción.</span></div>
+        <div class="why-item"><span class="comp">Range allocation</span><span class="reason">Workers reservan bloques (100K IDs) para evitar coordinación por request.</span></div>
+        <div class="why-item"><span class="comp">Bloom filter blocklist</span><span class="reason">Safe browsing check sin lookup remoto cada vez. Falsos positivos validados con API.</span></div>
+        <div class="why-item"><span class="comp">Kafka click_events</span><span class="reason">Analytics desacoplada del redirect. Si stream falla, el redirect sigue.</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Hot link viral</b> satura un solo shard de cache.</li>
+            <li><b>ID counter contention</b> si single-instance sin range allocation.</li>
+            <li><b>Safe Browsing API</b> rate limits durante creación masiva.</li>
+            <li><b>Cold cache</b> después de un deploy o cache wipe.</li>
+            <li><b>Analytics pipeline lag</b> bajo picos virales.</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>Tres tiers de cache</b>: in-memory + edge + Redis para 99.9% hit ratio.</li>
+            <li><b>Snowflake / range pre-allocation</b> por worker, sin coordinación por request.</li>
+            <li><b>Async Safe Browsing</b> con cache de resultados por dominio.</li>
+            <li><b>Cache warm-up post-deploy</b> con top 1% de links.</li>
+            <li><b>Sampling</b> en analytics para picos, agregando 100% al final del día.</li>
+            <li><b>Multi-region</b> con KV replicado, redirect siempre local.</li>
+          </ul>
         </div>
       </div>
     </section>

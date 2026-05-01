@@ -111,8 +111,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -233,6 +256,52 @@ flowchart LR
     Notify --> Client
     Meta --> ACL["Permissions<br/>Zanzibar-style"]
     Store --> GC["GC<br/>chunks huérfanos"]
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Upload chunked.</b> User sube un archivo de 1 GB. Cliente hace <code>POST /api/files/upload-url</code>. El API responde con un <code>upload_session_id</code>, chunk size (8 MB), y N pre-signed URLs (una por chunk). El cliente sube cada chunk <em>directo</em> a object storage en paralelo. Si se cae la red, retoma desde el último chunk completo.</p>
+        <p><b>Dedup transparente.</b> Antes de subir cada chunk, el cliente lo hashea (SHA256) y pregunta al API: "¿ya existe este hash?". Si sí, no sube — solo registra la referencia (<code>chunk_id</code>). Si no, sube. Esto da ~30% de ahorro de storage en archivos comunes (PDFs corporativos, fotos repetidas).</p>
+        <p><b>Complete + atomic metadata.</b> Cuando todos los chunks están en storage, cliente hace <code>POST /files/{id}/complete</code> con la lista ordenada de chunk IDs. El API ejecuta una transacción en la Metadata DB que: crea el archivo en el árbol, registra la versión nueva, incrementa <code>ref_count</code> de cada chunk, emite un <code>sync_event</code>. Esto debe ser atómico — si falla a mitad, no queda metadata huérfana.</p>
+        <p><b>Sync delta.</b> Los demás dispositivos del user (laptop, móvil) tienen un <code>sync_cursor</code>. Periódicamente piden <code>GET /sync/changes?since={cursor}</code>. El servicio devuelve el delta (archivos cambiados/borrados/movidos) y el nuevo cursor. El cliente baja los chunks faltantes desde object storage.</p>
+        <p><b>Permisos.</b> Compartir = insertar en permissions table (Zanzibar-style: <code>doc:42 viewer user:alice</code>). Acceso luego hace lookup que expande herencia (folder padre → root) hasta el primer match. Cache para evitar el árbol completo.</p>
+        <p><b>Frase clave:</b> separo metadata transaccional (small, ACID) de blobs (large, eventually consistent). El cliente sube directo a storage; mi backend solo gestiona el árbol, los permisos y los eventos de sync.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">Pre-signed URL</span><span class="reason">Bytes nunca tocan mi backend. Ahorro masivo de bandwidth y CPU.</span></div>
+        <div class="why-item"><span class="comp">Chunked upload (8 MB)</span><span class="reason">Resume tras falla, paralelismo, dedup por chunk no por archivo entero.</span></div>
+        <div class="why-item"><span class="comp">SHA256 dedup</span><span class="reason">~30% ahorro de storage. Ref counting para GC seguro.</span></div>
+        <div class="why-item"><span class="comp">Metadata DB transaccional</span><span class="reason">Spanner / Postgres garantiza moves atómicos y consistencia del árbol.</span></div>
+        <div class="why-item"><span class="comp">Object Storage (S3 / GCS)</span><span class="reason">11×9 durabilidad, escala a EB sin operar discos.</span></div>
+        <div class="why-item"><span class="comp">Versioning</span><span class="reason">Restore de archivos perdidos y safety net en colaboración.</span></div>
+        <div class="why-item"><span class="comp">Sync con cursor</span><span class="reason">Incremental, idempotent. Sobrevive desconexiones largas.</span></div>
+        <div class="why-item"><span class="comp">Zanzibar permissions</span><span class="reason">Granular, herencia explícita, cache decisiones por (subject, object).</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Move de carpeta gigante</b> → tx grande en metadata DB.</li>
+            <li><b>Hot folder</b> con muchos sync subscribers (compartido empresa-wide).</li>
+            <li><b>Permissions resolution recursivo</b> en árboles profundos.</li>
+            <li><b>GC de chunks huérfanos</b> — storage waste si no se ejecuta.</li>
+            <li><b>Pequeños archivos</b> — mucho overhead de metadata vs bytes.</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>Lazy materialization</b> en moves: cambiar parent pointer, recompute en read.</li>
+            <li><b>Sub-folders shard</b> por hash si crecen mucho (avoid hot single row).</li>
+            <li><b>Cache de decisiones</b> de permisos con invalidation por path al cambiar herencia.</li>
+            <li><b>Reference counting + GC nocturno</b> para liberar chunks sin bloquear el path.</li>
+            <li><b>Pack files</b> para muchos archivos pequeños (write amplification reduction).</li>
+            <li><b>Hot tier vs cold tier</b> automático según último access (Glacier para old).</li>
+          </ul>
         </div>
       </div>
     </section>

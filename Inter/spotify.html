@@ -111,8 +111,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -232,6 +255,50 @@ flowchart LR
     Stream --> CDN["CDN POPs"]
     CDN -->|miss| AudioStore[("Object Storage<br/>audio segments")]
     Client -. listen events .-> Pipe[("Kafka<br/>analytics + reco loop")]
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Búsqueda.</b> El usuario teclea "Bad Bunny". Cliente hace <code>GET /api/search?q=...</code>. El gateway routea al Search Service que pega a Elasticsearch con un query multi-match (track + artist + album), filtra por la región del user (licencias) y devuelve top resultados con score. La búsqueda nunca toca la DB relacional principal, justamente porque LIKE '%q%' no escala.</p>
+        <p><b>Playback.</b> Tap en un track. Cliente hace <code>GET /api/tracks/{id}/stream</code>. El Stream Service: (1) verifica que <code>licensed_regions</code> incluya la región del user, (2) firma una URL al CDN POP regional con expiración 15 min, (3) devuelve el manifest con bitrates disponibles. El cliente se conecta al CDN y baja segmentos de audio. El backend nunca sirve bytes.</p>
+        <p><b>Recomendaciones.</b> Mientras escucha, el cliente envía eventos al Kafka <code>listen_events</code>. El stream alimenta dos cosas: (1) el Feature Store online para recomendaciones (Discover Weekly, daily mix), y (2) el pipeline de royalties para licencias por play. Las recos online se sirven leyendo features de user + items candidatos (vía ANN sobre embeddings) y rankeando.</p>
+        <p><b>Frase clave:</b> separo catálogo, búsqueda, recomendaciones y streaming en servicios distintos. El audio nunca toca mi app — vive en object storage detrás de CDN, con manifiesto firmado por región para respetar licencias.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">Catalog Service + DB</span><span class="reason">Tracks, álbumes y artistas en relacional con joins. Lecturas masivas, escrituras esporádicas.</span></div>
+        <div class="why-item"><span class="comp">Search Service + Elasticsearch</span><span class="reason">Full-text con sinónimos, fuzzy, ranking. SQL no aguanta a esa escala.</span></div>
+        <div class="why-item"><span class="comp">Stream Service + signed URLs</span><span class="reason">Geo-fencing por región, expiración corta, revoca acceso si user cancela suscripción.</span></div>
+        <div class="why-item"><span class="comp">Object Storage + CDN</span><span class="reason">Audio escala horizontal sin egress propio. POP regional para latencia &lt; 200 ms.</span></div>
+        <div class="why-item"><span class="comp">Reco Service + Feature Store</span><span class="reason">Modelo offline + serving online consistente. Same code path en train y serve.</span></div>
+        <div class="why-item"><span class="comp">Embeddings ANN</span><span class="reason">Vecinos cercanos a "lo que ya escuchaste". Sub-10 ms en millones de tracks.</span></div>
+        <div class="why-item"><span class="comp">Kafka listen_events</span><span class="reason">Una fuente para reco, royalties, trending y BI. Reprocesable.</span></div>
+        <div class="why-item"><span class="comp">DRM token corto</span><span class="reason">15 min de validez con renew silencioso. Si user cancela mid-month, expira solo.</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Cold cache</b> para tracks nuevos virales — primer impacto pega al origen.</li>
+            <li><b>Search index lag</b> detrás de releases (si no es streaming-friendly).</li>
+            <li><b>Token refresh storm</b> si miles renuevan al mismo tiempo.</li>
+            <li><b>Cross-region latency</b> en países sin POP cercano.</li>
+            <li><b>Feature store hot keys</b> en tracks populares globalmente.</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>Pre-cache regional</b> según predicción de releases populares.</li>
+            <li><b>Bulk signing + renew silencioso</b> antes de expiración.</li>
+            <li><b>Predictive prefetch</b> del siguiente track de la queue (gapless playback).</li>
+            <li><b>Edge compute</b> para personalización de queue sin round-trip al backend.</li>
+            <li><b>Replicación de features</b> hot a múltiples regiones.</li>
+            <li><b>Indexación incremental</b> en search engine para releases en tiempo casi real.</li>
+          </ul>
         </div>
       </div>
     </section>

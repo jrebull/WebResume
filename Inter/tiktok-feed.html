@@ -111,8 +111,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -232,6 +255,51 @@ flowchart LR
     Stream --> Train["Training Pipeline<br/>model refresh"]
     Train --> Rank
     Client -- video bytes --> CDN["CDN POPs"]
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Apertura.</b> El user abre la app y hace <code>GET /api/feed?cursor=...</code>. El cursor es un token opaco que codifica sesión + offset + experimento. Esto sobrevive a re-rankings y cambios de modelo. El Feed API dispara dos cosas en paralelo: candidate generation y feature lookup del user.</p>
+        <p><b>Candidate generation.</b> Combino tres fuentes para llegar a ~500 candidatos: (1) <em>trending</em> por región/país desde un cache caliente, (2) <em>follow graph</em> con uploads recientes de creators que sigues, (3) <em>vecinos en embeddings</em> via ANN (HNSW/FAISS) sobre lo que ya viste. La lectura debe estar en ~30 ms.</p>
+        <p><b>Online ranker.</b> Esos 500 candidatos pasan al ranker. Trae las features pre-calculadas del feature store para user e items, las pasa al modelo (TF Serving o ONNX) y devuelve scores. Aplico filtros: policy (no NSFW, locale match), diversity (no stack del mismo creator, mezcla de topics), <code>recent_seen</code> dedup. Top 10–15 al cliente. Total: ~100 ms p99.</p>
+        <p><b>Feedback loop.</b> Mientras user mira, cada watch / like / share / share emite evento al Kafka. El stream alimenta features online (fast: segundos) y el training pipeline (batch: cada hora o día) para refrescar el modelo.</p>
+        <p><b>Frase clave:</b> es un pipeline de dos etapas — recall (mucho candidate, barato) más ranking (pocos, caro) — con un feedback loop que aprende rápido sin entrenar en el path crítico.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">Cursor opaco</span><span class="reason">Sobrevive a cambios de ranking y deploys. El cliente no debe entender qué hay dentro.</span></div>
+        <div class="why-item"><span class="comp">Two-stage retrieval</span><span class="reason">Costo y latencia: rankear millones es imposible; recall barato + rank caro es óptimo.</span></div>
+        <div class="why-item"><span class="comp">ANN (HNSW / FAISS)</span><span class="reason">Top-K en embeddings sub-10 ms. Esencial para "similar a lo que viste".</span></div>
+        <div class="why-item"><span class="comp">Feature Store</span><span class="reason">Train/serve consistency: la misma feature en entrenamiento y en inferencia. Evita skew.</span></div>
+        <div class="why-item"><span class="comp">Online ranker</span><span class="reason">Modelo entrenado offline, servido online. Estabilidad de latencia y A/B sano.</span></div>
+        <div class="why-item"><span class="comp">Diversity filter</span><span class="reason">Sin esto el feed se aburre y hay eco chamber. Mezcla creators y topics.</span></div>
+        <div class="why-item"><span class="comp">recent_seen dedup</span><span class="reason">SET en Redis con TTL por sesión. Evita ver el mismo video dos veces.</span></div>
+        <div class="why-item"><span class="comp">Kafka events</span><span class="reason">Feedback en segundos al feature store. Reprocesable para training.</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Feature store hot keys</b>: items virales son leídos por todos.</li>
+            <li><b>Cold start</b> de users sin historial — ANN sobre embedding vacío.</li>
+            <li><b>Model serving</b> en GPU saturado durante peak.</li>
+            <li><b>Feature lookup latency</b>: típicamente el bottleneck más grande.</li>
+            <li><b>Embedding refresh</b> lag para items nuevos (no aparecen en ANN inmediatamente).</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>Co-locate features con ranker</b> (sidecar) para reducir RTT.</li>
+            <li><b>Bandit con epsilon-greedy</b> en cold start: forzar exploración 5–10%.</li>
+            <li><b>Modelo lighter en path crítico</b>; modelo heavier ofrece refresh batch.</li>
+            <li><b>HNSW incremental updates</b> para reflejar uploads en minutos.</li>
+            <li><b>Pre-warming</b> de candidates de viajes/sesiones esperadas.</li>
+            <li><b>Edge inference</b> para queries simples sin round-trip al ranker central.</li>
+          </ul>
         </div>
       </div>
     </section>

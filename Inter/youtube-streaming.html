@@ -111,8 +111,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -230,6 +253,50 @@ flowchart LR
     Client -- playback request --> Edge["CDN Edge POPs"]
     Edge -->|miss| Store
     Client -. events .-> Analytics[("Analytics Pipeline<br/>BigQuery")]
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Upload.</b> El creador presiona "subir". El cliente pide <code>POST /api/videos/upload-url</code>; el API responde con un <code>videoId</code> y una pre-signed URL multipart al object storage. El cliente sube los chunks <em>directo</em> a S3/GCS — los bytes nunca tocan mi backend. Cuando termina, hace <code>POST /api/videos/{id}/complete-upload</code> y eso publica un evento <code>video.uploaded</code> al Pub/Sub.</p>
+        <p><b>Transcoding async.</b> Los Transcoder workers (auto-scaled) consumen el evento, descargan el master, generan renditions (240p, 480p, 720p, 1080p, 4K) más segmentos HLS y thumbnails con FFmpeg, y los suben de regreso al storage. Updatean la metadata DB cambiando estado de <code>processing</code> a <code>ready</code>.</p>
+        <p><b>Playback.</b> El viewer hace play. Cliente pide <code>GET /api/videos/{id}/manifest.m3u8</code>. El edge CDN responde si lo tiene cacheado; si no, va al origen y popula. El cliente pide segmentos de 2–10 s al CDN POP más cercano. <em>Mi backend nunca toca los bytes</em>; eso es lo que hace que esto escale a billones de horas/día.</p>
+        <p><b>Frase clave:</b> el truco es que el upload va por pre-signed URL y la entrega va por CDN. Mi backend solo gestiona metadata y orquestación de jobs — los blobs pesados los maneja la infra de almacenamiento y entrega.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">Pre-signed URL multipart</span><span class="reason">Resumable, paralelizable, ahorra ancho de banda. El cliente sube directo a storage.</span></div>
+        <div class="why-item"><span class="comp">Object Storage (S3/GCS)</span><span class="reason">11×9 durabilidad, escala a EB sin operar discos.</span></div>
+        <div class="why-item"><span class="comp">Pub/Sub video.uploaded</span><span class="reason">Desacopla la confirmación del upload del trabajo pesado de transcoding.</span></div>
+        <div class="why-item"><span class="comp">Transcoder workers</span><span class="reason">Auto-scaling según cola. Un worker procesa 1 video a la vez, paralelismo natural.</span></div>
+        <div class="why-item"><span class="comp">Múltiples renditions</span><span class="reason">Adaptive bitrate. El cliente elige la calidad según red y dispositivo, sin re-encoding.</span></div>
+        <div class="why-item"><span class="comp">Metadata DB</span><span class="reason">Joins para search, comments, channels. Indexable por title, tags, etc.</span></div>
+        <div class="why-item"><span class="comp">CDN edge POPs</span><span class="reason">95%+ cache hit ratio define el costo del negocio. Latencia &lt; 100 ms global.</span></div>
+        <div class="why-item"><span class="comp">Analytics pipeline</span><span class="reason">View events alimentan recos, trending, billing y royalties — sin presionar operacional.</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Encoding queue lag</b> en eventos virales o uploads masivos.</li>
+            <li><b>Cold cache</b> para videos nuevos virales — primer impacto pega al origen.</li>
+            <li><b>Search index lag</b> detrás de uploads recientes.</li>
+            <li><b>Egress cost</b> cuando hay miss en CDN (clip que no estaba caliente).</li>
+            <li><b>Long-tail storage</b>: 99% de videos nunca se ven después del primer mes pero ocupan EB.</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>Tiered encoding</b>: 480p disponible en segundos, resto en background.</li>
+            <li><b>Cache prewarm</b> al detectar trending por geo / canal popular.</li>
+            <li><b>Per-segment caching</b> más fino, no todo el video.</li>
+            <li><b>Cold storage</b> tier (Glacier) para videos sin views &gt; 90 días.</li>
+            <li><b>Two-pass encoding</b> en videos con alto watch time (mejor quality/byte).</li>
+            <li><b>P2P assist</b> (CDN edge serving via clients) para eventos en vivo masivos.</li>
+          </ul>
         </div>
       </div>
     </section>

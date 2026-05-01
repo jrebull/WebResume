@@ -112,8 +112,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -229,6 +252,49 @@ flowchart LR
     Agg --> Cache
     Agg --> Cold[("Cold Storage<br/>BigQuery / S3")]
     Cache -. cache miss .-> Agg
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Read path.</b> Cuando el cliente abre la home y pide el top, el browser pega al edge. Si el edge tiene la respuesta en cache (TTL 5–30 s), responde directo. Si no, va al API Gateway que valida auth y rate limit, y de ahí al Redis sorted set <code>top:1h:{region}</code>. Hago <code>ZREVRANGE 0 9 WITHSCORES</code> en O(log N), hidrato con metadata de producto y devuelvo. Nunca toco la base transaccional para servir el top.</p>
+        <p><b>Write path.</b> Al hacer checkout, el Order Service escribe la orden en Postgres (fuente de verdad transaccional, ACID) y emite un evento al Kafka <code>order_events</code>. El Aggregator consume el stream, agrupa en buckets de 1 minuto, y al cerrar cada bucket suma sobre los últimos 60/240/1440 buckets para mantener las tres ventanas en Redis con un <code>ZINCRBY</code>. La misma corriente se sinkea a BigQuery para análisis offline.</p>
+        <p><b>Frase clave:</b> separo la ruta crítica de checkout del cálculo del ranking; el ranking se construye asíncrono, así un pico de tráfico en el top no afecta la creación de órdenes y viceversa.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">CDN / Edge Cache</span><span class="reason">Absorbe 95%+ del tráfico de lectura sin tocar el origen. TTL corto + stale-while-revalidate.</span></div>
+        <div class="why-item"><span class="comp">API Gateway</span><span class="reason">Auth, rate limit por user/IP, observabilidad central. Un solo lugar para políticas.</span></div>
+        <div class="why-item"><span class="comp">Redis Sorted Set</span><span class="reason">Top-K en O(log N) con <code>ZREVRANGE</code>. Las DBs relacionales no escalan a este patrón.</span></div>
+        <div class="why-item"><span class="comp">Order Service + Postgres</span><span class="reason">ACID en checkout no es negociable. Postgres por madurez, joins y transacciones fuertes.</span></div>
+        <div class="why-item"><span class="comp">Kafka order_events</span><span class="reason">Desacopla el path crítico del cómputo del ranking. Permite reprocesar y agregar consumers sin tocar productores.</span></div>
+        <div class="why-item"><span class="comp">Aggregator (sliding window)</span><span class="reason">Buckets de 1 min se combinan para 1h/4h/24h. Stateless, escala horizontal por partición.</span></div>
+        <div class="why-item"><span class="comp">Cold Storage (BigQuery)</span><span class="reason">Históricos para BI sin presionar la base operacional. Permite cohortes y trends largos.</span></div>
+        <div class="why-item"><span class="comp">Idempotency-Key en POST</span><span class="reason">Evita doble cobro / doble orden si el cliente reintenta tras timeout.</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Hot products.</b> Un viral concentra escrituras en un solo shard de Redis.</li>
+            <li><b>Cache stampede.</b> Si el edge expira al mismo tiempo en muchas regiones, miles de pods tocan al aggregator.</li>
+            <li><b>Aggregator lag.</b> Si el stream se llena, el ranking deja de reflejar la realidad reciente.</li>
+            <li><b>Cancelaciones tardías.</b> Una orden que se canceló pero ya impactó el ranking deja "fantasmas" en el top.</li>
+            <li><b>Catálogo grande.</b> 1M+ productos × 3 ventanas crece el sorted set; consumo de memoria.</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>Particionar</b> sorted sets por hash(productId) y agregar a top-K final por reduce.</li>
+            <li><b>Stale-while-revalidate</b> en edge: sirve viejo mientras el agregador refresca en background.</li>
+            <li><b>Backpressure + DLQ</b> en el stream para no perder eventos, alertas si lag &gt; 30 s.</li>
+            <li><b>Eventos de compensación</b> para cancelaciones (negative count), aplicados al mismo bucket.</li>
+            <li><b>HyperLogLog / Count-Min Sketch</b> en ventanas de 24h para conteo aproximado y memoria fija.</li>
+            <li><b>Active-active multi-region</b> con sorted set por región y merge para vista global.</li>
+          </ul>
         </div>
       </div>
     </section>

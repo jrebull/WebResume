@@ -111,8 +111,31 @@
     .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
     .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
 
+    .flow-explain { padding: 22px 24px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.03); margin-top: 14px; }
+    .flow-explain h4 { margin: 0 0 12px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .flow-explain h4::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .flow-explain p { margin: 0 0 12px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .flow-explain p:last-child { margin-bottom: 0; }
+    .flow-explain b { color: var(--accent); }
+    .flow-explain code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
+    .why { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .why-item { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .why-item .comp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 13px; display: block; margin-bottom: 4px; }
+    .why-item .reason { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .tradeoffs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .bottleneck, .improve { padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); }
+    .bottleneck { background: rgba(251,113,133,.06); border-color: rgba(251,113,133,.22); }
+    .bottleneck h4 { color: #fb7185; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .improve { background: rgba(52,211,153,.06); border-color: rgba(52,211,153,.22); }
+    .improve h4 { color: #34d399; margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 900; }
+    .bottleneck ul, .improve ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+    .bottleneck li, .improve li { margin: 5px 0; }
+    .bottleneck b, .improve b { color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -231,6 +254,51 @@ flowchart LR
     Auth --> AuthDB[("ACL store")]
     Doc --> Search[("Search Index<br/>full-text")]
     Editor -. presence .-> Pres["Presence Service"]
+        </div>
+      </div>
+
+      <div class="flow-explain">
+        <h4>Cómo lo explico en la entrevista</h4>
+        <p><b>Apertura del doc.</b> User abre un documento. Cliente hace <code>GET /api/documents/{id}</code> que devuelve el snapshot más reciente y la versión actual (v1024). El cliente abre un WebSocket al Gateway con sticky session por <code>documentId</code> — esto es crítico, porque el Doc Service mantiene el estado del doc en memoria y todas las ops del mismo doc deben pasar por la misma instancia.</p>
+        <p><b>Edición concurrente.</b> User escribe. El editor genera ops locales (<code>insert pos 27 "rapid"</code>) y las envía vía WS con <code>baseVersion=1024</code>. El Doc Service: (1) recibe la op, (2) la transforma contra cualquier op concurrente que ya aplicó (Operational Transform) o la merge (CRDT), (3) la appendea al op log con <code>version=1025</code>, (4) la broadcastea a los demás clientes conectados al doc por Pub/Sub.</p>
+        <p><b>Resync de los demás.</b> Cada cliente recibe la op, la transforma contra sus pendientes locales, la aplica al DOM. Esto da consistencia eventual fuerte: todos convergen al mismo estado independientemente del orden de llegada.</p>
+        <p><b>Snapshots y permisos.</b> Cada ~5 min un job async genera un snapshot del estado y lo guarda. Esto acelera "abrir doc" — no necesitas replay completo del op log. Los permisos los chequeo al conectar y al hacer save (Zanzibar lookup), con cache para evitar el árbol completo.</p>
+        <p><b>Frase clave:</b> el documento es un append-only op log con OT/CRDT. Sticky por docId garantiza un solo transformador secuencial; snapshots aceleran la lectura inicial; permisos granulares vía Zanzibar.</p>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué cada componente</h2></div>
+      <div class="why">
+        <div class="why-item"><span class="comp">Sticky session por docId</span><span class="reason">Sin esto, dos pods aplicarían ops del mismo doc en paralelo y el log diverge.</span></div>
+        <div class="why-item"><span class="comp">WebSocket</span><span class="reason">Latencia de ms para colaboración. Polling no escala ni da la sensación de "en vivo".</span></div>
+        <div class="why-item"><span class="comp">OT vs CRDT</span><span class="reason">OT es lo de Google Docs original (transformaciones explícitas). CRDT es más distribuido pero merge complejo. Ambos válidos.</span></div>
+        <div class="why-item"><span class="comp">Op log append-only</span><span class="reason">Fuente de verdad. Permite revert, audit y reproducir cualquier versión.</span></div>
+        <div class="why-item"><span class="comp">Snapshots periódicos</span><span class="reason">Sin esto, abrir un doc con 10K ops lleva replay completo. Snapshot + delta es O(1) amortizado.</span></div>
+        <div class="why-item"><span class="comp">Pub/Sub broadcast</span><span class="reason">Fan-out a N clientes del doc sin que el Doc Service tenga que conocer cada conexión.</span></div>
+        <div class="why-item"><span class="comp">Zanzibar permissions</span><span class="reason">Modelo basado en relaciones (viewer/editor/owner). Granular sin árboles imposibles.</span></div>
+        <div class="why-item"><span class="comp">Presence service</span><span class="reason">Cursores remotos, avatares y selección — UX que diferencia colaborativo real de "edición compartida".</span></div>
+      </div>
+
+      <div class="tradeoffs">
+        <div class="bottleneck">
+          <h4>Cuellos de botella</h4>
+          <ul>
+            <li><b>Hot doc</b> con 100+ editores activos en una reunión grande.</li>
+            <li><b>Permission resolution recursivo</b> en árboles de carpetas profundas.</li>
+            <li><b>WebSocket reconnection storm</b> tras un deploy o falla parcial.</li>
+            <li><b>Op log size</b> en docs largos sin compactación.</li>
+            <li><b>Sticky LB y migración</b> cuando un pod falla con docs activos.</li>
+          </ul>
+        </div>
+        <div class="improve">
+          <h4>Mejoras / cómo escala</h4>
+          <ul>
+            <li><b>Compactación</b> del op log con snapshots y truncate del prefijo aplicado.</li>
+            <li><b>Permissions cache</b> con TTL e invalidación por path al cambiar herencia.</li>
+            <li><b>Heartbeat con backoff + jitter</b> para evitar reconnect storms.</li>
+            <li><b>Sharding por doc range</b> con migración en vivo (handoff state).</li>
+            <li><b>CRDT</b> en lugar de OT si necesitas multi-master geográfico.</li>
+            <li><b>Local-first</b> con sync diferido para offline-first.</li>
+          </ul>
         </div>
       </div>
     </section>
