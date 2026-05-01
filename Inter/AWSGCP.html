@@ -3,172 +3,173 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cloud Services Cheat Sheet | AWS vs GCP</title>
+  <title>Cloud Cheat Sheet · Google System Design Interview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f172a;
+      --bg: #0b1020;
+      --bg-2: #0f172a;
       --card: #111827;
       --card-2: #1e293b;
       --text: #e5e7eb;
+      --text-bright: #f8fafc;
       --muted: #94a3b8;
+      --dim: #64748b;
       --accent: #38bdf8;
       --accent-2: #a78bfa;
+      --google-blue: #4285f4;
+      --google-red: #ea4335;
+      --google-yellow: #fbbc04;
+      --google-green: #34a853;
       --aws: #ff9900;
       --gcp: #34a853;
-      --border: rgba(255, 255, 255, 0.12);
+      --gcp-strong: #fbbc04;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border: rgba(255, 255, 255, 0.10);
+      --border-bright: rgba(255, 255, 255, 0.18);
       --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 32%),
-        radial-gradient(circle at top right, rgba(167, 139, 250, 0.16), transparent 34%),
+        radial-gradient(circle at 0% 0%, rgba(66, 133, 244, 0.12), transparent 40%),
+        radial-gradient(circle at 100% 0%, rgba(167, 139, 250, 0.10), transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(52, 168, 83, 0.08), transparent 50%),
         var(--bg);
       color: var(--text);
-      line-height: 1.6;
-    }
-
-    .page {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 48px 0 72px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.25fr 0.75fr;
-      gap: 28px;
-      align-items: stretch;
-      margin-bottom: 28px;
-    }
-
-    .hero-main,
-    .hero-side,
-    .card {
-      border: 1px solid var(--border);
-      background: linear-gradient(145deg, rgba(17, 24, 39, 0.94), rgba(30, 41, 59, 0.82));
-      box-shadow: var(--shadow);
-      border-radius: 28px;
-    }
-
-    .hero-main {
-      padding: 38px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-main::after {
-      content: "";
-      position: absolute;
-      right: -90px;
-      top: -90px;
-      width: 240px;
-      height: 240px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(167, 139, 250, 0.18));
-      border-radius: 50%;
-      filter: blur(4px);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--accent);
-      background: rgba(56, 189, 248, 0.08);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      max-width: 780px;
-      font-size: clamp(36px, 6vw, 68px);
-      line-height: 0.96;
-      letter-spacing: -0.06em;
-    }
-
-    .subtitle {
-      position: relative;
-      z-index: 1;
-      margin: 22px 0 0;
-      max-width: 760px;
-      color: var(--muted);
-      font-size: 18px;
-    }
-
-    .hero-side {
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .mini-title {
-      margin: 0 0 12px;
-      font-size: 14px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-weight: 800;
-    }
-
-    .stack {
-      display: grid;
-      gap: 12px;
-    }
-
-    .pill {
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
-      font-weight: 700;
-    }
-
-    .pill span {
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin: 28px 0;
-    }
-
-    .card {
-      padding: 24px;
-    }
-
-    .card h2 {
-      margin: 0 0 8px;
-      font-size: 22px;
-      letter-spacing: -0.03em;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
+      line-height: 1.55;
       font-size: 15px;
     }
 
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ============ STICKY TOPBAR ============ */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 16, 32, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .brand .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--google-blue), var(--google-green));
+      box-shadow: 0 0 12px var(--google-blue);
+    }
+
+    .search-wrap {
+      position: relative;
+      max-width: 560px;
+      width: 100%;
+      justify-self: center;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 44px 10px 38px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-bright);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.15s;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    .search-wrap::before {
+      content: "🔍";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    .search-wrap kbd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 2px 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-bright);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .topnav {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .topnav a {
+      padding: 7px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .topnav a:hover {
+      color: var(--text-bright);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* ============ MAIN LAYOUT ============ */
+    .page {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 80px;
+    }
+
     .section {
-      margin-top: 30px;
+      margin-top: 36px;
+      scroll-margin-top: 80px;
     }
 
     .section-header {
@@ -176,556 +177,1721 @@
       justify-content: space-between;
       align-items: end;
       gap: 20px;
-      margin: 34px 0 16px;
+      margin: 0 0 16px;
     }
 
     .section-header h2 {
       margin: 0;
-      font-size: 30px;
-      letter-spacing: -0.04em;
+      font-size: 26px;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-header .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--google-blue), var(--google-green));
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
     }
 
     .section-header p {
       margin: 0;
       color: var(--muted);
-      max-width: 520px;
+      max-width: 560px;
+      font-size: 14px;
     }
 
+    /* ============ HERO ============ */
+    .hero {
+      padding: 28px 32px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.94), rgba(30, 41, 59, 0.7));
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(66, 133, 244, 0.18), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid rgba(52, 168, 83, 0.4);
+      border-radius: 999px;
+      color: var(--google-green);
+      background: rgba(52, 168, 83, 0.1);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 14px 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--google-blue), var(--google-green) 50%, var(--google-yellow));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero .subtitle {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 720px;
+    }
+
+    /* ============ CARDS / GRIDS ============ */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px; }
+
+    .card {
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.85), rgba(30, 41, 59, 0.6));
+      border-radius: 14px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card .icon {
+      font-size: 18px;
+    }
+
+    .card p, .card li {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .card ul { padding-left: 18px; margin: 6px 0 0; }
+    .card li { margin: 4px 0; }
+
+    /* ============ FRAMEWORK STEPS ============ */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .step {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(17, 24, 39, 0.7);
+      position: relative;
+      transition: all 0.15s;
+    }
+
+    .step:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .step .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--google-yellow);
+      letter-spacing: 0.1em;
+    }
+
+    .step .step-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin: 4px 0 6px;
+      letter-spacing: -0.01em;
+      color: var(--text-bright);
+    }
+
+    .step .step-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--google-blue);
+      font-weight: 600;
+    }
+
+    .step .step-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* ============ NUMBERS / METRIC CARDS ============ */
+    .numbers-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .num-card {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(17, 24, 39, 0.7);
+    }
+
+    .num-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .num-card .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--google-green);
+      letter-spacing: -0.02em;
+    }
+
+    .num-card .hint {
+      font-size: 12px;
+      color: var(--dim);
+      margin-top: 4px;
+    }
+
+    /* ============ TABLES ============ */
     .table-wrap {
       overflow: hidden;
       border: 1px solid var(--border);
-      border-radius: 24px;
-      background: rgba(15, 23, 42, 0.8);
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
       box-shadow: var(--shadow);
     }
+
+    .table-wrap.scrollable { overflow-x: auto; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     thead {
-      background: linear-gradient(90deg, rgba(56, 189, 248, 0.18), rgba(167, 139, 250, 0.14));
+      background: linear-gradient(90deg, rgba(66, 133, 244, 0.16), rgba(52, 168, 83, 0.12));
     }
 
-    th,
-    td {
-      padding: 16px 18px;
+    th, td {
+      padding: 12px 14px;
       text-align: left;
       vertical-align: top;
       border-bottom: 1px solid var(--border);
     }
 
     th {
-      color: #ffffff;
-      font-size: 13px;
+      color: var(--text-bright);
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-    }
-
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    tbody tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .aws {
-      color: var(--aws);
       font-weight: 800;
+      position: sticky;
+      top: 0;
     }
 
-    .gcp {
-      color: var(--gcp);
+    tbody tr { transition: background 0.1s; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .aws { color: var(--aws); font-weight: 700; }
+    .gcp { color: var(--gcp); font-weight: 700; }
+    .gcp-star {
+      color: var(--gcp-strong);
       font-weight: 800;
+      position: relative;
+    }
+    .gcp-star::after {
+      content: "★";
+      margin-left: 4px;
+      font-size: 11px;
+      color: var(--google-yellow);
     }
 
     .category {
-      color: #ffffff;
-      font-weight: 800;
+      color: var(--text-bright);
+      font-weight: 700;
+      font-size: 13px;
     }
 
+    .desc { color: var(--muted); font-size: 13px; }
+
+    /* ============ TAGS ============ */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tag-sql { background: rgba(66, 133, 244, 0.15); color: var(--google-blue); }
+    .tag-nosql { background: rgba(167, 139, 250, 0.15); color: var(--accent-2); }
+    .tag-cp { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    .tag-ap { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .tag-warm { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+
+    /* ============ QUOTE BLOCKS ============ */
     .quote {
-      margin-top: 28px;
-      padding: 28px;
-      border-radius: 24px;
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(167, 139, 250, 0.10));
+      margin-top: 16px;
+      padding: 18px 22px;
+      border-radius: 14px;
+      border-left: 3px solid var(--google-blue);
+      background: linear-gradient(90deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.05));
     }
 
     .quote p {
       margin: 0;
-      font-size: 18px;
-      color: #f8fafc;
+      font-size: 14px;
+      color: var(--text-bright);
+      font-style: italic;
     }
 
-    .example {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-top: 18px;
+    /* ============ KEY BINDING HINT ============ */
+    .kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-bright);
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-bright);
     }
 
-    .example-box {
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 22px;
-      background: rgba(255, 255, 255, 0.04);
+    /* ============ SEARCH HIGHLIGHTING ============ */
+    .hide { display: none !important; }
+    mark {
+      background: rgba(251, 188, 4, 0.35);
+      color: var(--text-bright);
+      padding: 0 2px;
+      border-radius: 2px;
     }
 
-    .example-box h3 {
-      margin: 0 0 14px;
-      font-size: 18px;
-    }
-
-    .example-box ul {
-      margin: 0;
-      padding-left: 20px;
+    .no-results {
+      padding: 40px;
+      text-align: center;
       color: var(--muted);
+      font-size: 15px;
     }
 
-    .example-box li {
-      margin: 8px 0;
+    /* ============ COLLAPSIBLE ============ */
+    details > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s;
     }
 
+    details > summary:hover { background: rgba(255, 255, 255, 0.06); }
+
+    details > summary::-webkit-details-marker { display: none; }
+
+    details > summary::before {
+      content: "▶";
+      font-size: 10px;
+      color: var(--accent);
+      transition: transform 0.15s;
+    }
+
+    details[open] > summary::before { transform: rotate(90deg); }
+
+    details[open] > summary { margin-bottom: 10px; }
+
+    /* ============ FOOTER ============ */
     .footer {
-      margin-top: 40px;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
       color: var(--muted);
       text-align: center;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    @media (max-width: 900px) {
-      .hero,
-      .grid,
-      .example {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-main {
-        padding: 30px;
-      }
-
-      .section-header {
-        align-items: start;
-        flex-direction: column;
-      }
-
-      table {
-        min-width: 820px;
-      }
-
-      .table-wrap {
-        overflow-x: auto;
-      }
+    .footer kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      margin: 0 2px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-bright);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-bright);
     }
 
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1100px) {
+      .topbar { grid-template-columns: 1fr; gap: 10px; }
+      .topnav { justify-content: center; }
+      .steps { grid-template-columns: repeat(3, 1fr); }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .numbers-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 760px) {
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .grid-4, .numbers-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps { grid-template-columns: 1fr; }
+      .table-wrap { overflow-x: auto; }
+      table { min-width: 620px; }
+      .hero { padding: 22px; }
+    }
+
+    /* ============ PRINT ============ */
     @media print {
-      body {
-        background: #ffffff;
-        color: #111827;
-      }
-
-      .hero-main,
-      .hero-side,
-      .card,
-      .table-wrap,
-      .quote,
-      .example-box {
+      .topbar, .topnav, .search-wrap { display: none; }
+      body { background: #fff; color: #111; }
+      .card, .hero, .table-wrap, .num-card, .step, .quote {
+        background: #fff;
+        border-color: #ccc;
         box-shadow: none;
-        background: #ffffff;
-        border-color: #d1d5db;
       }
-
-      .subtitle,
-      .card p,
-      .section-header p,
-      .example-box ul,
-      .footer {
-        color: #374151;
-      }
+      .muted, p { color: #333; }
+      h1, h2, h3 { color: #111; }
+      .gcp, .gcp-star { color: #2d7d3a; }
+      .aws { color: #b86400; }
     }
   </style>
 </head>
 <body>
+
+  <!-- ============ STICKY TOP BAR ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>Cloud SD · Google Interview</span>
+    </div>
+    <div class="search-wrap">
+      <input id="search" type="text" placeholder="Buscar servicio, patrón, número, palabra clave..." autocomplete="off" />
+      <kbd>/</kbd>
+    </div>
+    <nav class="topnav">
+      <a href="#framework">Framework</a>
+      <a href="#capacity">Capacidad</a>
+      <a href="#latency">Latencia</a>
+      <a href="#db">DB</a>
+      <a href="#patterns">Patrones</a>
+      <a href="#services">Servicios</a>
+      <a href="#examples">Ejemplos</a>
+      <a href="#questions">Preguntas</a>
+    </nav>
+  </header>
+
   <main class="page">
+
+    <!-- ============ HERO ============ -->
     <section class="hero">
-      <div class="hero-main">
-        <div class="badge">System Design Interview · Cloud Cheat Sheet</div>
-        <h1>Servicios de nube: AWS vs GCP</h1>
-        <p class="subtitle">
-          Guía rápida para defender decisiones técnicas en entrevistas de system design. Usa esta hoja para mapear necesidades del sistema con servicios equivalentes en AWS y Google Cloud Platform.
-        </p>
+      <span class="hero-badge">★ System Design Interview · Google</span>
+      <h1>Cloud Cheat Sheet · <span class="grad">GCP vs AWS</span></h1>
+      <p class="subtitle">
+        Hoja de referencia rápida para usar <strong>durante</strong> tu entrevista. Optimizada para Google: GCP primero, servicios "Google-native" destacados con ★, framework estructurado y números pre-computados. Presiona <span class="kbd">/</span> para buscar cualquier cosa.
+      </p>
+    </section>
+
+    <!-- ============ FRAMEWORK ============ -->
+    <section class="section" id="framework">
+      <div class="section-header">
+        <h2><span class="num">1</span> Framework de la entrevista</h2>
+        <p>Sigue estos 7 pasos en orden. Pierde 2 min y verbalizando cada uno: muestra estructura.</p>
       </div>
 
-      <aside class="hero-side">
-        <div>
-          <p class="mini-title">Regla mental</p>
-          <div class="stack">
-            <div class="pill">Compute <span>para correr lógica</span></div>
-            <div class="pill">Storage <span>para archivos grandes</span></div>
-            <div class="pill">Database <span>para datos operacionales</span></div>
-            <div class="pill">Queue <span>para desacoplar servicios</span></div>
-          </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">PASO 1</div>
+          <div class="step-title">Clarificar</div>
+          <div class="step-time">~5 min</div>
+          <div class="step-desc">Funcionales, no funcionales (latencia, consistencia, disponibilidad), usuarios, alcance.</div>
         </div>
-      </aside>
-    </section>
-
-    <section class="grid">
-      <div class="card">
-        <h2>Cómo contestar</h2>
-        <p>No menciones solo el servicio. Explica qué problema resuelve: latencia, escala, costo, seguridad, resiliencia o simplicidad operacional.</p>
-      </div>
-      <div class="card">
-        <h2>Frase útil</h2>
-        <p>“Separaría compute, storage, database, networking, messaging, security y observability para que cada capa escale de forma independiente.”</p>
-      </div>
-      <div class="card">
-        <h2>Tip de entrevista</h2>
-        <p>Primero diseña de forma simple. Luego agrega cache, colas, CDN, réplicas, monitoreo y rate limiting según el cuello de botella.</p>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <h2>Tabla principal</h2>
-        <p>Equivalencias prácticas entre AWS y GCP para elegir servicios durante una entrevista.</p>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Necesidad</th>
-              <th>Uso en system design</th>
-              <th>AWS</th>
-              <th>GCP</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="category">Virtual machines</td>
-              <td>Servidores tradicionales configurables.</td>
-              <td class="aws">EC2</td>
-              <td class="gcp">Compute Engine</td>
-            </tr>
-            <tr>
-              <td class="category">Contenedores administrados</td>
-              <td>Correr microservicios en Docker con menos operación.</td>
-              <td class="aws">ECS / Fargate</td>
-              <td class="gcp">Cloud Run</td>
-            </tr>
-            <tr>
-              <td class="category">Kubernetes</td>
-              <td>Orquestar muchos microservicios containerizados.</td>
-              <td class="aws">EKS</td>
-              <td class="gcp">GKE</td>
-            </tr>
-            <tr>
-              <td class="category">Serverless functions</td>
-              <td>Ejecutar código por eventos sin administrar servidores.</td>
-              <td class="aws">Lambda</td>
-              <td class="gcp">Cloud Functions</td>
-            </tr>
-            <tr>
-              <td class="category">Object storage</td>
-              <td>Guardar imágenes, documentos, videos, backups o archivos grandes.</td>
-              <td class="aws">S3</td>
-              <td class="gcp">Cloud Storage</td>
-            </tr>
-            <tr>
-              <td class="category">Block storage</td>
-              <td>Disco persistente para una máquina virtual.</td>
-              <td class="aws">EBS</td>
-              <td class="gcp">Persistent Disk</td>
-            </tr>
-            <tr>
-              <td class="category">File storage</td>
-              <td>File system compartido entre servidores.</td>
-              <td class="aws">EFS</td>
-              <td class="gcp">Filestore</td>
-            </tr>
-            <tr>
-              <td class="category">Load balancer</td>
-              <td>Distribuir tráfico entre múltiples instancias o servicios.</td>
-              <td class="aws">Elastic Load Balancing</td>
-              <td class="gcp">Cloud Load Balancing</td>
-            </tr>
-            <tr>
-              <td class="category">CDN</td>
-              <td>Servir contenido estático cerca del usuario.</td>
-              <td class="aws">CloudFront</td>
-              <td class="gcp">Cloud CDN</td>
-            </tr>
-            <tr>
-              <td class="category">DNS</td>
-              <td>Resolver dominios como api.miapp.com.</td>
-              <td class="aws">Route 53</td>
-              <td class="gcp">Cloud DNS</td>
-            </tr>
-            <tr>
-              <td class="category">Red privada</td>
-              <td>Aislar servicios, subredes, firewalls y reglas de tráfico.</td>
-              <td class="aws">VPC</td>
-              <td class="gcp">VPC</td>
-            </tr>
-            <tr>
-              <td class="category">SQL administrado</td>
-              <td>Base relacional para transacciones, consistencia y relaciones claras.</td>
-              <td class="aws">RDS</td>
-              <td class="gcp">Cloud SQL</td>
-            </tr>
-            <tr>
-              <td class="category">SQL global / escala alta</td>
-              <td>SQL distribuido, alta disponibilidad y escala regional o global.</td>
-              <td class="aws">Aurora</td>
-              <td class="gcp">Cloud Spanner</td>
-            </tr>
-            <tr>
-              <td class="category">NoSQL</td>
-              <td>Baja latencia, escala horizontal y patrones de acceso simples.</td>
-              <td class="aws">DynamoDB</td>
-              <td class="gcp">Firestore</td>
-            </tr>
-            <tr>
-              <td class="category">Wide-column</td>
-              <td>Volumen masivo, time series, logs o lecturas de muy baja latencia.</td>
-              <td class="aws">Keyspaces / DynamoDB</td>
-              <td class="gcp">Bigtable</td>
-            </tr>
-            <tr>
-              <td class="category">Cache</td>
-              <td>Reducir latencia y carga en la base de datos.</td>
-              <td class="aws">ElastiCache</td>
-              <td class="gcp">Memorystore</td>
-            </tr>
-            <tr>
-              <td class="category">Data warehouse</td>
-              <td>Analítica SQL sobre grandes volúmenes de datos.</td>
-              <td class="aws">Redshift</td>
-              <td class="gcp">BigQuery</td>
-            </tr>
-            <tr>
-              <td class="category">Data lake</td>
-              <td>Guardar datos crudos para analytics, ML o auditoría.</td>
-              <td class="aws">S3 + Lake Formation</td>
-              <td class="gcp">Cloud Storage + Dataplex</td>
-            </tr>
-            <tr>
-              <td class="category">Queue</td>
-              <td>Desacoplar servicios y procesar trabajos asíncronos.</td>
-              <td class="aws">SQS</td>
-              <td class="gcp">Pub/Sub</td>
-            </tr>
-            <tr>
-              <td class="category">Pub/Sub events</td>
-              <td>Publicar eventos para múltiples consumidores.</td>
-              <td class="aws">SNS</td>
-              <td class="gcp">Pub/Sub</td>
-            </tr>
-            <tr>
-              <td class="category">Streaming</td>
-              <td>Procesar eventos en tiempo real.</td>
-              <td class="aws">Kinesis</td>
-              <td class="gcp">Pub/Sub + Dataflow</td>
-            </tr>
-            <tr>
-              <td class="category">Workflow</td>
-              <td>Coordinar procesos con múltiples pasos.</td>
-              <td class="aws">Step Functions</td>
-              <td class="gcp">Workflows</td>
-            </tr>
-            <tr>
-              <td class="category">API Gateway</td>
-              <td>Exponer APIs, autenticar, limitar tráfico y enrutar requests.</td>
-              <td class="aws">API Gateway</td>
-              <td class="gcp">API Gateway / Apigee</td>
-            </tr>
-            <tr>
-              <td class="category">IAM</td>
-              <td>Roles, permisos y control de acceso.</td>
-              <td class="aws">IAM</td>
-              <td class="gcp">IAM</td>
-            </tr>
-            <tr>
-              <td class="category">Secrets</td>
-              <td>Guardar passwords, tokens y API keys.</td>
-              <td class="aws">Secrets Manager</td>
-              <td class="gcp">Secret Manager</td>
-            </tr>
-            <tr>
-              <td class="category">KMS</td>
-              <td>Manejo de llaves de cifrado.</td>
-              <td class="aws">KMS</td>
-              <td class="gcp">Cloud KMS</td>
-            </tr>
-            <tr>
-              <td class="category">Logs</td>
-              <td>Consultar logs de aplicaciones y servicios.</td>
-              <td class="aws">CloudWatch Logs</td>
-              <td class="gcp">Cloud Logging</td>
-            </tr>
-            <tr>
-              <td class="category">Métricas y alertas</td>
-              <td>Monitoreo, dashboards, alertas y salud del sistema.</td>
-              <td class="aws">CloudWatch</td>
-              <td class="gcp">Cloud Monitoring</td>
-            </tr>
-            <tr>
-              <td class="category">Tracing</td>
-              <td>Seguir requests entre microservicios.</td>
-              <td class="aws">X-Ray</td>
-              <td class="gcp">Cloud Trace</td>
-            </tr>
-            <tr>
-              <td class="category">CI/CD</td>
-              <td>Build, test y deploy automatizado.</td>
-              <td class="aws">CodeBuild / CodePipeline</td>
-              <td class="gcp">Cloud Build / Cloud Deploy</td>
-            </tr>
-            <tr>
-              <td class="category">Container registry</td>
-              <td>Guardar imágenes Docker.</td>
-              <td class="aws">ECR</td>
-              <td class="gcp">Artifact Registry</td>
-            </tr>
-            <tr>
-              <td class="category">ML platform</td>
-              <td>Entrenar, desplegar y monitorear modelos de machine learning.</td>
-              <td class="aws">SageMaker</td>
-              <td class="gcp">Vertex AI</td>
-            </tr>
-            <tr>
-              <td class="category">Batch jobs</td>
-              <td>Procesar trabajos pesados de forma asíncrona.</td>
-              <td class="aws">AWS Batch</td>
-              <td class="gcp">Cloud Batch</td>
-            </tr>
-            <tr>
-              <td class="category">WAF / DDoS</td>
-              <td>Proteger aplicaciones públicas contra ataques y abuso.</td>
-              <td class="aws">AWS WAF + Shield</td>
-              <td class="gcp">Cloud Armor</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <h2>Servicios que debes memorizar</h2>
-        <p>Estos son suficientes para defender la mayoría de diseños de nivel entrevista.</p>
+        <div class="step">
+          <div class="step-num">PASO 2</div>
+          <div class="step-title">Estimar</div>
+          <div class="step-time">~5 min</div>
+          <div class="step-desc">DAU, QPS read/write, storage, bandwidth. Razona en voz alta con números redondos.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 3</div>
+          <div class="step-title">API Design</div>
+          <div class="step-time">~5 min</div>
+          <div class="step-desc">REST/gRPC. Endpoints, params, response. Esquema de datos básico.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 4</div>
+          <div class="step-title">High-Level</div>
+          <div class="step-time">~10 min</div>
+          <div class="step-desc">Diagrama: client → LB → API → service → DB. Cache, queue, CDN si aplica.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 5</div>
+          <div class="step-title">Deep Dive</div>
+          <div class="step-time">~10 min</div>
+          <div class="step-desc">El entrevistador elige un componente. Sharding, replicación, índices, consistencia.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 6</div>
+          <div class="step-title">Bottlenecks</div>
+          <div class="step-time">~5 min</div>
+          <div class="step-desc">¿Qué falla primero? SPOF, hot partitions, thundering herd. Plan B.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 7</div>
+          <div class="step-title">Wrap Up</div>
+          <div class="step-time">~5 min</div>
+          <div class="step-desc">Monitoring, observability, security, futuras extensiones.</div>
+        </div>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Categoría</th>
-              <th>AWS</th>
-              <th>GCP</th>
-              <th>Frase de defensa</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="category">Compute</td>
-              <td class="aws">EC2 / ECS / Lambda</td>
-              <td class="gcp">Compute Engine / Cloud Run / Cloud Functions</td>
-              <td>Uso compute para correr la lógica del backend.</td>
-            </tr>
-            <tr>
-              <td class="category">Storage</td>
-              <td class="aws">S3</td>
-              <td class="gcp">Cloud Storage</td>
-              <td>Uso object storage para archivos grandes y durables.</td>
-            </tr>
-            <tr>
-              <td class="category">SQL</td>
-              <td class="aws">RDS</td>
-              <td class="gcp">Cloud SQL</td>
-              <td>Uso SQL cuando necesito transacciones y relaciones claras.</td>
-            </tr>
-            <tr>
-              <td class="category">NoSQL</td>
-              <td class="aws">DynamoDB</td>
-              <td class="gcp">Firestore</td>
-              <td>Uso NoSQL para baja latencia y escala horizontal.</td>
-            </tr>
-            <tr>
-              <td class="category">Cache</td>
-              <td class="aws">ElastiCache</td>
-              <td class="gcp">Memorystore</td>
-              <td>Uso cache para reducir latencia y lecturas repetidas.</td>
-            </tr>
-            <tr>
-              <td class="category">Queue</td>
-              <td class="aws">SQS</td>
-              <td class="gcp">Pub/Sub</td>
-              <td>Uso colas para desacoplar servicios y absorber picos.</td>
-            </tr>
-            <tr>
-              <td class="category">CDN</td>
-              <td class="aws">CloudFront</td>
-              <td class="gcp">Cloud CDN</td>
-              <td>Uso CDN para acercar contenido estático al usuario.</td>
-            </tr>
-            <tr>
-              <td class="category">Monitoring</td>
-              <td class="aws">CloudWatch</td>
-              <td class="gcp">Cloud Monitoring</td>
-              <td>Uso monitoreo para detectar errores, latencia y saturación.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-header">
-        <h2>Ejemplo: API de documentos</h2>
-        <p>Aplicado a POST, GET y PUT de documentos.</p>
-      </div>
-
-      <div class="example">
-        <div class="example-box">
-          <h3>Versión AWS</h3>
+      <div class="grid-3">
+        <div class="card">
+          <h3><span class="icon">❓</span> Preguntas que SIEMPRE haces</h3>
           <ul>
-            <li><strong>API pública:</strong> API Gateway</li>
-            <li><strong>Backend:</strong> ECS/Fargate, EKS o Lambda</li>
-            <li><strong>Metadata:</strong> RDS o DynamoDB</li>
-            <li><strong>Contenido:</strong> S3</li>
-            <li><strong>Cache:</strong> ElastiCache</li>
-            <li><strong>Procesamiento async:</strong> SQS</li>
-            <li><strong>Observabilidad:</strong> CloudWatch</li>
+            <li>¿Cuántos usuarios activos diarios?</li>
+            <li>¿Read-heavy o write-heavy?</li>
+            <li>¿Latencia aceptable? (p50/p99)</li>
+            <li>¿Consistencia fuerte o eventual?</li>
+            <li>¿Global o regional?</li>
+            <li>¿Tamaño promedio del payload?</li>
           </ul>
         </div>
-
-        <div class="example-box">
-          <h3>Versión GCP</h3>
+        <div class="card">
+          <h3><span class="icon">🎯</span> Frase de oro al iniciar</h3>
+          <p style="color: var(--text-bright); font-style: italic; font-size: 13.5px;">"Primero voy a clarificar requisitos y estimar escala, luego diseñar el API y la arquitectura de alto nivel. Después profundizo donde quieras. Voy a separar compute, storage, database y messaging para que escalen independientemente."</p>
+        </div>
+        <div class="card">
+          <h3><span class="icon">⚠️</span> Errores comunes</h3>
           <ul>
-            <li><strong>API pública:</strong> API Gateway o Apigee</li>
-            <li><strong>Backend:</strong> Cloud Run, GKE o Cloud Functions</li>
-            <li><strong>Metadata:</strong> Cloud SQL o Firestore</li>
-            <li><strong>Contenido:</strong> Cloud Storage</li>
-            <li><strong>Cache:</strong> Memorystore</li>
-            <li><strong>Procesamiento async:</strong> Pub/Sub</li>
-            <li><strong>Observabilidad:</strong> Cloud Logging + Monitoring</li>
+            <li>Saltar a la solución sin clarificar</li>
+            <li>Mencionar servicios sin justificar</li>
+            <li>No estimar números reales</li>
+            <li>Diseñar para 1B usuarios desde el inicio</li>
+            <li>Olvidar monitoring y failure modes</li>
+            <li>No mencionar trade-offs</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CAPACITY ESTIMATION ============ -->
+    <section class="section" id="capacity">
+      <div class="section-header">
+        <h2><span class="num">2</span> Estimación de capacidad</h2>
+        <p>Números que debes tener pre-computados. Redondea siempre. Verbaliza tus cálculos.</p>
+      </div>
+
+      <div class="numbers-grid">
+        <div class="num-card">
+          <div class="label">Segundos por día</div>
+          <div class="value">86,400</div>
+          <div class="hint">≈ 100K (úsalo para QPS rápido)</div>
+        </div>
+        <div class="num-card">
+          <div class="label">Segundos por mes</div>
+          <div class="value">2.5M</div>
+          <div class="hint">30 días × 86,400</div>
+        </div>
+        <div class="num-card">
+          <div class="label">Segundos por año</div>
+          <div class="value">~30M</div>
+          <div class="hint">365 × 86,400 ≈ 31.5M</div>
+        </div>
+        <div class="num-card">
+          <div class="label">QPS · 1M req/día</div>
+          <div class="value">~12</div>
+          <div class="hint">1M / 86,400</div>
+        </div>
+        <div class="num-card">
+          <div class="label">QPS · 100M req/día</div>
+          <div class="value">~1,200</div>
+          <div class="hint">Pico ≈ 2-3x avg</div>
+        </div>
+        <div class="num-card">
+          <div class="label">QPS · 1B req/día</div>
+          <div class="value">~12,000</div>
+          <div class="hint">Pico ≈ 30K QPS</div>
+        </div>
+        <div class="num-card">
+          <div class="label">Read:Write social</div>
+          <div class="value">100 : 1</div>
+          <div class="hint">Twitter/IG approx</div>
+        </div>
+        <div class="num-card">
+          <div class="label">Read:Write commerce</div>
+          <div class="value">10 : 1</div>
+          <div class="hint">Amazon-style</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 18px;">
+        <div class="card">
+          <h3><span class="icon">💾</span> Tamaños de referencia</h3>
+          <ul style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">
+            <li>Char ASCII: <strong>1 byte</strong></li>
+            <li>Char UTF-8: <strong>1-4 bytes</strong></li>
+            <li>UUID: <strong>16 bytes</strong> (36 chars string)</li>
+            <li>Timestamp: <strong>8 bytes</strong> (int64)</li>
+            <li>Tweet/post: <strong>~1 KB</strong></li>
+            <li>Imagen JPEG: <strong>~200 KB - 2 MB</strong></li>
+            <li>Video 1 min HD: <strong>~50 MB</strong></li>
+            <li>Página web promedio: <strong>~2 MB</strong></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📐</span> Plantilla de cálculo</h3>
+          <ul style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.7;">
+            <li><strong>QPS</strong> = DAU × actions/user / 86,400</li>
+            <li><strong>Pico QPS</strong> ≈ avg × 2-3</li>
+            <li><strong>Storage/día</strong> = QPS × payload × 86,400</li>
+            <li><strong>Storage 5 años</strong> = storage/día × 1,825</li>
+            <li><strong>Bandwidth</strong> = QPS × payload (bits)</li>
+            <li><strong>Cache size</strong> = 20% del hot data (regla 80/20)</li>
+            <li><strong>Replicas</strong> = redundancia × 3 (típico)</li>
           </ul>
         </div>
       </div>
 
       <div class="quote">
-        <p>
-          “Para documentos grandes, no guardaría el contenido completo en la base de datos. Guardaría metadata en SQL o NoSQL y el archivo en object storage. Para tareas pesadas como indexar, extraer texto o generar thumbnails, usaría una cola para procesarlas de forma asíncrona.”
-        </p>
+        <p>"Para 100M DAU con 10 acciones diarias: 1B requests/día → ~12K QPS promedio, ~30K QPS pico. Si cada request escribe 1KB, son 1TB/día, 365TB/año. Necesito sharding desde el inicio."</p>
       </div>
     </section>
 
-    <p class="footer">Cloud Services Cheat Sheet · AWS vs GCP · Preparación para System Design Interview</p>
+    <!-- ============ LATENCY NUMBERS ============ -->
+    <section class="section" id="latency">
+      <div class="section-header">
+        <h2><span class="num">3</span> Latency numbers (Jeff Dean)</h2>
+        <p>Clásico de Google. Si te preguntan cualquier cosa de latencia, estos son los números.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40%;">Operación</th>
+              <th style="width: 25%;">Latencia</th>
+              <th>Comparación mental</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="category">L1 cache reference</td>
+              <td class="mono" style="color: var(--success);">0.5 ns</td>
+              <td class="desc">Base · 1 ciclo de CPU moderna</td>
+            </tr>
+            <tr>
+              <td class="category">Branch mispredict</td>
+              <td class="mono" style="color: var(--success);">5 ns</td>
+              <td class="desc">10× L1</td>
+            </tr>
+            <tr>
+              <td class="category">L2 cache reference</td>
+              <td class="mono" style="color: var(--success);">7 ns</td>
+              <td class="desc">14× L1</td>
+            </tr>
+            <tr>
+              <td class="category">Mutex lock/unlock</td>
+              <td class="mono" style="color: var(--success);">25 ns</td>
+              <td class="desc">50× L1</td>
+            </tr>
+            <tr>
+              <td class="category">Main memory reference (RAM)</td>
+              <td class="mono" style="color: var(--success);">100 ns</td>
+              <td class="desc">200× L1 · 20× L2</td>
+            </tr>
+            <tr>
+              <td class="category">Compress 1KB con Zippy/Snappy</td>
+              <td class="mono" style="color: var(--warning);">3 μs</td>
+              <td class="desc">30,000× L1</td>
+            </tr>
+            <tr>
+              <td class="category">Send 1KB sobre red 1 Gbps</td>
+              <td class="mono" style="color: var(--warning);">10 μs</td>
+              <td class="desc">100,000× L1</td>
+            </tr>
+            <tr>
+              <td class="category">Read 1MB secuencial de RAM</td>
+              <td class="mono" style="color: var(--warning);">250 μs</td>
+              <td class="desc">2.5M× L1</td>
+            </tr>
+            <tr>
+              <td class="category">Round trip mismo datacenter</td>
+              <td class="mono" style="color: var(--warning);">500 μs (0.5 ms)</td>
+              <td class="desc">El "barómetro" del datacenter</td>
+            </tr>
+            <tr>
+              <td class="category">Read 1MB secuencial de SSD</td>
+              <td class="mono" style="color: var(--danger);">1 ms</td>
+              <td class="desc">4× faster than disk</td>
+            </tr>
+            <tr>
+              <td class="category">Disk seek (HDD)</td>
+              <td class="mono" style="color: var(--danger);">10 ms</td>
+              <td class="desc">20× round trip · ¡Evítalo!</td>
+            </tr>
+            <tr>
+              <td class="category">Read 1MB secuencial de disk (HDD)</td>
+              <td class="mono" style="color: var(--danger);">30 ms</td>
+              <td class="desc">120× SSD</td>
+            </tr>
+            <tr>
+              <td class="category">Round trip CA → Netherlands → CA</td>
+              <td class="mono" style="color: var(--danger);">150 ms</td>
+              <td class="desc">300× datacenter · CDN!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-3" style="margin-top: 16px;">
+        <div class="card">
+          <h3><span class="icon">⚡</span> Targets típicos</h3>
+          <ul>
+            <li><strong>API p50:</strong> &lt; 100ms</li>
+            <li><strong>API p99:</strong> &lt; 500ms</li>
+            <li><strong>Page load:</strong> &lt; 2s</li>
+            <li><strong>Search autocomplete:</strong> &lt; 50ms</li>
+            <li><strong>Video start:</strong> &lt; 2s</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🌐</span> Memoria vs disco vs red</h3>
+          <p style="font-size: 13px;">Si <strong>RAM = 1 segundo</strong>, entonces:<br>
+          <span class="mono">SSD ≈ 10 segundos</span><br>
+          <span class="mono">HDD seek ≈ 100 segundos</span><br>
+          <span class="mono">Datacenter RTT ≈ 5 segundos</span><br>
+          <span class="mono">Cross-continent ≈ 25 minutos</span></p>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📊</span> Throughput SSD vs HDD</h3>
+          <ul>
+            <li><strong>HDD:</strong> ~100 MB/s seq, ~100 IOPS random</li>
+            <li><strong>SSD:</strong> ~500 MB/s seq, ~10K IOPS</li>
+            <li><strong>NVMe:</strong> ~3 GB/s seq, ~500K IOPS</li>
+            <li><strong>RAM:</strong> ~10 GB/s</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DATABASES ============ -->
+    <section class="section" id="db">
+      <div class="section-header">
+        <h2><span class="num">4</span> Bases de datos · decisión rápida</h2>
+        <p>SQL, NoSQL, CAP. La pregunta no es "cuál es mejor", es "cuál encaja con mis requisitos".</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 14%;">Tipo</th>
+              <th style="width: 26%;">Cuándo usar</th>
+              <th style="width: 22%;">GCP</th>
+              <th style="width: 18%;">AWS</th>
+              <th>CAP / Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag tag-sql">SQL</span></td>
+              <td class="desc">Transacciones ACID, joins, schema fijo, relaciones complejas. Pagos, ledger, inventario.</td>
+              <td class="gcp">Cloud SQL <span class="desc">(Postgres/MySQL)</span></td>
+              <td class="aws">RDS</td>
+              <td><span class="tag tag-cp">CP</span> Vertical scale primero</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-sql">SQL global</span></td>
+              <td class="desc">Consistencia fuerte + escala horizontal + global. Inventario multi-región, finanzas globales.</td>
+              <td class="gcp-star">Cloud Spanner</td>
+              <td class="aws">Aurora Global</td>
+              <td><span class="tag tag-cp">CP+HA</span> TrueTime · Único en el mercado</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-nosql">Document</span></td>
+              <td class="desc">Schema flexible, datos anidados, mobile/web apps, real-time sync.</td>
+              <td class="gcp">Firestore</td>
+              <td class="aws">DynamoDB</td>
+              <td><span class="tag tag-ap">AP</span> Strong opcional</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-nosql">Key-Value</span></td>
+              <td class="desc">Lookups simples por key, alta escritura, baja latencia. Sesiones, carrito, perfiles.</td>
+              <td class="gcp">Firestore / Memorystore</td>
+              <td class="aws">DynamoDB</td>
+              <td><span class="tag tag-ap">AP</span> O(1) lookup</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-nosql">Wide-column</span></td>
+              <td class="desc">Volúmenes masivos (PB), time series, IoT, métricas, logs, ad analytics. Writes muy altos.</td>
+              <td class="gcp-star">Bigtable</td>
+              <td class="aws">Keyspaces</td>
+              <td><span class="tag tag-cp">CP</span> Mismo motor que Gmail/Maps/Search</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-nosql">Graph</span></td>
+              <td class="desc">Relaciones complejas: redes sociales, fraude, recomendaciones, knowledge graph.</td>
+              <td class="gcp">Spanner Graph / Neo4j en VM</td>
+              <td class="aws">Neptune</td>
+              <td><span class="tag tag-cp">CP</span> Cypher / Gremlin</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-warm">Search</span></td>
+              <td class="desc">Full-text search, facets, autocompletado, ranking. Catálogos, logs analytics.</td>
+              <td class="gcp">Elasticsearch en GKE</td>
+              <td class="aws">OpenSearch</td>
+              <td><span class="tag tag-ap">AP</span> Inverted index</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-warm">Cache</span></td>
+              <td class="desc">Reducir lecturas repetidas a la DB, sesiones, rate limiting, leaderboards.</td>
+              <td class="gcp">Memorystore <span class="desc">(Redis/Memcached)</span></td>
+              <td class="aws">ElastiCache</td>
+              <td><span class="tag tag-ap">AP</span> En memoria · TTL</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-warm">Warehouse</span></td>
+              <td class="desc">Analítica SQL sobre PB de datos. Reportes, BI, ad-hoc queries históricas.</td>
+              <td class="gcp-star">BigQuery</td>
+              <td class="aws">Redshift</td>
+              <td><span class="tag tag-cp">OLAP</span> Serverless · Columnar</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-warm">Object</span></td>
+              <td class="desc">Archivos grandes inmutables: imágenes, videos, backups, data lake.</td>
+              <td class="gcp">Cloud Storage</td>
+              <td class="aws">S3</td>
+              <td><span class="tag tag-ap">AP</span> 11 nines durabilidad</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-3" style="margin-top: 16px;">
+        <div class="card">
+          <h3><span class="icon">🎯</span> CAP Theorem (en 30 seg)</h3>
+          <p style="font-size: 13.5px;">En presencia de <strong>partición de red</strong>, eliges entre <strong>consistencia</strong> o <strong>disponibilidad</strong>.</p>
+          <ul>
+            <li><span class="tag tag-cp">CP</span> Spanner, Bigtable, HBase, Mongo</li>
+            <li><span class="tag tag-ap">AP</span> Cassandra, Dynamo, Couchbase</li>
+            <li><strong>Spanner</strong>: CP pero con 99.999% (TrueTime)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📚</span> ACID vs BASE</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>ACID:</strong> Atomicity, Consistency, Isolation, Durability. SQL clásico.</li>
+            <li><strong>BASE:</strong> Basically Available, Soft state, Eventually consistent. NoSQL.</li>
+            <li><strong>Trade-off:</strong> ACID = correctness, BASE = scale.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🇬🇴</span> Tip Google-specific</h3>
+          <p style="font-size: 13.5px;">A Google le encanta cuando mencionas <strong>Spanner</strong> (lo inventaron), <strong>Bigtable</strong> (lo inventaron), <strong>BigQuery</strong> (Dremel paper). Si encajan con el problema, úsalos. Justifica con TrueTime, escala global, o columnar storage.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COMMON PATTERNS ============ -->
+    <section class="section" id="patterns">
+      <div class="section-header">
+        <h2><span class="num">5</span> Patrones comunes</h2>
+        <p>Lo que el entrevistador espera que menciones cuando hay escala, picos, o consistencia.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3><span class="icon">🚦</span> Rate Limiting</h3>
+          <ul>
+            <li><strong>Token bucket:</strong> permite bursts, refill constante. Default.</li>
+            <li><strong>Leaky bucket:</strong> tasa fija, suaviza. Para protección.</li>
+            <li><strong>Fixed window:</strong> simple, pero pico al borde.</li>
+            <li><strong>Sliding window:</strong> preciso, más memoria.</li>
+            <li><strong>Distribuido:</strong> Redis con INCR + TTL atómico.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🔪</span> Sharding / Partitioning</h3>
+          <ul>
+            <li><strong>Hash:</strong> uniforme, pero re-shard duele.</li>
+            <li><strong>Consistent hashing:</strong> minimiza movimiento al re-shard.</li>
+            <li><strong>Range:</strong> queries por rango eficientes; hot spots si skewed.</li>
+            <li><strong>Geographic:</strong> latencia baja, regulación.</li>
+            <li><strong>Hot partition:</strong> evita con salt en el key.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📚</span> Replicación</h3>
+          <ul>
+            <li><strong>Leader-Follower:</strong> writes a leader, reads de followers. Lag eventual.</li>
+            <li><strong>Multi-leader:</strong> writes en cualquier región. Conflictos.</li>
+            <li><strong>Leaderless (Dynamo):</strong> quorum R+W&gt;N para consistencia.</li>
+            <li><strong>Sync vs async:</strong> trade-off latencia vs durabilidad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🧊</span> Caching</h3>
+          <ul>
+            <li><strong>Cache-aside (lazy):</strong> app lee cache, si miss → DB → escribe cache.</li>
+            <li><strong>Write-through:</strong> escribe a cache y DB juntos.</li>
+            <li><strong>Write-back:</strong> escribe a cache, async a DB. Riesgo de pérdida.</li>
+            <li><strong>Eviction:</strong> LRU, LFU, TTL.</li>
+            <li><strong>Stampede:</strong> mutex, jittered TTL, request coalescing.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">⚖️</span> Load Balancing</h3>
+          <ul>
+            <li><strong>L4 (TCP):</strong> rápido, sin contexto de app.</li>
+            <li><strong>L7 (HTTP):</strong> routing por path/header, slower.</li>
+            <li><strong>Round robin / least conn / IP hash.</strong></li>
+            <li><strong>Health checks</strong> + circuit breaker.</li>
+            <li><strong>GCP:</strong> Cloud Load Balancing (anycast global).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📨</span> Queue vs Pub/Sub</h3>
+          <ul>
+            <li><strong>Queue (SQS):</strong> 1 mensaje → 1 consumidor. Trabajo distribuido.</li>
+            <li><strong>Pub/Sub (GCP):</strong> 1 mensaje → N consumidores. Fan-out de eventos.</li>
+            <li><strong>Pub/Sub de Google</strong> hace ambos. AWS los separa (SQS+SNS).</li>
+            <li><strong>Idempotencia:</strong> los consumidores deben tolerar duplicados.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">💥</span> Resilience patterns</h3>
+          <ul>
+            <li><strong>Retry con exponential backoff + jitter</strong></li>
+            <li><strong>Circuit breaker:</strong> abre tras N fallos, evita cascada.</li>
+            <li><strong>Bulkhead:</strong> aísla recursos por consumidor.</li>
+            <li><strong>Timeout</strong> en cada llamada de red.</li>
+            <li><strong>Idempotency keys</strong> para writes.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🔐</span> Consistencia</h3>
+          <ul>
+            <li><strong>Strong:</strong> read ve último write (Spanner).</li>
+            <li><strong>Eventual:</strong> converge eventualmente (DNS, Dynamo).</li>
+            <li><strong>Read-your-writes:</strong> tu propio write es visible.</li>
+            <li><strong>Causal:</strong> orden causal preservado.</li>
+            <li><strong>Linearizability &gt; serializability &gt; causal &gt; eventual.</strong></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🆔</span> ID generation</h3>
+          <ul>
+            <li><strong>UUID v4:</strong> 128 bits, sin coordinación, no ordenable.</li>
+            <li><strong>ULID / KSUID:</strong> ordenables por tiempo.</li>
+            <li><strong>Snowflake (Twitter):</strong> 64 bits, time + machine + seq.</li>
+            <li><strong>Auto-increment:</strong> SPOF, no escala global.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section class="section" id="services">
+      <div class="section-header">
+        <h2><span class="num">6</span> Equivalencias GCP ↔ AWS</h2>
+        <p>★ = servicio donde GCP es referencia/líder. Menciónalo si encaja con el problema.</p>
+      </div>
+
+      <details open>
+        <summary>Compute & Containers</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">Virtual machines</td>
+                <td class="desc">Servidores tradicionales, lift-and-shift, control total.</td>
+                <td class="gcp">Compute Engine</td>
+                <td class="aws">EC2</td>
+              </tr>
+              <tr>
+                <td class="category">Containers serverless</td>
+                <td class="desc">Microservicios HTTP sin gestionar infra. Scale to zero.</td>
+                <td class="gcp-star">Cloud Run</td>
+                <td class="aws">ECS Fargate / App Runner</td>
+              </tr>
+              <tr>
+                <td class="category">Kubernetes</td>
+                <td class="desc">Orquestar muchos microservicios, control granular.</td>
+                <td class="gcp-star">GKE</td>
+                <td class="aws">EKS</td>
+              </tr>
+              <tr>
+                <td class="category">Serverless functions</td>
+                <td class="desc">Código por eventos: triggers de storage, queue, HTTP.</td>
+                <td class="gcp">Cloud Functions</td>
+                <td class="aws">Lambda</td>
+              </tr>
+              <tr>
+                <td class="category">Batch jobs</td>
+                <td class="desc">Procesamiento pesado offline, ML training, ETL.</td>
+                <td class="gcp">Cloud Batch / Dataflow</td>
+                <td class="aws">AWS Batch</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>Storage</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">Object storage</td>
+                <td class="desc">Archivos grandes inmutables: imágenes, videos, backups, data lake. 11 nines durabilidad.</td>
+                <td class="gcp">Cloud Storage</td>
+                <td class="aws">S3</td>
+              </tr>
+              <tr>
+                <td class="category">Block storage</td>
+                <td class="desc">Disco persistente para una VM. Bases de datos auto-administradas.</td>
+                <td class="gcp">Persistent Disk / Hyperdisk</td>
+                <td class="aws">EBS</td>
+              </tr>
+              <tr>
+                <td class="category">File storage (NFS)</td>
+                <td class="desc">File system compartido entre múltiples VMs.</td>
+                <td class="gcp">Filestore</td>
+                <td class="aws">EFS</td>
+              </tr>
+              <tr>
+                <td class="category">Archive / cold</td>
+                <td class="desc">Datos accedidos raramente, compliance, backups largos.</td>
+                <td class="gcp">Cloud Storage Archive</td>
+                <td class="aws">S3 Glacier</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>Databases (resumen) — para el detalle ver sección 4</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">SQL administrado</td>
+                <td class="desc">ACID, joins, transacciones. Default para datos relacionales.</td>
+                <td class="gcp">Cloud SQL</td>
+                <td class="aws">RDS</td>
+              </tr>
+              <tr>
+                <td class="category">SQL global / fuerte</td>
+                <td class="desc">Consistencia fuerte + escala horizontal + global. Único Spanner.</td>
+                <td class="gcp-star">Cloud Spanner</td>
+                <td class="aws">Aurora Global</td>
+              </tr>
+              <tr>
+                <td class="category">NoSQL document</td>
+                <td class="desc">Schema flexible, real-time sync, mobile.</td>
+                <td class="gcp">Firestore</td>
+                <td class="aws">DynamoDB</td>
+              </tr>
+              <tr>
+                <td class="category">Wide-column</td>
+                <td class="desc">PB de time series, IoT, ad analytics. Writes muy altos.</td>
+                <td class="gcp-star">Bigtable</td>
+                <td class="aws">Keyspaces</td>
+              </tr>
+              <tr>
+                <td class="category">Cache</td>
+                <td class="desc">Reducir latencia, sesiones, leaderboards.</td>
+                <td class="gcp">Memorystore</td>
+                <td class="aws">ElastiCache</td>
+              </tr>
+              <tr>
+                <td class="category">Data warehouse</td>
+                <td class="desc">Analytics serverless sobre PB. SQL.</td>
+                <td class="gcp-star">BigQuery</td>
+                <td class="aws">Redshift</td>
+              </tr>
+              <tr>
+                <td class="category">Data lake</td>
+                <td class="desc">Datos crudos para ML, analytics, auditoría.</td>
+                <td class="gcp">Cloud Storage + Dataplex</td>
+                <td class="aws">S3 + Lake Formation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>Networking & CDN</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">Load balancer</td>
+                <td class="desc">Distribuir tráfico. GCP es anycast global con una sola IP.</td>
+                <td class="gcp-star">Cloud Load Balancing</td>
+                <td class="aws">Elastic Load Balancing</td>
+              </tr>
+              <tr>
+                <td class="category">CDN</td>
+                <td class="desc">Servir contenido estático cerca del usuario, reducir latencia y costo.</td>
+                <td class="gcp">Cloud CDN</td>
+                <td class="aws">CloudFront</td>
+              </tr>
+              <tr>
+                <td class="category">DNS</td>
+                <td class="desc">Resolver dominios, geo-routing, health checks.</td>
+                <td class="gcp">Cloud DNS</td>
+                <td class="aws">Route 53</td>
+              </tr>
+              <tr>
+                <td class="category">Red privada</td>
+                <td class="desc">Aislar servicios, subredes, firewalls, peering.</td>
+                <td class="gcp">VPC</td>
+                <td class="aws">VPC</td>
+              </tr>
+              <tr>
+                <td class="category">API Gateway</td>
+                <td class="desc">Exponer APIs, autenticación, rate limiting, routing.</td>
+                <td class="gcp">API Gateway / Apigee</td>
+                <td class="aws">API Gateway</td>
+              </tr>
+              <tr>
+                <td class="category">Service mesh</td>
+                <td class="desc">Comunicación segura y observable entre microservicios.</td>
+                <td class="gcp">Anthos Service Mesh / Istio</td>
+                <td class="aws">App Mesh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>Messaging & Streaming</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">Queue (work)</td>
+                <td class="desc">Desacoplar servicios, absorber picos, retry asíncrono.</td>
+                <td class="gcp-star">Pub/Sub</td>
+                <td class="aws">SQS</td>
+              </tr>
+              <tr>
+                <td class="category">Pub/Sub (events)</td>
+                <td class="desc">Fan-out de eventos a múltiples consumidores.</td>
+                <td class="gcp-star">Pub/Sub</td>
+                <td class="aws">SNS</td>
+              </tr>
+              <tr>
+                <td class="category">Streaming (Kafka-like)</td>
+                <td class="desc">Procesar eventos en orden, replay, time-windows.</td>
+                <td class="gcp">Pub/Sub + Dataflow</td>
+                <td class="aws">Kinesis / MSK</td>
+              </tr>
+              <tr>
+                <td class="category">Workflow orchestration</td>
+                <td class="desc">Coordinar procesos largos con pasos, retries y compensación.</td>
+                <td class="gcp">Workflows</td>
+                <td class="aws">Step Functions</td>
+              </tr>
+              <tr>
+                <td class="category">Stream processing</td>
+                <td class="desc">ETL en tiempo real, ventanas, agregaciones.</td>
+                <td class="gcp-star">Dataflow <span class="desc">(Apache Beam)</span></td>
+                <td class="aws">Kinesis Data Analytics</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details style="margin-top: 12px;">
+        <summary>Security · Identity · Secrets · Encryption</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">IAM</td>
+                <td class="desc">Roles, permisos, principals, least privilege.</td>
+                <td class="gcp">IAM</td>
+                <td class="aws">IAM</td>
+              </tr>
+              <tr>
+                <td class="category">Secrets</td>
+                <td class="desc">Passwords, tokens, API keys, rotación automática.</td>
+                <td class="gcp">Secret Manager</td>
+                <td class="aws">Secrets Manager</td>
+              </tr>
+              <tr>
+                <td class="category">KMS</td>
+                <td class="desc">Llaves de cifrado, encryption at rest/in transit.</td>
+                <td class="gcp">Cloud KMS</td>
+                <td class="aws">KMS</td>
+              </tr>
+              <tr>
+                <td class="category">WAF / DDoS</td>
+                <td class="desc">Protección ante ataques L7, OWASP top 10, DDoS.</td>
+                <td class="gcp">Cloud Armor</td>
+                <td class="aws">AWS WAF + Shield</td>
+              </tr>
+              <tr>
+                <td class="category">Identity (users)</td>
+                <td class="desc">Autenticación de usuarios finales: OAuth, OIDC, social login.</td>
+                <td class="gcp">Identity Platform / Firebase Auth</td>
+                <td class="aws">Cognito</td>
+              </tr>
+              <tr>
+                <td class="category">Zero trust</td>
+                <td class="desc">Acceso a apps internas sin VPN.</td>
+                <td class="gcp-star">BeyondCorp / IAP</td>
+                <td class="aws">Verified Access</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details style="margin-top: 12px;">
+        <summary>Observability · Logs · Metrics · Tracing</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">Logs centralizados</td>
+                <td class="desc">Búsqueda, alertas, audit, debugging.</td>
+                <td class="gcp">Cloud Logging</td>
+                <td class="aws">CloudWatch Logs</td>
+              </tr>
+              <tr>
+                <td class="category">Métricas / dashboards</td>
+                <td class="desc">SLI/SLO, error rate, latencia p99, saturación.</td>
+                <td class="gcp">Cloud Monitoring</td>
+                <td class="aws">CloudWatch Metrics</td>
+              </tr>
+              <tr>
+                <td class="category">Distributed tracing</td>
+                <td class="desc">Seguir requests entre microservicios, encontrar cuellos.</td>
+                <td class="gcp">Cloud Trace</td>
+                <td class="aws">X-Ray</td>
+              </tr>
+              <tr>
+                <td class="category">Profiling continuo</td>
+                <td class="desc">CPU/heap profiling en producción, encontrar hot code.</td>
+                <td class="gcp-star">Cloud Profiler</td>
+                <td class="aws">CodeGuru Profiler</td>
+              </tr>
+              <tr>
+                <td class="category">Error reporting</td>
+                <td class="desc">Agrupar y priorizar errores en producción.</td>
+                <td class="gcp">Error Reporting</td>
+                <td class="aws">CloudWatch + custom</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details style="margin-top: 12px;">
+        <summary>DevOps · CI/CD · ML</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 18%;">Necesidad</th>
+                <th style="width: 32%;">Uso en system design</th>
+                <th style="width: 25%;">GCP</th>
+                <th>AWS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">CI/CD</td>
+                <td class="desc">Build, test, deploy automatizado.</td>
+                <td class="gcp">Cloud Build / Cloud Deploy</td>
+                <td class="aws">CodeBuild / CodePipeline</td>
+              </tr>
+              <tr>
+                <td class="category">Container registry</td>
+                <td class="desc">Imágenes Docker, vulnerability scanning.</td>
+                <td class="gcp">Artifact Registry</td>
+                <td class="aws">ECR</td>
+              </tr>
+              <tr>
+                <td class="category">ML platform</td>
+                <td class="desc">Entrenar, desplegar y monitorear modelos.</td>
+                <td class="gcp-star">Vertex AI</td>
+                <td class="aws">SageMaker</td>
+              </tr>
+              <tr>
+                <td class="category">LLMs / GenAI</td>
+                <td class="desc">Modelos generativos, embeddings, RAG.</td>
+                <td class="gcp-star">Vertex AI · Gemini</td>
+                <td class="aws">Bedrock</td>
+              </tr>
+              <tr>
+                <td class="category">Vector DB</td>
+                <td class="desc">Búsqueda semántica, RAG, recomendaciones.</td>
+                <td class="gcp">Vertex AI Vector Search</td>
+                <td class="aws">OpenSearch / Aurora pgvector</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ EXAMPLE ARCHITECTURE ============ -->
+    <section class="section" id="examples">
+      <div class="section-header">
+        <h2><span class="num">7</span> Arquitecturas de ejemplo</h2>
+        <p>Plantillas que puedes adaptar a la pregunta que te toque.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3><span class="icon">📄</span> API de documentos (Drive-like)</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>API pública:</strong> Cloud Load Balancing → API Gateway / Apigee</li>
+            <li><strong>Backend:</strong> Cloud Run o GKE (stateless)</li>
+            <li><strong>Metadata:</strong> Cloud SQL (relacional) o Firestore</li>
+            <li><strong>Contenido:</strong> Cloud Storage (signed URLs)</li>
+            <li><strong>Cache:</strong> Memorystore Redis</li>
+            <li><strong>Async:</strong> Pub/Sub → Cloud Functions (thumbnails, OCR, indexar)</li>
+            <li><strong>Search:</strong> Elasticsearch en GKE o Vertex AI Search</li>
+            <li><strong>Observability:</strong> Cloud Logging + Monitoring + Trace</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📺</span> Video streaming (YouTube-like)</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>Upload:</strong> Cloud Storage (resumable uploads)</li>
+            <li><strong>Transcoding:</strong> Pub/Sub → Cloud Run / Transcoder API</li>
+            <li><strong>Storage final:</strong> Cloud Storage multi-bitrate (HLS/DASH)</li>
+            <li><strong>Metadata:</strong> Spanner (global) o Bigtable (analytics)</li>
+            <li><strong>CDN:</strong> Cloud CDN para playback</li>
+            <li><strong>Recommendations:</strong> Vertex AI + BigQuery (watch history)</li>
+            <li><strong>Comments:</strong> Firestore o Spanner</li>
+            <li><strong>Analytics:</strong> Pub/Sub → Dataflow → BigQuery</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">💬</span> Chat (WhatsApp-like)</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>Conexión:</strong> WebSocket en GKE (sticky LB)</li>
+            <li><strong>Mensajes:</strong> Bigtable (wide-column, time-ordered)</li>
+            <li><strong>Presencia:</strong> Memorystore Redis (TTL corto)</li>
+            <li><strong>Push:</strong> Pub/Sub → FCM</li>
+            <li><strong>Media:</strong> Cloud Storage + signed URLs</li>
+            <li><strong>E2E encryption:</strong> claves en cliente, servidor solo enruta</li>
+            <li><strong>Group fan-out:</strong> async vía Pub/Sub</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🔗</span> URL Shortener (bit.ly)</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>API:</strong> Cloud Run + Cloud Load Balancing</li>
+            <li><strong>Generación ID:</strong> base62 de counter (Spanner) o hash + colisión-check</li>
+            <li><strong>Storage:</strong> Bigtable (key=short_url, value=long_url) o Spanner</li>
+            <li><strong>Cache:</strong> Memorystore Redis (read-heavy)</li>
+            <li><strong>CDN:</strong> Cloud CDN para redirects populares</li>
+            <li><strong>Analytics:</strong> Pub/Sub → BigQuery (clicks, geo)</li>
+            <li><strong>Rate limit:</strong> Cloud Armor + Redis token bucket</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🐦</span> Timeline (Twitter-like)</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>Tweets:</strong> Spanner (global) + Cloud Storage (media)</li>
+            <li><strong>Fan-out on write:</strong> Pub/Sub al timeline de followers (Bigtable)</li>
+            <li><strong>Fan-out on read:</strong> celebrities con &gt;1M followers</li>
+            <li><strong>Híbrido:</strong> push para usuarios normales, pull para celebrities</li>
+            <li><strong>Cache:</strong> Memorystore Redis (timelines hot)</li>
+            <li><strong>Search:</strong> Elasticsearch / Vertex AI Search</li>
+            <li><strong>Trending:</strong> Dataflow + Bigtable counters</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🌐</span> Web Crawler / Search</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>URL frontier:</strong> Pub/Sub con prioridad</li>
+            <li><strong>Crawler workers:</strong> GKE pool autoescalado</li>
+            <li><strong>Dedup:</strong> Bloom filter + Bigtable seen-URLs</li>
+            <li><strong>HTML store:</strong> Cloud Storage</li>
+            <li><strong>Index:</strong> Bigtable (inverted index) o Elasticsearch</li>
+            <li><strong>robots.txt cache:</strong> Memorystore</li>
+            <li><strong>Politeness:</strong> token bucket por dominio</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="quote">
+        <p>"Para documentos grandes, no guardo el contenido en la DB. Metadata en Spanner o Firestore, archivo en Cloud Storage con signed URLs. Tareas pesadas (indexar, OCR, thumbnails) van por Pub/Sub a workers asíncronos. Esto desacopla la API del procesamiento y permite escalar cada pieza independientemente."</p>
+      </div>
+    </section>
+
+    <!-- ============ COMMON QUESTIONS ============ -->
+    <section class="section" id="questions">
+      <div class="section-header">
+        <h2><span class="num">8</span> Preguntas típicas de Google</h2>
+        <p>Las que aparecen una y otra vez. Con la pista de qué quieren ver.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25%;">Pregunta</th>
+              <th style="width: 30%;">Conceptos clave</th>
+              <th>Trampas / lo que buscan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="category">Diseñar Google Drive / Dropbox</td>
+              <td class="desc">Object storage, metadata DB, signed URLs, sync, deduplicación por hash, chunking</td>
+              <td class="desc">Conflictos de sync (vector clocks), dedup chunk-level, resumable uploads</td>
+            </tr>
+            <tr>
+              <td class="category">Diseñar YouTube</td>
+              <td class="desc">Upload, transcoding pipeline, CDN, multi-bitrate, recomendaciones, watch history</td>
+              <td class="desc">Cómo manejar 500+ horas/min de upload, hot videos en CDN, viewer count en tiempo real</td>
+            </tr>
+            <tr>
+              <td class="category">Diseñar Google Maps</td>
+              <td class="desc">Geo-indexing (geohash, S2, quadtree), tile serving, routing, real-time traffic</td>
+              <td class="desc">Spatial queries, Bigtable para tiles, traffic con Pub/Sub + Dataflow</td>
+            </tr>
+            <tr>
+              <td class="category">URL Shortener</td>
+              <td class="desc">Hash vs counter, colisiones, cache, analytics, rate limiting</td>
+              <td class="desc">¿Qué pasa con QPS &gt;100K? Spanner vs Bigtable, base62 encoding</td>
+            </tr>
+            <tr>
+              <td class="category">Rate Limiter distribuido</td>
+              <td class="desc">Token/leaky bucket, sliding window, Redis atómico, sincronización entre nodos</td>
+              <td class="desc">Race conditions, fail-open vs fail-closed, costo de Redis vs memoria local</td>
+            </tr>
+            <tr>
+              <td class="category">Twitter timeline</td>
+              <td class="desc">Fan-out on write vs read, celebrities, hybrid approach, Bigtable</td>
+              <td class="desc">Justin Bieber problem (100M followers), eventually consistent timeline</td>
+            </tr>
+            <tr>
+              <td class="category">WhatsApp / Chat</td>
+              <td class="desc">WebSockets, presencia, mensajes ordenados, push, E2E encryption</td>
+              <td class="desc">Mensajes offline, message ordering, group fan-out, leer recibos</td>
+            </tr>
+            <tr>
+              <td class="category">Typeahead / Autocomplete</td>
+              <td class="desc">Trie, prefix index, ranking por popularidad, edge serving</td>
+              <td class="desc">Latencia &lt;100ms, top-K en cada nodo, actualización de popularidad</td>
+            </tr>
+            <tr>
+              <td class="category">Web Crawler</td>
+              <td class="desc">URL frontier, dedup, robots.txt, politeness, distributed BFS</td>
+              <td class="desc">Bloom filter + Bigtable, trampa de URLs infinitas, idioma/relevancia</td>
+            </tr>
+            <tr>
+              <td class="category">Distributed Cache</td>
+              <td class="desc">Consistent hashing, replicación, eviction (LRU), invalidación</td>
+              <td class="desc">Cache stampede, hot keys, jittered TTL</td>
+            </tr>
+            <tr>
+              <td class="category">Notification system</td>
+              <td class="desc">Multi-channel (push/email/SMS), idempotencia, retry, prioridad</td>
+              <td class="desc">No spamear, dedup por user+template, fan-out por canal</td>
+            </tr>
+            <tr>
+              <td class="category">Payment / Order system</td>
+              <td class="desc">ACID, idempotency keys, saga pattern, exactly-once, ledger</td>
+              <td class="desc">Doble cobro, distributed transactions, reconciliación</td>
+            </tr>
+            <tr>
+              <td class="category">Distributed counter</td>
+              <td class="desc">Sharded counters, eventually consistent, hot key mitigation</td>
+              <td class="desc">Cómo contar likes/views a 1M QPS sin hot partition</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="card">
+          <h3><span class="icon">🎤</span> Frases listas para usar</h3>
+          <ul style="font-size: 13.5px;">
+            <li>"Antes de diseñar, déjame clarificar requisitos y estimar escala."</li>
+            <li>"El cuello de botella más probable es X. Lo mitigaría con Y."</li>
+            <li>"Hay un trade-off entre consistencia y latencia. Yo elegiría..."</li>
+            <li>"Para esto usaría Spanner porque necesito consistencia fuerte global."</li>
+            <li>"Esto es read-heavy, así que cache agresivo y replicación."</li>
+            <li>"Para evitar hot partitions, voy a salt el key con..."</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🚀</span> Si te queda tiempo, menciona</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>Multi-region:</strong> failover, latencia regional</li>
+            <li><strong>Backups & DR:</strong> RPO/RTO, point-in-time recovery</li>
+            <li><strong>Cost optimization:</strong> tiered storage, spot/preemptible</li>
+            <li><strong>Compliance:</strong> GDPR, data residency, audit logs</li>
+            <li><strong>Internationalization:</strong> i18n, multi-currency, multi-timezone</li>
+            <li><strong>A/B testing & feature flags</strong></li>
+            <li><strong>Chaos engineering & game days</strong></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">
+      Cloud SD Cheat Sheet · Optimizado para Google System Design Interview ·
+      Atajos: <kbd>/</kbd> buscar · <kbd>Esc</kbd> limpiar búsqueda · <kbd>Ctrl</kbd>+<kbd>P</kbd> imprimir
+    </p>
   </main>
+
+  <script>
+    // ============ LIVE SEARCH ============
+    const searchInput = document.getElementById('search');
+    const searchableContainers = document.querySelectorAll('section.section');
+
+    // Capture original HTML once for highlight reset
+    const originalCells = new Map();
+    document.querySelectorAll('td, li, .step-desc, .step-title, .num-card, .card p').forEach(el => {
+      originalCells.set(el, el.innerHTML);
+    });
+
+    function clearHighlights() {
+      originalCells.forEach((html, el) => {
+        if (el.innerHTML !== html) el.innerHTML = html;
+      });
+    }
+
+    function highlightTerm(el, term) {
+      if (!term) return;
+      const original = originalCells.get(el);
+      if (!original) return;
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`(${escaped})(?![^<]*>)`, 'gi');
+      el.innerHTML = original.replace(re, '<mark>$1</mark>');
+    }
+
+    function filter(query) {
+      const q = query.trim().toLowerCase();
+      clearHighlights();
+
+      // Show everything if empty
+      if (!q) {
+        document.querySelectorAll('.hide').forEach(el => el.classList.remove('hide'));
+        document.querySelectorAll('.no-results').forEach(el => el.remove());
+        return;
+      }
+
+      // Filter table rows
+      document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(q)) {
+          row.classList.remove('hide');
+          row.querySelectorAll('td').forEach(td => highlightTerm(td, q));
+        } else {
+          row.classList.add('hide');
+        }
+      });
+
+      // Filter cards (grid-2, grid-3, grid-4)
+      document.querySelectorAll('.card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(q)) {
+          card.classList.remove('hide');
+          card.querySelectorAll('p, li').forEach(el => highlightTerm(el, q));
+        } else {
+          card.classList.add('hide');
+        }
+      });
+
+      // Filter steps
+      document.querySelectorAll('.step').forEach(step => {
+        const text = step.textContent.toLowerCase();
+        if (text.includes(q)) {
+          step.classList.remove('hide');
+          step.querySelectorAll('.step-desc, .step-title').forEach(el => highlightTerm(el, q));
+        } else {
+          step.classList.add('hide');
+        }
+      });
+
+      // Filter num-cards
+      document.querySelectorAll('.num-card').forEach(nc => {
+        const text = nc.textContent.toLowerCase();
+        if (text.includes(q)) {
+          nc.classList.remove('hide');
+        } else {
+          nc.classList.add('hide');
+        }
+      });
+
+      // Hide entire sections that have no visible content
+      document.querySelectorAll('section.section').forEach(sec => {
+        const visibleRows = sec.querySelectorAll('tbody tr:not(.hide)');
+        const visibleCards = sec.querySelectorAll('.card:not(.hide)');
+        const visibleSteps = sec.querySelectorAll('.step:not(.hide)');
+        const visibleNums = sec.querySelectorAll('.num-card:not(.hide)');
+        const totalVisible = visibleRows.length + visibleCards.length + visibleSteps.length + visibleNums.length;
+
+        if (totalVisible === 0) {
+          sec.classList.add('hide');
+        } else {
+          sec.classList.remove('hide');
+        }
+      });
+
+      // Auto-open all <details> when searching so results aren't hidden
+      document.querySelectorAll('details').forEach(d => d.open = true);
+    }
+
+    searchInput.addEventListener('input', e => filter(e.target.value));
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      // "/" focuses search (unless already in an input)
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+      // Esc clears search
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = '';
+        filter('');
+        searchInput.blur();
+      }
+      // Ctrl/Cmd+K also focuses search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
+    // Smooth scroll on nav clicks (already in CSS but ensures focus)
+    document.querySelectorAll('.topnav a').forEach(a => {
+      a.addEventListener('click', () => {
+        searchInput.value = '';
+        filter('');
+      });
+    });
+  </script>
 </body>
 </html>
