@@ -294,9 +294,9 @@ POST /api/files/fi_72/complete
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["App / Sync Daemon"] -->|pre-signed| API["API Service"]
+    Client(["App / Sync Daemon"]) -->|pre-signed| API
     Client -->|chunks directo| Store
-    API --> Meta
+    API{{"🌐 API GATEWAY + API Service"}} --> Meta
     API --> Dedup["Dedup<br/>chunk hash check"]
     Dedup --> Store
     API -. eventos .-> Sync
@@ -305,13 +305,13 @@ flowchart LR
     Meta --> ACL
     Store --> GC["GC<br/>chunks huérfanos"]
 
-    subgraph Store["Object Storage · S3 / GCS"]
+    subgraph Store["🗄️ Object Storage · S3 / GCS"]
       direction TB
       s1["chunks/sha256"]
       s2["thumbnails"]
     end
 
-    subgraph Meta["Metadata DB · Spanner / Postgres"]
+    subgraph Meta["💾 Metadata DB · Spanner / Postgres"]
       direction TB
       m1["files"]
       m2["file_versions"]
@@ -319,16 +319,23 @@ flowchart LR
       m4["folders"]
     end
 
-    subgraph Sync["Sync Stream · Pub/Sub"]
+    subgraph Sync["📨 Sync Stream · Pub/Sub"]
       direction TB
       k1["sync_events"]
     end
 
-    subgraph ACL["Permissions · Zanzibar"]
+    subgraph ACL["💾 Permissions · Zanzibar"]
       direction TB
       a1["permissions"]
       a2["sync_cursor"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#78350f,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class API gateway
+    class Dedup,Notify,GC service
+    class Client client
         </div>
       </div>
 
@@ -543,8 +550,8 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["App / Sync Daemon"] --> LB["L7 Load Balancer<br/>NGINX / ALB"]
-    LB --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit (Redis)"]
+    Client(["App / Sync Daemon"]) --> LB
+    LB{{"⚖️ L7 LOAD BALANCER<br/>NGINX / ALB"}} --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit (Redis)"]
     Pod --> Meta
     Pod --> Dedup["Dedup<br/>chunk hash check"]
     Client -->|chunks pre-signed URL| Store
@@ -554,13 +561,13 @@ flowchart LR
     Pod --> ACL["Permissions Service<br/>Zanzibar"]
     Store --> GC["GC chunks huérfanos"]
 
-    subgraph Store["Object Storage · S3 / GCS"]
+    subgraph Store["🗄️ Object Storage · S3 / GCS"]
       direction TB
       s1["chunks/sha256"]
       s2["thumbnails"]
     end
 
-    subgraph Meta["Metadata DB · Spanner / Postgres"]
+    subgraph Meta["💾 Metadata DB · Spanner / Postgres"]
       direction TB
       m1["files"]
       m2["file_versions"]
@@ -568,10 +575,17 @@ flowchart LR
       m4["folders"]
     end
 
-    subgraph Sync["Sync Stream · Pub/Sub"]
+    subgraph Sync["📨 Sync Stream · Pub/Sub"]
       direction TB
       k1["sync_events"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#78350f,stroke:#fbbf24,stroke-width:2px,color:#fef3c7
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB lb
+    class Pod,Dedup,Notify,ACL,GC service
+    class Client client
         </div>
       </div>
       <div class="flow-explain">

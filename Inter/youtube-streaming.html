@@ -290,26 +290,26 @@
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["Cliente Web/Móvil"] -->|pre-signed URL| API["API Service"]
+    Client(["Cliente Web/Móvil"]) -->|pre-signed URL| API
     Client -->|chunks directo| Store
-    API --> Meta
+    API{{"🌐 API GATEWAY + API Service<br/>Auth + Rate Limit"}} --> Meta
     API -->|complete-upload| Stream
     Stream --> Trans["Transcoder Workers<br/>FFmpeg async"]
     Trans --> Store
     Trans --> Meta
     Trans --> Thumb["Thumbnail Generator"]
-    Client -- playback request --> Edge["CDN Edge POPs"]
+    Client -- playback request --> Edge(["CDN Edge POPs"])
     Edge -->|miss| Store
     Client -. events .-> Analytics
 
-    subgraph Store["Object Storage · S3 / GCS"]
+    subgraph Store["🗄️ Object Storage · S3 / GCS"]
       direction TB
       s1["videos/raw"]
       s2["videos/hls"]
       s3["thumbnails"]
     end
 
-    subgraph Meta["Metadata DB · Postgres / Spanner"]
+    subgraph Meta["💾 Metadata DB · Postgres / Spanner"]
       direction TB
       m1["videos"]
       m2["video_assets"]
@@ -318,17 +318,26 @@ flowchart LR
       m5["subscriptions"]
     end
 
-    subgraph Stream["Pub/Sub"]
+    subgraph Stream["📨 Pub/Sub"]
       direction TB
       k1["video.uploaded"]
       k2["video.transcoded"]
     end
 
-    subgraph Analytics["Analytics · BigQuery"]
+    subgraph Analytics["🗄️ Analytics · BigQuery"]
       direction TB
       a1["view_events"]
       a2["watch_time_daily"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#7f1d1d,stroke:#fb7185,stroke-width:2px,color:#fecdd3
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class API gateway
+    class Edge edge
+    class Trans,Thumb service
+    class Client client
         </div>
       </div>
 
@@ -544,9 +553,9 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["Cliente Web/Móvil"] --> Edge["CDN POPs (segments)"]
-    Client --> LB["L7 Load Balancer<br/>ALB / Cloud LB"]
-    LB --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit Redis"]
+    Client(["Cliente Web/Móvil"]) --> Edge(["CDN POPs (segments)"])
+    Client --> LB
+    LB{{"⚖️ L7 LOAD BALANCER<br/>ALB / Cloud LB"}} --> Pod["API Pods<br/>+ JWT auth middleware<br/>+ Rate limit Redis"]
     Pod --> Meta
     Pod -->|complete-upload| Stream
     Stream --> Trans["Transcoder Workers"]
@@ -555,14 +564,14 @@ flowchart LR
     Client -->|pre-signed URL| Store
     Client -. events .-> Analytics
 
-    subgraph Store["Object Storage · S3 / GCS"]
+    subgraph Store["🗄️ Object Storage · S3 / GCS"]
       direction TB
       s1["videos/raw"]
       s2["videos/hls"]
       s3["thumbnails"]
     end
 
-    subgraph Meta["Metadata DB"]
+    subgraph Meta["💾 Metadata DB"]
       direction TB
       m1["videos"]
       m2["video_assets"]
@@ -570,15 +579,24 @@ flowchart LR
       m4["comments"]
     end
 
-    subgraph Stream["Pub/Sub"]
+    subgraph Stream["📨 Pub/Sub"]
       direction TB
       k1["video.uploaded"]
     end
 
-    subgraph Analytics["Pipeline analítico · BigQuery"]
+    subgraph Analytics["🗄️ Pipeline analítico · BigQuery"]
       direction TB
       a1["view_events"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#7f1d1d,stroke:#fb7185,stroke-width:2px,color:#fecdd3
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB lb
+    class Edge edge
+    class Pod,Trans service
+    class Client client
         </div>
       </div>
       <div class="flow-explain">

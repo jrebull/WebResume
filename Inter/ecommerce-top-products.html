@@ -288,8 +288,8 @@
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["Cliente Web/Móvil"] --> Edge["CDN / Edge Cache<br/>TTL 5–30s"]
-    Edge -->|GET top| GW["API Gateway<br/>Auth + Rate Limit"]
+    Client(["Cliente Web/Móvil"]) --> Edge(["CDN / Edge Cache<br/>TTL 5–30s"])
+    Edge -->|GET top| GW{{"🌐 API GATEWAY<br/>Auth + Rate Limit"}}
     GW -->|read| Cache
     GW -->|POST /orders| Order["Order Service"]
     Order --> DB
@@ -299,7 +299,7 @@ flowchart LR
     Agg --> Cold
     Cache -. cache miss .-> Agg
 
-    subgraph Cache["Redis · Sorted Sets"]
+    subgraph Cache["💾 Redis · Sorted Sets"]
       direction TB
       rs1["top:1h:region"]
       rs2["top:4h:region"]
@@ -307,23 +307,32 @@ flowchart LR
       rs4["bucket:1m:ts"]
     end
 
-    subgraph DB["Orders DB · Postgres"]
+    subgraph DB["💾 Orders DB · Postgres"]
       direction TB
       d1["orders"]
       d2["order_items"]
       d3["products"]
     end
 
-    subgraph Stream["Kafka"]
+    subgraph Stream["📨 Kafka"]
       direction TB
       k1["order_events"]
     end
 
-    subgraph Cold["Cold Storage · BigQuery / S3"]
+    subgraph Cold["🗄️ Cold Storage · BigQuery / S3"]
       direction TB
       c1["orders_archive"]
       c2["events_archive"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e0f2fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class GW gateway
+    class Edge edge
+    class Order,Agg service
+    class Client client
         </div>
       </div>
 
@@ -530,9 +539,9 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["Cliente Web/Móvil"] --> Edge["CDN / Edge Cache<br/>TTL 5–30s"]
-    Edge --> LB["L7 Load Balancer<br/>NGINX / ALB / Cloud LB<br/>TLS + path routing"]
-    LB --> Pod["API Pods<br/>+ Auth Middleware (JWT)<br/>+ Rate Limit (Redis token bucket)"]
+    Client(["Cliente Web/Móvil"]) --> Edge(["CDN / Edge Cache<br/>TTL 5–30s"])
+    Edge --> LB{{"⚖️ L7 LOAD BALANCER<br/>NGINX / ALB / Cloud LB<br/>TLS + path routing"}}
+    LB --> Pod["API Pods<br/>+ Auth Middleware (JWT)<br/>+ Rate Limit (Redis)"]
     Pod -->|read top| Cache
     Pod -->|POST /orders| Order["Order Service"]
     Order --> DB
@@ -540,24 +549,33 @@ flowchart LR
     Stream --> Agg["Aggregator"]
     Agg --> Cache
 
-    subgraph Cache["Redis · Sorted Sets"]
+    subgraph Cache["💾 Redis · Sorted Sets"]
       direction TB
       rs1["top:1h:region"]
       rs2["top:4h:region"]
       rs3["top:24h:region"]
     end
 
-    subgraph DB["Orders DB · Postgres"]
+    subgraph DB["💾 Orders DB · Postgres"]
       direction TB
       d1["orders"]
       d2["order_items"]
       d3["products"]
     end
 
-    subgraph Stream["Kafka"]
+    subgraph Stream["📨 Kafka"]
       direction TB
       k1["order_events"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e0f2fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB lb
+    class Edge edge
+    class Pod,Order,Agg service
+    class Client client
         </div>
       </div>
       <div class="flow-explain">

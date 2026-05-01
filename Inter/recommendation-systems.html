@@ -307,8 +307,8 @@
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["Cliente"] --> Reco["Reco API"]
-    Reco --> Recall["Candidate Generation<br/>ANN + popular + cohort"]
+    Client(["Cliente"]) --> Reco
+    Reco{{"🌐 RECO API GATEWAY<br/>experiment routing"}} --> Recall["Candidate Generation<br/>ANN + popular + cohort"]
     Recall --> Embed
     Reco --> Rank["Ranker Online<br/>p99 ≈ 100 ms"]
     Rank --> FS
@@ -320,25 +320,32 @@ flowchart LR
     Train --> Rank
     Train --> Embed
 
-    subgraph Embed["Embeddings ANN · HNSW / FAISS"]
+    subgraph Embed["🧠 Embeddings ANN · HNSW / FAISS"]
       direction TB
       v1["item_vectors"]
       v2["user_vectors"]
     end
 
-    subgraph FS["Feature Store · Bigtable / Redis"]
+    subgraph FS["💾 Feature Store · Bigtable / Redis"]
       direction TB
       f1["user:id"]
       f2["item:id"]
       f3["cohort:id"]
     end
 
-    subgraph Stream["Kafka · events"]
+    subgraph Stream["📨 Kafka · events"]
       direction TB
       k1["impressions"]
       k2["clicks"]
       k3["conversions"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#4c1d95,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class Reco gateway
+    class Recall,Rank,Filter,Exp,Train service
+    class Client client
         </div>
       </div>
 
@@ -664,8 +671,8 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["Cliente"] --> LB["L7 Load Balancer<br/>region routing"]
-    LB --> Pod["Reco API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit (token bucket)"]
+    Client(["Cliente"]) --> LB
+    LB{{"⚖️ L7 LOAD BALANCER<br/>region routing"}} --> Pod["Reco API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit (token bucket)"]
     Pod --> Recall["Candidate Generation"]
     Recall --> Embed
     Pod --> Rank["Ranker Online"]
@@ -678,24 +685,31 @@ flowchart LR
     Train --> Rank
     Train --> Embed
 
-    subgraph Embed["Embeddings ANN"]
+    subgraph Embed["🧠 Embeddings ANN"]
       direction TB
       v1["item_vectors"]
       v2["user_vectors"]
     end
 
-    subgraph FS["Feature Store"]
+    subgraph FS["💾 Feature Store"]
       direction TB
       f1["user:id"]
       f2["item:id"]
     end
 
-    subgraph Stream["Kafka events"]
+    subgraph Stream["📨 Kafka events"]
       direction TB
       k1["impressions"]
       k2["clicks"]
       k3["conversions"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#4c1d95,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB lb
+    class Pod,Recall,Rank,Filter,Exp,Train service
+    class Client client
         </div>
       </div>
       <div class="flow-explain">

@@ -292,8 +292,8 @@
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Editor["Editor Web/Móvil<br/>local OT/CRDT"] -- WS --> GW["Gateway<br/>sticky by docId"]
-    GW --> Doc["Doc Service<br/>OT/CRDT engine"]
+    Editor(["Editor Web/Móvil<br/>local OT/CRDT"]) -- WS --> GW
+    GW{{"🌐 API GATEWAY<br/>sticky by docId"}} --> Doc["Doc Service<br/>OT/CRDT engine"]
     Doc --> Log
     Doc --> Snap
     Doc --> Bcast["Broadcast<br/>Pub/Sub"]
@@ -303,28 +303,35 @@ flowchart LR
     Doc --> Search
     Editor -. presence .-> Pres["Presence Service"]
 
-    subgraph Log["Op Log · Spanner / Postgres (append-only)"]
+    subgraph Log["💾 Op Log · Spanner / Postgres (append-only)"]
       direction TB
       l1["operations"]
       l2["documents"]
     end
 
-    subgraph Snap["Snapshot Store · S3"]
+    subgraph Snap["🗄️ Snapshot Store · S3"]
       direction TB
       sn1["snapshots/doc_id/v"]
     end
 
-    subgraph AuthDB["ACL Store · Spanner / Zanzibar"]
+    subgraph AuthDB["💾 ACL Store · Spanner / Zanzibar"]
       direction TB
       a1["permissions"]
       a2["groups"]
       a3["users"]
     end
 
-    subgraph Search["Search Index · Elasticsearch"]
+    subgraph Search["🔍 Search Index · Elasticsearch"]
       direction TB
       s1["docs_fts"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e0f2fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class GW gateway
+    class Doc,Auth,Bcast,Pres service
+    class Editor client
         </div>
       </div>
 
@@ -530,8 +537,8 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Editor["Editor Web/Móvil"] --> LB["L7 Load Balancer<br/>sticky by documentId<br/>(consistent hashing)"]
-    LB --> Doc["Doc Service Pod<br/>+ Auth (Google SSO / JWT)<br/>+ OT/CRDT engine"]
+    Editor(["Editor Web/Móvil"]) --> LB
+    LB{{"⚖️ L7 LOAD BALANCER<br/>sticky by documentId<br/>(consistent hashing)"}} --> Doc["Doc Service Pod<br/>+ Auth (Google SSO / JWT)<br/>+ OT/CRDT engine"]
     Doc --> Log
     Doc --> Snap
     Doc --> Bcast["Pub/Sub broadcast"]
@@ -540,22 +547,29 @@ flowchart LR
     Auth --> AuthDB
     Editor -. presence .-> Pres["Presence Service"]
 
-    subgraph Log["Op Log · Spanner"]
+    subgraph Log["💾 Op Log · Spanner"]
       direction TB
       l1["operations"]
       l2["documents"]
     end
 
-    subgraph Snap["Snapshot Store · S3"]
+    subgraph Snap["🗄️ Snapshot Store · S3"]
       direction TB
       sn1["snapshots"]
     end
 
-    subgraph AuthDB["ACL Store · Zanzibar"]
+    subgraph AuthDB["💾 ACL Store · Zanzibar"]
       direction TB
       a1["permissions"]
       a2["groups"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e0f2fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB lb
+    class Doc,Auth,Bcast,Pres service
+    class Editor client
         </div>
       </div>
       <div class="flow-explain">

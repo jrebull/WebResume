@@ -292,9 +292,9 @@ Idempotency-Key: 5f8a-...
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    R["Rider App"] -- WS / HTTP --> GW["API Gateway<br/>WebSocket + REST"]
-    D["Driver App"] -- WS --> GW
-    GW --> Ride["Ride Service<br/>state machine"]
+    R(["Rider App"]) -- WS / HTTP --> GW
+    D(["Driver App"]) -- WS --> GW
+    GW{{"🌐 API GATEWAY<br/>WebSocket + REST"}} --> Ride["Ride Service<br/>state machine"]
     GW --> Loc["Location Service"]
     Loc --> Geo
     Ride --> Match["Matcher<br/>candidate ranking"]
@@ -306,14 +306,14 @@ flowchart LR
     Stream --> Pay["Payment Service"]
     Stream --> Rate["Rating Service"]
 
-    subgraph Geo["Redis GEO · geohash / S2"]
+    subgraph Geo["💾 Redis GEO · geohash / S2"]
       direction TB
       g1["geo:drivers:city"]
       g2["lock:ride:id"]
       g3["session:driver:id"]
     end
 
-    subgraph RDB["Rides DB · Postgres + PostGIS"]
+    subgraph RDB["💾 Rides DB · Postgres + PostGIS"]
       direction TB
       r1["rides"]
       r2["drivers"]
@@ -322,10 +322,19 @@ flowchart LR
       r5["ratings"]
     end
 
-    subgraph Stream["Kafka"]
+    subgraph Stream["📨 Kafka"]
       direction TB
       k1["ride_events"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#d1fae5
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    classDef external fill:#1f2937,stroke:#94a3b8,stroke-width:2px,stroke-dasharray:5 5,color:#e5e7eb
+    class GW gateway
+    class Ride,Loc,Match,Pay,Rate service
+    class R,D client
+    class Push external
         </div>
       </div>
 
@@ -532,9 +541,9 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    R["Rider App"] --> NLB["L4 NLB sticky<br/>WebSocket-friendly"]
-    D["Driver App"] --> NLB
-    NLB --> Pod["API Pods<br/>+ JWT verifier middleware<br/>+ Rate limit (Redis)"]
+    R(["Rider App"]) --> NLB
+    D(["Driver App"]) --> NLB
+    NLB{{"⚖️ L4 NLB STICKY<br/>WebSocket-friendly"}} --> Pod["API Pods<br/>+ JWT verifier middleware<br/>+ Rate limit (Redis)"]
     Pod --> Ride["Ride Service<br/>state machine"]
     Pod --> Loc["Location Service"]
     Loc --> Geo
@@ -545,14 +554,14 @@ flowchart LR
     Ride --> RDB
     Ride -. eventos .-> Stream
 
-    subgraph Geo["Redis GEO"]
+    subgraph Geo["💾 Redis GEO"]
       direction TB
       g1["geo:drivers:city"]
       g2["lock:ride:id"]
       g3["session:driver:id"]
     end
 
-    subgraph RDB["Rides DB · Postgres"]
+    subgraph RDB["💾 Rides DB · Postgres"]
       direction TB
       r1["rides"]
       r2["drivers"]
@@ -561,10 +570,19 @@ flowchart LR
       r5["ratings"]
     end
 
-    subgraph Stream["Kafka"]
+    subgraph Stream["📨 Kafka"]
       direction TB
       k1["ride_events"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef service fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#d1fae5
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    classDef external fill:#1f2937,stroke:#94a3b8,stroke-width:2px,stroke-dasharray:5 5,color:#e5e7eb
+    class NLB lb
+    class Pod,Ride,Loc,Match service
+    class R,D client
+    class Push external
         </div>
       </div>
       <div class="flow-explain">

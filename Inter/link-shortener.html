@@ -291,39 +291,49 @@ Location: https://example.com/articulo-largo</pre>
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    User["Usuario / cliente"] --> Edge["Edge / CDN<br/>redirect cache"]
-    Edge -->|miss| API["Redirect Service"]
-    API --> Cache
+    User(["Usuario / cliente"]) --> Edge(["Edge / CDN<br/>redirect cache"])
+    Edge -->|miss| API
+    API{{"🌐 API GATEWAY + Redirect Service"}} --> Cache
     Cache -->|miss| KV
-    Creator["Creator API"] --> IDGen["ID Generator<br/>Snowflake / counter base62"]
+    Creator(["Creator API client"]) --> API
+    API --> IDGen["ID Generator<br/>Snowflake / counter base62"]
     IDGen --> KV
-    Creator --> Block["Block / Safe Browsing"]
+    API --> Block["Block / Safe Browsing"]
     User -. click event .-> Stream
     Stream --> Stats
 
-    subgraph Cache["Redis · cache hot"]
+    subgraph Cache["💾 Redis · cache hot"]
       direction TB
       r1["hot:shortCode"]
       r2["blocklist (Bloom)"]
       r3["rl:user:1m"]
     end
 
-    subgraph KV["KV Store · DynamoDB / Cassandra"]
+    subgraph KV["💾 KV Store · DynamoDB / Cassandra"]
       direction TB
       k1["links"]
       k2["id_ranges"]
     end
 
-    subgraph Stream["Kafka · click_events"]
+    subgraph Stream["📨 Kafka · click_events"]
       direction TB
       s1["click_events"]
     end
 
-    subgraph Stats["Analytics DB · BigQuery"]
+    subgraph Stats["🗄️ Analytics DB · BigQuery"]
       direction TB
       a1["click_events_archive"]
       a2["clicks_daily"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e0f2fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class API gateway
+    class Edge edge
+    class IDGen,Block service
+    class User,Creator client
         </div>
       </div>
 
@@ -535,39 +545,48 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    User["Usuario / cliente"] --> Edge["Edge / CDN<br/>redirect cache"]
-    Edge -->|miss| LB["L7 Load Balancer<br/>health checks"]
-    LB --> Pod["Redirect Service Pods<br/>+ Bloom filter (in-memory)<br/>+ Rate limit (Redis)"]
+    User(["Usuario / cliente"]) --> Edge(["Edge / CDN<br/>redirect cache"])
+    Edge -->|miss| LB
+    LB{{"⚖️ L7 LOAD BALANCER<br/>health checks"}} --> Pod["Redirect Service Pods<br/>+ Bloom filter (in-memory)<br/>+ Rate limit (Redis)"]
     Pod --> Cache
     Cache -->|miss| KV
-    Creator["Creator API"] --> LBC["L7 LB Creator path"]
-    LBC --> CPod["Creator Pods<br/>+ Auth (JWT)"]
+    Creator(["Creator API client"]) --> LBC
+    LBC{{"⚖️ L7 LB Creator path"}} --> CPod["Creator Pods<br/>+ Auth (JWT)"]
     CPod --> IDGen["ID Generator"]
     IDGen --> KV
     User -. click event .-> Stream
     Stream --> Stats
 
-    subgraph Cache["Redis hot"]
+    subgraph Cache["💾 Redis hot"]
       direction TB
       r1["hot:shortCode"]
       r2["blocklist"]
     end
 
-    subgraph KV["DynamoDB / Cassandra"]
+    subgraph KV["💾 DynamoDB / Cassandra"]
       direction TB
       k1["links"]
       k2["id_ranges"]
     end
 
-    subgraph Stream["Kafka"]
+    subgraph Stream["📨 Kafka"]
       direction TB
       s1["click_events"]
     end
 
-    subgraph Stats["BigQuery"]
+    subgraph Stats["🗄️ BigQuery"]
       direction TB
       a1["click_events_archive"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#0c4a6e,stroke:#38bdf8,stroke-width:2px,color:#e0f2fe
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB,LBC lb
+    class Edge edge
+    class Pod,CPod,IDGen service
+    class User,Creator client
         </div>
       </div>
       <div class="flow-explain">

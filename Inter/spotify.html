@@ -291,8 +291,8 @@ Authorization: Bearer ...
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["App / Web / Speaker"] --> GW["API Gateway<br/>Auth + Region routing"]
-    GW --> Cat["Catalog Service"]
+    Client(["App / Web / Speaker"]) --> GW
+    GW{{"🌐 API GATEWAY<br/>Auth + Region routing"}} --> Cat["Catalog Service"]
     Cat --> CatDB
     GW --> Search["Search Service"]
     Search --> SIdx
@@ -300,11 +300,11 @@ flowchart LR
     Reco --> FS
     Reco --> Embed
     GW --> Stream["Stream Service<br/>token signer"]
-    Stream --> CDN["CDN POPs"]
+    Stream --> CDN(["CDN POPs"])
     CDN -->|miss| AudioStore
     Client -. listen events .-> Pipe
 
-    subgraph CatDB["Catalog DB · Postgres / Cassandra"]
+    subgraph CatDB["💾 Catalog DB · Postgres / Cassandra"]
       direction TB
       c1["tracks"]
       c2["albums"]
@@ -313,37 +313,46 @@ flowchart LR
       c5["users"]
     end
 
-    subgraph SIdx["Search Index · Elasticsearch"]
+    subgraph SIdx["🔍 Search Index · Elasticsearch"]
       direction TB
       e1["tracks_index"]
       e2["artists_index"]
       e3["albums_index"]
     end
 
-    subgraph FS["Feature Store · Bigtable / Redis"]
+    subgraph FS["💾 Feature Store · Bigtable / Redis"]
       direction TB
       f1["user:id"]
       f2["item:id"]
       f3["cohort:id"]
     end
 
-    subgraph Embed["Embeddings ANN · FAISS / ScaNN"]
+    subgraph Embed["🧠 Embeddings ANN · FAISS / ScaNN"]
       direction TB
       v1["track_vectors"]
       v2["user_vectors"]
     end
 
-    subgraph AudioStore["Object Storage · S3 / GCS"]
+    subgraph AudioStore["🗄️ Object Storage · S3 / GCS"]
       direction TB
       a1["audio/96kbps"]
       a2["audio/160kbps"]
       a3["audio/320kbps"]
     end
 
-    subgraph Pipe["Kafka · analytics + reco loop"]
+    subgraph Pipe["📨 Kafka · analytics + reco loop"]
       direction TB
       p1["listen_events"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#d1fae5
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class GW gateway
+    class CDN edge
+    class Cat,Search,Reco,Stream service
+    class Client client
         </div>
       </div>
 
@@ -555,8 +564,8 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["App / Web / Speaker / Car"] --> LB["L7 Load Balancer<br/>NGINX / GCLB<br/>TLS + region routing"]
-    LB --> Pod["API Pods<br/>+ JWT/OAuth middleware<br/>+ Rate limit"]
+    Client(["App / Web / Speaker / Car"]) --> LB
+    LB{{"⚖️ L7 LOAD BALANCER<br/>NGINX / GCLB<br/>TLS + region routing"}} --> Pod["API Pods<br/>+ JWT/OAuth middleware<br/>+ Rate limit"]
     Pod --> Cat["Catalog Service"]
     Cat --> CatDB
     Pod --> Search["Search Service"]
@@ -564,11 +573,11 @@ flowchart LR
     Pod --> Reco["Reco Service"]
     Reco --> FS
     Pod --> Stream["Stream Service<br/>token signer"]
-    Stream --> CDN["CDN POPs"]
+    Stream --> CDN(["CDN POPs"])
     CDN -->|miss| AudioStore
     Client -. listen events .-> Pipe
 
-    subgraph CatDB["Catalog DB"]
+    subgraph CatDB["💾 Catalog DB"]
       direction TB
       c1["tracks"]
       c2["albums"]
@@ -576,29 +585,38 @@ flowchart LR
       c4["playlists"]
     end
 
-    subgraph SIdx["Elasticsearch"]
+    subgraph SIdx["🔍 Elasticsearch"]
       direction TB
       e1["tracks_index"]
       e2["artists_index"]
     end
 
-    subgraph FS["Feature Store"]
+    subgraph FS["💾 Feature Store"]
       direction TB
       f1["user:id"]
       f2["item:id"]
     end
 
-    subgraph AudioStore["Object Storage"]
+    subgraph AudioStore["🗄️ Object Storage"]
       direction TB
       a1["audio/96"]
       a2["audio/160"]
       a3["audio/320"]
     end
 
-    subgraph Pipe["Kafka"]
+    subgraph Pipe["📨 Kafka"]
       direction TB
       p1["listen_events"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#d1fae5
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB lb
+    class CDN edge
+    class Pod,Cat,Search,Reco,Stream service
+    class Client client
         </div>
       </div>
       <div class="flow-explain">

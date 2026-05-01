@@ -290,8 +290,8 @@
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["App / Móvil"] -->|GET /feed| Feed["Feed API<br/>cursor token"]
-    Feed --> CG["Candidate Generation<br/>trending + follow + ANN"]
+    Client(["App / Móvil"]) -->|GET /feed| Feed
+    Feed{{"🌐 FEED API GATEWAY<br/>cursor token"}} --> CG["Candidate Generation<br/>trending + follow + ANN"]
     CG --> Trend
     CG --> Graph
     CG --> ANN
@@ -302,39 +302,48 @@ flowchart LR
     Stream --> FS
     Stream --> Train["Training Pipeline<br/>model refresh"]
     Train --> Rank
-    Client -- video bytes --> CDN["CDN POPs"]
+    Client -- video bytes --> CDN(["CDN POPs"])
 
-    subgraph Trend["Trending Cache · Redis"]
+    subgraph Trend["💾 Trending Cache · Redis"]
       direction TB
       t1["trending:region"]
       t2["trending:topic"]
     end
 
-    subgraph Graph["Follow Graph · Cassandra"]
+    subgraph Graph["💾 Follow Graph · Cassandra"]
       direction TB
       g1["follows"]
       g2["videos"]
     end
 
-    subgraph ANN["Embeddings ANN · HNSW / FAISS"]
+    subgraph ANN["🧠 Embeddings ANN · HNSW / FAISS"]
       direction TB
       v1["video_vectors"]
       v2["user_vectors"]
     end
 
-    subgraph FS["Feature Store · Bigtable / Redis"]
+    subgraph FS["💾 Feature Store · Bigtable / Redis"]
       direction TB
       f1["user_features:id"]
       f2["item_features:id"]
       f3["recent_seen:id"]
     end
 
-    subgraph Stream["Kafka · watch/like/share"]
+    subgraph Stream["📨 Kafka · watch/like/share"]
       direction TB
       k1["watch_events"]
       k2["like_events"]
       k3["share_events"]
     end
+
+    classDef gateway fill:#fbbf24,stroke:#f59e0b,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#581c87,stroke:#f472b6,stroke-width:2px,color:#fce7f3
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class Feed gateway
+    class CDN edge
+    class CG,Rank,Diverse,Train service
+    class Client client
         </div>
       </div>
 
@@ -540,8 +549,8 @@ flowchart LR
       <div class="mermaid-box">
         <div class="mermaid">
 flowchart LR
-    Client["App / Móvil"] --> LB["L7 Load Balancer<br/>NGINX / ALB<br/>region routing"]
-    LB --> Pod["Feed API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit Redis"]
+    Client(["App / Móvil"]) --> LB
+    LB{{"⚖️ L7 LOAD BALANCER<br/>NGINX / ALB<br/>region routing"}} --> Pod["Feed API Pods<br/>+ JWT verifier (local)<br/>+ Rate limit Redis"]
     Pod --> CG["Candidate Gen"]
     CG --> ANN
     Pod --> Rank["Online Ranker"]
@@ -549,27 +558,36 @@ flowchart LR
     Pod --> Diverse["Diversity Filter"]
     Client -. eventos .-> Stream
     Stream --> FS
-    Client -- video bytes --> CDN["CDN POPs"]
+    Client -- video bytes --> CDN(["CDN POPs"])
 
-    subgraph ANN["Embeddings ANN · HNSW / FAISS"]
+    subgraph ANN["🧠 Embeddings ANN · HNSW / FAISS"]
       direction TB
       v1["video_vectors"]
       v2["user_vectors"]
     end
 
-    subgraph FS["Feature Store · Bigtable / Redis"]
+    subgraph FS["💾 Feature Store · Bigtable / Redis"]
       direction TB
       f1["user_features:id"]
       f2["item_features:id"]
       f3["recent_seen:id"]
     end
 
-    subgraph Stream["Kafka · watch/like/share"]
+    subgraph Stream["📨 Kafka · watch/like/share"]
       direction TB
       k1["watch_events"]
       k2["like_events"]
       k3["share_events"]
     end
+
+    classDef lb fill:#34d399,stroke:#10b981,stroke-width:3px,color:#0f172a,font-weight:bold
+    classDef edge fill:#1e1b4b,stroke:#a78bfa,stroke-width:2px,color:#e0e7ff
+    classDef service fill:#581c87,stroke:#f472b6,stroke-width:2px,color:#fce7f3
+    classDef client fill:#1f2937,stroke:#94a3b8,stroke-width:2px,color:#e5e7eb
+    class LB lb
+    class CDN edge
+    class Pod,CG,Rank,Diverse service
+    class Client client
         </div>
       </div>
       <div class="flow-explain">
