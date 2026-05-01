@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Docs · System Design</title>
+  <style>
+    :root {
+      --bg: #09090f;
+      --text: #f8fafc;
+      --muted: #a1a1aa;
+      --line: rgba(255,255,255,0.12);
+      --accent: #38bdf8;
+      --green: #34d399;
+      --blue: #38bdf8;
+      --yellow: #fbbf24;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --shadow: 0 30px 80px rgba(0,0,0,.42);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(56,189,248,.20), transparent 30%),
+        radial-gradient(circle at 92% 0%, rgba(167,139,250,.16), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    .back { margin-bottom: 18px; }
+    .back a {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px;
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.03); transition: all .18s ease;
+    }
+    .back a:hover { color: var(--accent); border-color: rgba(56,189,248,.4); }
+    .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 20px; margin-bottom: 22px; }
+    .hero-main, .hero-side, .card, .table-box, .panel, .script { border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78)); box-shadow: var(--shadow); }
+    .hero-main { padding: 36px; }
+    .hero-side { padding: 26px; display: flex; flex-direction: column; gap: 12px; }
+    .badge {
+      display: inline-flex; gap: 8px; padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(56,189,248,.32); background: rgba(56,189,248,.1);
+      color: var(--accent); font-size: 12px; font-weight: 850; letter-spacing: .04em;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(32px, 5.4vw, 60px); line-height: .95; letter-spacing: -.05em; }
+    .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 17px; max-width: 640px; }
+    .side-title { margin: 0; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .problem { margin: 0; font-size: 17px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 8px 0 18px; }
+    .card { padding: 20px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .1em; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 28px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+    .section-head p { margin: 0; color: var(--muted); max-width: 480px; }
+    .table-box { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(167,139,250,.14)); }
+    th, td { padding: 13px 15px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: white; }
+    tr:last-child td { border-bottom: 0; }
+    code { color: #e0f2fe; background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.18); padding: 2px 6px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+    .method { font-weight: 900; margin-right: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .get { color: var(--green); } .post { color: var(--blue); } .put { color: var(--yellow); } .patch { color: var(--purple); } .delete { color: var(--red); }
+    .panel { padding: 26px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .arch-step { padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); text-align: center; font-size: 13px; }
+    .arch-step b { display: block; color: var(--accent); margin-bottom: 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    pre { margin: 0; padding: 18px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; color: #e0f2fe; }
+    .pitfalls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pit { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(251,113,133,.06); }
+    .pit b { display: block; color: var(--red); margin-bottom: 6px; }
+    .pit p { margin: 0; color: var(--muted); font-size: 14px; }
+    .script { padding: 26px; }
+    .script p { margin: 0; font-size: 17px; }
+    .script strong { color: var(--accent); }
+    .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+    @media (max-width: 980px) {
+      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      table { min-width: 720px; } .table-box { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="back"><a href="APIs.html">← Volver al playbook</a></nav>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="badge">Caso 6 · Collaboration</div>
+        <h1>Google Docs: edición en tiempo real</h1>
+        <p class="subtitle">Múltiples usuarios editan el mismo documento al mismo tiempo, con presence, cursores remotos, historial y sin pisar trabajo.</p>
+      </div>
+      <aside class="hero-side">
+        <p class="side-title">Problema central</p>
+        <p class="problem">Concurrencia y consistencia: cómo aplicar operaciones de varios clientes sobre el mismo doc sin perder cambios.</p>
+      </aside>
+    </section>
+
+    <section class="quick-grid">
+      <div class="card"><h3>Recursos</h3><p>Document, Operation, Snapshot, Permission, Presence.</p></div>
+      <div class="card"><h3>Operaciones</h3><p>Editar, sincronizar, versionar, compartir, ver historial.</p></div>
+      <div class="card"><h3>Escala</h3><p>Miles de operaciones por documento por minuto en sesiones activas.</p></div>
+      <div class="card"><h3>Riesgo</h3><p>Lost updates, conflictos, permisos rotos, audit débil.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Endpoints</h2><p>WebSocket para edición; HTTP para CRUD y permisos.</p></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Método</th><th>Path</th><th>Descripción</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/documents</code></td><td>Crear documento.</td><td></td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/documents/{id}</code></td><td>Snapshot inicial + version.</td><td></td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/documents/{id}/operations</code></td><td>Aplica operación (insert/delete) sobre version base.</td><td>OT/CRDT.</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/documents/{id}/changes?since={v}</code></td><td>Devuelve operaciones desde versión.</td><td>Catch-up.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/documents/{id}/permissions</code></td><td>Compartir con usuario/grupo.</td><td>RBAC/ACL.</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/documents/{id}/history</code></td><td>Lista versiones para revert.</td><td></td></tr>
+            <tr><td>WS</td><td><code>/ws/documents/{id}</code></td><td>Canal en vivo: ops + presence.</td><td>WebSocket.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Ejemplo: operación</h2></div>
+      <div class="panel">
+<pre>POST /api/documents/d_42/operations
+{
+  "baseVersion": 184,
+  "operations": [
+    { "op": "insert", "pos": 27, "text": "rápido " },
+    { "op": "delete", "pos": 14, "len": 3 }
+  ],
+  "clientId": "c_alice"
+}
+
+200 OK
+{ "appliedAt": 185, "transformed": true }</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Arquitectura</h2></div>
+      <div class="panel">
+        <div class="arch-flow">
+          <div class="arch-step"><b>Cliente</b>Editor + WS</div>
+          <div class="arch-step"><b>Gateway</b>Sticky por doc</div>
+          <div class="arch-step"><b>Doc Svc</b>OT/CRDT engine</div>
+          <div class="arch-step"><b>Op Log</b>Append-only</div>
+          <div class="arch-step"><b>Snapshot</b>Periódico</div>
+          <div class="arch-step"><b>Permissions</b>ACL/RBAC</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Decisiones técnicas</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Concurrencia</td><td>Operational Transform o CRDT.</td><td>Dos algoritmos clásicos; OT es de Google Docs, CRDT es más distribuido.</td></tr>
+            <tr><td>Routing</td><td>Sticky session por documentId.</td><td>Las operaciones se transforman secuencialmente en una sola instancia.</td></tr>
+            <tr><td>Storage</td><td>Op log + snapshots periódicos.</td><td>Reconstruir cualquier versión sin replay completo.</td></tr>
+            <tr><td>Presence</td><td>WebSocket con heartbeat.</td><td>Cursores y avatares en vivo.</td></tr>
+            <tr><td>Permisos</td><td>ACL granular + cache de checks.</td><td>Compartir por usuario, grupo o link.</td></tr>
+            <tr><td>Offline</td><td>Cliente guarda ops y reenvía.</td><td>Resincroniza al volver, OT/CRDT lo absorbe.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Pitfalls</h2></div>
+      <div class="pitfalls">
+        <div class="pit"><b>Lost updates</b><p>Sin OT/CRDT, dos escrituras se pisan. Versionar y transformar siempre.</p></div>
+        <div class="pit"><b>Routing inconsistente</b><p>Si el mismo doc aterriza en dos pods, los logs divergen. Sticky por docId.</p></div>
+        <div class="pit"><b>Auditoría floja</b><p>Sin op log inmutable, no puedes hacer revert ni investigar abuso.</p></div>
+      </div>
+    </section>
+
+    <section class="section script">
+      <p><strong>Script de respuesta:</strong> “Modelo el documento como un append-only op log con OT o CRDT. El editor envía operaciones por WebSocket contra una sticky session por docId; el servidor las transforma contra ops concurrentes y replica el resultado a todos los clientes. Snapshots periódicos aceleran la carga inicial; permisos por ACL controlan acceso. Presence va por el mismo canal. Mido latencia de propagación, conflictos y tasa de revert.”</p>
+    </section>
+
+    <p class="footer">Caso 6 de 10 · System Design Interview Playbook</p>
+  </main>
+</body>
+</html>

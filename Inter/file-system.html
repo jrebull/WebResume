@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File System (Dropbox/GDrive) · System Design</title>
+  <style>
+    :root {
+      --bg: #09090f;
+      --text: #f8fafc;
+      --muted: #a1a1aa;
+      --line: rgba(255,255,255,0.12);
+      --accent: #fbbf24;
+      --green: #34d399;
+      --blue: #38bdf8;
+      --yellow: #fbbf24;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --shadow: 0 30px 80px rgba(0,0,0,.42);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(251,191,36,.18), transparent 30%),
+        radial-gradient(circle at 92% 0%, rgba(56,189,248,.16), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    .back { margin-bottom: 18px; }
+    .back a {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px;
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.03); transition: all .18s ease;
+    }
+    .back a:hover { color: var(--accent); border-color: rgba(251,191,36,.4); }
+    .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 20px; margin-bottom: 22px; }
+    .hero-main, .hero-side, .card, .table-box, .panel, .script { border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78)); box-shadow: var(--shadow); }
+    .hero-main { padding: 36px; }
+    .hero-side { padding: 26px; display: flex; flex-direction: column; gap: 12px; }
+    .badge {
+      display: inline-flex; gap: 8px; padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(251,191,36,.32); background: rgba(251,191,36,.1);
+      color: var(--accent); font-size: 12px; font-weight: 850; letter-spacing: .04em;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(32px, 5.4vw, 60px); line-height: .95; letter-spacing: -.05em; }
+    .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 17px; max-width: 640px; }
+    .side-title { margin: 0; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .problem { margin: 0; font-size: 17px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 8px 0 18px; }
+    .card { padding: 20px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .1em; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 28px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+    .section-head p { margin: 0; color: var(--muted); max-width: 480px; }
+    .table-box { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: linear-gradient(90deg, rgba(251,191,36,.16), rgba(56,189,248,.14)); }
+    th, td { padding: 13px 15px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: white; }
+    tr:last-child td { border-bottom: 0; }
+    code { color: #fef3c7; background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.18); padding: 2px 6px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+    .method { font-weight: 900; margin-right: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .get { color: var(--green); } .post { color: var(--blue); } .put { color: var(--yellow); } .patch { color: var(--purple); } .delete { color: var(--red); }
+    .panel { padding: 26px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .arch-step { padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); text-align: center; font-size: 13px; }
+    .arch-step b { display: block; color: var(--accent); margin-bottom: 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    pre { margin: 0; padding: 18px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; color: #e0f2fe; }
+    .pitfalls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pit { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(251,113,133,.06); }
+    .pit b { display: block; color: var(--red); margin-bottom: 6px; }
+    .pit p { margin: 0; color: var(--muted); font-size: 14px; }
+    .script { padding: 26px; }
+    .script p { margin: 0; font-size: 17px; }
+    .script strong { color: var(--accent); }
+    .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+    @media (max-width: 980px) {
+      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      table { min-width: 720px; } .table-box { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="back"><a href="APIs.html">← Volver al playbook</a></nav>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="badge">Caso 9 · Dropbox/GDrive core</div>
+        <h1>Sistema de archivos en la nube</h1>
+        <p class="subtitle">Crear carpetas, subir archivos en chunks, sincronizar entre dispositivos, versionar y compartir con permisos finos.</p>
+      </div>
+      <aside class="hero-side">
+        <p class="side-title">Problema central</p>
+        <p class="problem">Árbol de metadata + blobs grandes + sincronización + permisos heredados, manteniendo operaciones atómicas.</p>
+      </aside>
+    </section>
+
+    <section class="quick-grid">
+      <div class="card"><h3>Recursos</h3><p>File, Folder, Version, Chunk, Permission, SyncEvent.</p></div>
+      <div class="card"><h3>Operaciones</h3><p>Upload chunked, mover, renombrar, compartir, dedup.</p></div>
+      <div class="card"><h3>Escala</h3><p>Petabytes, miles de millones de archivos, sync continuo.</p></div>
+      <div class="card"><h3>Riesgo</h3><p>Renames no atómicos, permisos rotos, costos de egress.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Endpoints</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Método</th><th>Path</th><th>Descripción</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/files/upload-url</code></td><td>Pre-signed URL multipart por chunks.</td><td>Resumable.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/files/{id}/complete</code></td><td>Finaliza upload, crea versión.</td><td></td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/folders</code></td><td>Crea folder.</td><td></td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/files/{id}/metadata</code></td><td>Metadata + version actual.</td><td></td></tr>
+            <tr><td><span class="method patch">PATCH</span></td><td><code>/api/files/{id}/move</code></td><td>Move/rename atómico.</td><td>Tx en metadata DB.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/files/{id}/share</code></td><td>Comparte con user/grupo/link.</td><td>ACL.</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/files/{id}/versions</code></td><td>Historial de versiones.</td><td></td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/sync/changes?since=...</code></td><td>Delta sync incremental.</td><td>Cliente de escritorio.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Ejemplo: upload chunked</h2></div>
+      <div class="panel">
+<pre>POST /api/files/upload-url
+{ "name": "video.mp4", "sizeBytes": 1073741824, "folderId": "f_4" }
+
+201 Created
+{
+  "fileId": "fi_72",
+  "uploadId": "up_1a",
+  "chunkSize": 8388608,
+  "uploadUrls": ["https://storage/.../1?sig=...", "..."]
+}
+
+POST /api/files/fi_72/complete
+{ "uploadId": "up_1a", "etags": ["...","..."] }</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Arquitectura</h2></div>
+      <div class="panel">
+        <div class="arch-flow">
+          <div class="arch-step"><b>Cliente</b>App/Sync</div>
+          <div class="arch-step"><b>API</b>Pre-signed URLs</div>
+          <div class="arch-step"><b>Object Storage</b>Chunks</div>
+          <div class="arch-step"><b>Metadata DB</b>Tree + ACL</div>
+          <div class="arch-step"><b>Dedup</b>Hash de chunks</div>
+          <div class="arch-step"><b>Sync Stream</b>Eventos</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Decisiones técnicas</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Metadata</td><td>DB con árbol jerárquico (parentId).</td><td>Renames atómicos a nivel registro.</td></tr>
+            <tr><td>Blobs</td><td>Object storage con chunks.</td><td>Resumable, paralelizable, deduplicable.</td></tr>
+            <tr><td>Dedup</td><td>Hash por chunk.</td><td>Ahorro de espacio enorme con archivos comunes.</td></tr>
+            <tr><td>Versioning</td><td>Cada complete crea nueva versión.</td><td>Restore, audit y collab.</td></tr>
+            <tr><td>Sync</td><td>Cliente con changeId; servidor responde delta.</td><td>Incremental, sobrevive a desconexiones.</td></tr>
+            <tr><td>Permisos</td><td>ACL por nodo + herencia.</td><td>Granular pero performante con cache.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Pitfalls</h2></div>
+      <div class="pitfalls">
+        <div class="pit"><b>Move no atómico</b><p>Si renombras una carpeta con miles de hijos sin tx, dejas estado inconsistente.</p></div>
+        <div class="pit"><b>Chunk huérfano</b><p>Sin GC, los blobs sin referencia quedan ocupando espacio.</p></div>
+        <div class="pit"><b>Herencia de permisos</b><p>Calcular ACL recursivo en lectura es lento. Cachea decisiones.</p></div>
+      </div>
+    </section>
+
+    <section class="section script">
+      <p><strong>Script de respuesta:</strong> “Separo metadata (árbol jerárquico, ACL, versiones) del almacenamiento de blobs (object storage en chunks). El upload es chunked y resumable con pre-signed URLs; deduplico por hash. El move/rename es una operación transaccional sólo en metadata. El sync usa un cursor que devuelve deltas. Cachea decisiones de permisos heredados y agrega GC para chunks huérfanos.”</p>
+    </section>
+
+    <p class="footer">Caso 9 de 10 · System Design Interview Playbook</p>
+  </main>
+</body>
+</html>

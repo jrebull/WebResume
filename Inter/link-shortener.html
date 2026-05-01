@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Link Shortener · System Design</title>
+  <style>
+    :root {
+      --bg: #09090f;
+      --text: #f8fafc;
+      --muted: #a1a1aa;
+      --line: rgba(255,255,255,0.12);
+      --accent: #38bdf8;
+      --green: #34d399;
+      --blue: #38bdf8;
+      --yellow: #fbbf24;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --shadow: 0 30px 80px rgba(0,0,0,.42);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(56,189,248,.20), transparent 30%),
+        radial-gradient(circle at 92% 0%, rgba(52,211,153,.16), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    .back { margin-bottom: 18px; }
+    .back a {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px;
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.03); transition: all .18s ease;
+    }
+    .back a:hover { color: var(--accent); border-color: rgba(56,189,248,.4); }
+    .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 20px; margin-bottom: 22px; }
+    .hero-main, .hero-side, .card, .table-box, .panel, .script { border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78)); box-shadow: var(--shadow); }
+    .hero-main { padding: 36px; }
+    .hero-side { padding: 26px; display: flex; flex-direction: column; gap: 12px; }
+    .badge {
+      display: inline-flex; gap: 8px; padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(56,189,248,.32); background: rgba(56,189,248,.1);
+      color: var(--accent); font-size: 12px; font-weight: 850; letter-spacing: .04em;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(32px, 5.4vw, 60px); line-height: .95; letter-spacing: -.05em; }
+    .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 17px; max-width: 640px; }
+    .side-title { margin: 0; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .problem { margin: 0; font-size: 17px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 8px 0 18px; }
+    .card { padding: 20px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .1em; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 28px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+    .section-head p { margin: 0; color: var(--muted); max-width: 480px; }
+    .table-box { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(52,211,153,.14)); }
+    th, td { padding: 13px 15px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: white; }
+    tr:last-child td { border-bottom: 0; }
+    code { color: #e0f2fe; background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.18); padding: 2px 6px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+    .method { font-weight: 900; margin-right: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .get { color: var(--green); } .post { color: var(--blue); } .put { color: var(--yellow); } .patch { color: var(--purple); } .delete { color: var(--red); }
+    .panel { padding: 26px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .arch-step { padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); text-align: center; font-size: 13px; }
+    .arch-step b { display: block; color: var(--accent); margin-bottom: 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    pre { margin: 0; padding: 18px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; color: #e0f2fe; }
+    .pitfalls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pit { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(251,113,133,.06); }
+    .pit b { display: block; color: var(--red); margin-bottom: 6px; }
+    .pit p { margin: 0; color: var(--muted); font-size: 14px; }
+    .script { padding: 26px; }
+    .script p { margin: 0; font-size: 17px; }
+    .script strong { color: var(--accent); }
+    .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+    @media (max-width: 980px) {
+      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      table { min-width: 720px; } .table-box { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="back"><a href="APIs.html">← Volver al playbook</a></nav>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="badge">Caso 8 · TinyURL/Bitly</div>
+        <h1>Link shortener escalable</h1>
+        <p class="subtitle">Convertir URLs largas en códigos cortos únicos y redirigir en milisegundos, con analítica y protección contra abuso.</p>
+      </div>
+      <aside class="hero-side">
+        <p class="side-title">Problema central</p>
+        <p class="problem">Generar IDs cortos sin colisiones a alto volumen y servir redirects con latencia muy baja.</p>
+      </aside>
+    </section>
+
+    <section class="quick-grid">
+      <div class="card"><h3>Recursos</h3><p>Link, ShortCode, Owner, ClickEvent.</p></div>
+      <div class="card"><h3>Operaciones</h3><p>Crear, redirigir, ver stats, expirar, borrar.</p></div>
+      <div class="card"><h3>Escala</h3><p>Lecturas mucho mayores a escrituras (1000:1 típico).</p></div>
+      <div class="card"><h3>Riesgo</h3><p>Colisiones, abuso/spam, links a malware, hot keys.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Endpoints</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Método</th><th>Path</th><th>Descripción</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/links</code></td><td>Crea short link.</td><td>Idempotency-Key.</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/{shortCode}</code></td><td>Redirige 301/302 al destino.</td><td>Cache agresivo.</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/links/{shortCode}</code></td><td>Devuelve metadata sin redirigir.</td><td></td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/links/{shortCode}/stats</code></td><td>Clicks, geo, referrers.</td><td>Pipeline analítico.</td></tr>
+            <tr><td><span class="method delete">DELETE</span></td><td><code>/api/links/{shortCode}</code></td><td>Borrar/desactivar.</td><td>Soft delete.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Ejemplo</h2></div>
+      <div class="panel">
+<pre>POST /api/links
+{ "longUrl": "https://example.com/articulo-largo", "ttlDays": 90 }
+
+201 Created
+{
+  "shortCode": "k8Pq2x",
+  "shortUrl":  "https://x.co/k8Pq2x",
+  "expiresAt": "2026-07-30T00:00:00Z"
+}
+
+GET /k8Pq2x
+→ 302 Found
+Location: https://example.com/articulo-largo</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Arquitectura</h2></div>
+      <div class="panel">
+        <div class="arch-flow">
+          <div class="arch-step"><b>Cliente</b>Web/API</div>
+          <div class="arch-step"><b>API</b>Crear/leer</div>
+          <div class="arch-step"><b>ID Gen</b>Snowflake/range</div>
+          <div class="arch-step"><b>KV Store</b>Redis + DB</div>
+          <div class="arch-step"><b>CDN</b>Edge redirect</div>
+          <div class="arch-step"><b>Analytics</b>Stream</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Decisiones técnicas</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Generación de ID</td><td>Counter + base62, o hash + check.</td><td>Counter evita colisiones por construcción.</td></tr>
+            <tr><td>Storage</td><td>Key-value (DynamoDB/Cassandra) + cache.</td><td>Lookup por shortCode es O(1) y muy hot.</td></tr>
+            <tr><td>Redirect</td><td>302 desde edge cache.</td><td>Latencia mínima y posibilidad de invalidar.</td></tr>
+            <tr><td>Analytics</td><td>Eventos a stream, agregación async.</td><td>No bloquea el redirect.</td></tr>
+            <tr><td>Abuso</td><td>Rate limit + bloomfilter de URL maliciosos.</td><td>Protege a usuarios y reputación.</td></tr>
+            <tr><td>Idempotency</td><td>Misma URL larga puede mapearse al mismo short.</td><td>Optimización opcional, controlable por user.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Pitfalls</h2></div>
+      <div class="pitfalls">
+        <div class="pit"><b>Colisiones por hash</b><p>Si haces hash sin verificar, dos URLs pueden chocar. Verifica antes de escribir.</p></div>
+        <div class="pit"><b>Hot link</b><p>Un link viral satura un shard. Replica reads y cachea agresivo.</p></div>
+        <div class="pit"><b>Spam y malware</b><p>Sin filtro, te conviertes en relay de phishing. Integra blocklists.</p></div>
+      </div>
+    </section>
+
+    <section class="section script">
+      <p><strong>Script de respuesta:</strong> “Genero IDs con un counter base62 para evitar colisiones por construcción y guardo el mapping en KV con cache. El redirect es 302 servido desde edge cache para latencia mínima. Los clicks van por stream a analytics, fuera del path crítico. Agrego rate limit, blocklists y soft delete. Mido p95 del redirect y tasa de cache hit.”</p>
+    </section>
+
+    <p class="footer">Caso 8 de 10 · System Design Interview Playbook</p>
+  </main>
+</body>
+</html>

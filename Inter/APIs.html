@@ -205,7 +205,41 @@
     }
 
     .case { padding: 24px; }
-    .case-top { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 14px; }
+    a.case {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      position: relative;
+    }
+    a.case:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56,189,248,.45);
+      box-shadow: 0 30px 80px rgba(0,0,0,.42), 0 0 0 1px rgba(56,189,248,.22);
+    }
+    a.case::after {
+      content: "↗";
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(56,189,248,.08);
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 900;
+      transition: transform .18s ease, background .18s ease;
+    }
+    a.case:hover::after {
+      transform: rotate(-12deg);
+      background: rgba(56,189,248,.18);
+    }
+    .case-top { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 14px; padding-right: 40px; }
     .tag {
       white-space: nowrap;
       padding: 6px 10px;
@@ -361,7 +395,7 @@
       </div>
 
       <div class="cases">
-        <article class="case">
+        <a class="case" href="ecommerce-top-products.html">
           <div class="case-top">
             <h3>1. E-commerce: top productos comprados</h3>
             <span class="tag">ClipKart.com</span>
@@ -378,9 +412,9 @@
             <div class="api"><span class="method get">GET</span> /api/products/top?window=24h&amp;limit=10</div>
             <div class="api"><span class="method post">POST</span> /api/orders</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="ride-sharing.html">
           <div class="case-top">
             <h3>2. Ride-sharing service</h3>
             <span class="tag">Uber/Lyft</span>
@@ -397,9 +431,9 @@
             <div class="api"><span class="method get">GET</span> /api/drivers/nearby?lat=...&amp;lng=...</div>
             <div class="api"><span class="method post">POST</span> /api/rides/{rideId}/accept</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="youtube-streaming.html">
           <div class="case-top">
             <h3>3. YouTube / streaming service</h3>
             <span class="tag">Video</span>
@@ -416,9 +450,9 @@
             <div class="api"><span class="method get">GET</span> /api/videos/{videoId}</div>
             <div class="api"><span class="method get">GET</span> /api/videos/{videoId}/stream</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="spotify.html">
           <div class="case-top">
             <h3>4. Spotify</h3>
             <span class="tag">Music</span>
@@ -435,9 +469,9 @@
             <div class="api"><span class="method post">POST</span> /api/playlists/{playlistId}/tracks</div>
             <div class="api"><span class="method get">GET</span> /api/recommendations?userId=...</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="tiktok-feed.html">
           <div class="case-top">
             <h3>5. TikTok feed</h3>
             <span class="tag">Feed ranking</span>
@@ -454,9 +488,9 @@
             <div class="api"><span class="method post">POST</span> /api/events/like</div>
             <div class="api"><span class="method get">GET</span> /api/videos/{videoId}</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="google-docs.html">
           <div class="case-top">
             <h3>6. Google Docs</h3>
             <span class="tag">Collaboration</span>
@@ -473,9 +507,9 @@
             <div class="api"><span class="method post">POST</span> /api/documents/{documentId}/operations</div>
             <div class="api"><span class="method get">GET</span> /api/documents/{documentId}/changes?since=...</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="recommendation-systems.html">
           <div class="case-top">
             <h3>7. Recommendation Systems</h3>
             <span class="tag">Tu mero mole</span>
@@ -492,9 +526,9 @@
             <div class="api"><span class="method post">POST</span> /api/events/click</div>
             <div class="api"><span class="method post">POST</span> /api/events/purchase</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="link-shortener.html">
           <div class="case-top">
             <h3>8. Link shortener</h3>
             <span class="tag">TinyURL/Bitly</span>
@@ -511,9 +545,9 @@
             <div class="api"><span class="method get">GET</span> /api/links/{shortCode}/stats</div>
             <div class="api"><span class="method delete">DELETE</span> /api/links/{shortCode}</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="file-system.html">
           <div class="case-top">
             <h3>9. File system</h3>
             <span class="tag">Dropbox/GDrive core</span>
@@ -530,9 +564,9 @@
             <div class="api"><span class="method get">GET</span> /api/files/{fileId}/metadata</div>
             <div class="api"><span class="method post">POST</span> /api/files/{fileId}/share</div>
           </div>
-        </article>
+        </a>
 
-        <article class="case">
+        <a class="case" href="dbms.html">
           <div class="case-top">
             <h3>10. DBMS / manejador de base de datos</h3>
             <span class="tag">Difícil pero defendible</span>
@@ -549,7 +583,7 @@
             <div class="api"><span class="method post">POST</span> /api/transactions/{txId}/commit</div>
             <div class="api"><span class="method post">POST</span> /api/transactions/{txId}/rollback</div>
           </div>
-        </article>
+        </a>
       </div>
     </section>
 

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recommendation Systems · System Design</title>
+  <style>
+    :root {
+      --bg: #09090f;
+      --text: #f8fafc;
+      --muted: #a1a1aa;
+      --line: rgba(255,255,255,0.12);
+      --accent: #a78bfa;
+      --green: #34d399;
+      --blue: #38bdf8;
+      --yellow: #fbbf24;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --shadow: 0 30px 80px rgba(0,0,0,.42);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(167,139,250,.20), transparent 30%),
+        radial-gradient(circle at 92% 0%, rgba(56,189,248,.16), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    .back { margin-bottom: 18px; }
+    .back a {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px;
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.03); transition: all .18s ease;
+    }
+    .back a:hover { color: var(--accent); border-color: rgba(167,139,250,.4); }
+    .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 20px; margin-bottom: 22px; }
+    .hero-main, .hero-side, .card, .table-box, .panel, .script { border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78)); box-shadow: var(--shadow); }
+    .hero-main { padding: 36px; }
+    .hero-side { padding: 26px; display: flex; flex-direction: column; gap: 12px; }
+    .badge {
+      display: inline-flex; gap: 8px; padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(167,139,250,.32); background: rgba(167,139,250,.1);
+      color: var(--accent); font-size: 12px; font-weight: 850; letter-spacing: .04em;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(32px, 5.4vw, 60px); line-height: .95; letter-spacing: -.05em; }
+    .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 17px; max-width: 640px; }
+    .side-title { margin: 0; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .problem { margin: 0; font-size: 17px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 8px 0 18px; }
+    .card { padding: 20px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .1em; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 28px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+    .section-head p { margin: 0; color: var(--muted); max-width: 480px; }
+    .table-box { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: linear-gradient(90deg, rgba(167,139,250,.18), rgba(56,189,248,.14)); }
+    th, td { padding: 13px 15px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: white; }
+    tr:last-child td { border-bottom: 0; }
+    code { color: #ede9fe; background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.18); padding: 2px 6px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+    .method { font-weight: 900; margin-right: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .get { color: var(--green); } .post { color: var(--blue); } .put { color: var(--yellow); } .patch { color: var(--purple); } .delete { color: var(--red); }
+    .panel { padding: 26px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .arch-step { padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); text-align: center; font-size: 13px; }
+    .arch-step b { display: block; color: var(--accent); margin-bottom: 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    pre { margin: 0; padding: 18px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; color: #e0f2fe; }
+    .pitfalls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pit { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(251,113,133,.06); }
+    .pit b { display: block; color: var(--red); margin-bottom: 6px; }
+    .pit p { margin: 0; color: var(--muted); font-size: 14px; }
+    .script { padding: 26px; }
+    .script p { margin: 0; font-size: 17px; }
+    .script strong { color: var(--accent); }
+    .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+    @media (max-width: 980px) {
+      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      table { min-width: 720px; } .table-box { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="back"><a href="APIs.html">← Volver al playbook</a></nav>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="badge">Caso 7 · Tu mero mole</div>
+        <h1>Sistemas de recomendación</h1>
+        <p class="subtitle">Generar candidatos relevantes para cada usuario, rankearlos rápido y aprender continuamente del feedback.</p>
+      </div>
+      <aside class="hero-side">
+        <p class="side-title">Problema central</p>
+        <p class="problem">Pipeline de candidates → ranker → feedback con baja latencia, manteniendo modelos frescos y métricas controladas.</p>
+      </aside>
+    </section>
+
+    <section class="quick-grid">
+      <div class="card"><h3>Recursos</h3><p>Recommendation, Candidate, FeatureVector, Event, Experiment.</p></div>
+      <div class="card"><h3>Operaciones</h3><p>Generar, rankear, registrar feedback, A/B test.</p></div>
+      <div class="card"><h3>Escala</h3><p>Millones de items, millones de users, decisiones por segundo.</p></div>
+      <div class="card"><h3>Riesgo</h3><p>Cold start, sesgo de exposición, drift, feedback loop tóxico.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Endpoints</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Método</th><th>Path</th><th>Descripción</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/recommendations?userId=&amp;context=home</code></td><td>Lista rankeada para un slot.</td><td>Latencia objetivo &lt;100ms.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/events/impression</code></td><td>Vista del item en pantalla.</td><td>Imprescindible para CTR.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/events/click</code></td><td>Click en una recomendación.</td><td></td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/events/conversion</code></td><td>Compra/like/save.</td><td>Señal positiva fuerte.</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/recommendations/explain?recId=...</code></td><td>Razón de la recomendación.</td><td>Útil para confianza.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/experiments/assign</code></td><td>Devuelve variante A/B.</td><td>Ideal stickiness por user.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Ejemplo</h2></div>
+      <div class="panel">
+<pre>GET /api/recommendations?userId=u_44&amp;context=home&amp;limit=10
+
+200 OK
+{
+  "experiment": "ranker_v3.2",
+  "items": [
+    { "id": "i_99", "score": 0.91, "reason": "similar_to_recent" },
+    { "id": "i_42", "score": 0.88, "reason": "popular_in_cohort" }
+  ]
+}</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Arquitectura</h2></div>
+      <div class="panel">
+        <div class="arch-flow">
+          <div class="arch-step"><b>Cliente</b>App/Web</div>
+          <div class="arch-step"><b>Reco API</b>Online</div>
+          <div class="arch-step"><b>Candidate Gen</b>ANN, recall</div>
+          <div class="arch-step"><b>Ranker</b>Modelo online</div>
+          <div class="arch-step"><b>Feature Store</b>User + item</div>
+          <div class="arch-step"><b>Event Pipeline</b>Stream → Train</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Decisiones técnicas</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Two-stage</td><td>Recall (mucha cantidad) + ranking (pocos, finos).</td><td>Costo y latencia, patrón estándar.</td></tr>
+            <tr><td>Embeddings</td><td>ANN (HNSW, FAISS, ScaNN) para recall.</td><td>Subsegundo aún con millones de items.</td></tr>
+            <tr><td>Features</td><td>Online + offline en feature store unificado.</td><td>Train/serve consistency.</td></tr>
+            <tr><td>Modelo</td><td>Entrenado offline, servido online.</td><td>Estabilidad de latencia, A/B sano.</td></tr>
+            <tr><td>Eventos</td><td>Stream con dedup y latencia &lt; segundos.</td><td>Aprende rápido del usuario.</td></tr>
+            <tr><td>Experimentos</td><td>Asignación stickyness por hash del userId.</td><td>Resultados consistentes en sesión.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Pitfalls</h2></div>
+      <div class="pitfalls">
+        <div class="pit"><b>Train/serve skew</b><p>Si las features online no matchean con las del entrenamiento, el modelo miente.</p></div>
+        <div class="pit"><b>Cold start</b><p>Usuarios nuevos sin historial. Usa popularidad, geografía, onboarding.</p></div>
+        <div class="pit"><b>Feedback loop</b><p>El modelo se reinforza a sí mismo. Reserva tráfico para exploración.</p></div>
+      </div>
+    </section>
+
+    <section class="section script">
+      <p><strong>Script de respuesta:</strong> “Diseño un pipeline de dos etapas: recall (con ANN sobre embeddings) y ranking (modelo offline servido online). Las features viven en un feature store compartido entre training y serving para evitar skew. Los eventos van por stream y alimentan el ciclo de re-entrenamiento. Manejo experimentos con asignación sticky por user, mido CTR, conversion, diversidad y exploro un porcentaje del tráfico.”</p>
+    </section>
+
+    <p class="footer">Caso 7 de 10 · System Design Interview Playbook</p>
+  </main>
+</body>
+</html>

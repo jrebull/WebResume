@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DBMS · System Design</title>
+  <style>
+    :root {
+      --bg: #09090f;
+      --text: #f8fafc;
+      --muted: #a1a1aa;
+      --line: rgba(255,255,255,0.12);
+      --accent: #a78bfa;
+      --green: #34d399;
+      --blue: #38bdf8;
+      --yellow: #fbbf24;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --shadow: 0 30px 80px rgba(0,0,0,.42);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(167,139,250,.20), transparent 30%),
+        radial-gradient(circle at 92% 0%, rgba(244,114,182,.14), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    .back { margin-bottom: 18px; }
+    .back a {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px;
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.03); transition: all .18s ease;
+    }
+    .back a:hover { color: var(--accent); border-color: rgba(167,139,250,.4); }
+    .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 20px; margin-bottom: 22px; }
+    .hero-main, .hero-side, .card, .table-box, .panel, .script { border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78)); box-shadow: var(--shadow); }
+    .hero-main { padding: 36px; }
+    .hero-side { padding: 26px; display: flex; flex-direction: column; gap: 12px; }
+    .badge {
+      display: inline-flex; gap: 8px; padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(167,139,250,.32); background: rgba(167,139,250,.1);
+      color: var(--accent); font-size: 12px; font-weight: 850; letter-spacing: .04em;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(32px, 5.4vw, 60px); line-height: .95; letter-spacing: -.05em; }
+    .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 17px; max-width: 640px; }
+    .side-title { margin: 0; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .problem { margin: 0; font-size: 17px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 8px 0 18px; }
+    .card { padding: 20px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .1em; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 28px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+    .section-head p { margin: 0; color: var(--muted); max-width: 480px; }
+    .table-box { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: linear-gradient(90deg, rgba(167,139,250,.18), rgba(244,114,182,.14)); }
+    th, td { padding: 13px 15px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: white; }
+    tr:last-child td { border-bottom: 0; }
+    code { color: #ede9fe; background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.18); padding: 2px 6px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+    .method { font-weight: 900; margin-right: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .get { color: var(--green); } .post { color: var(--blue); } .put { color: var(--yellow); } .patch { color: var(--purple); } .delete { color: var(--red); }
+    .panel { padding: 26px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .arch-step { padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); text-align: center; font-size: 13px; }
+    .arch-step b { display: block; color: var(--accent); margin-bottom: 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    pre { margin: 0; padding: 18px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; color: #e0f2fe; }
+    .pitfalls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pit { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(251,113,133,.06); }
+    .pit b { display: block; color: var(--red); margin-bottom: 6px; }
+    .pit p { margin: 0; color: var(--muted); font-size: 14px; }
+    .script { padding: 26px; }
+    .script p { margin: 0; font-size: 17px; }
+    .script strong { color: var(--accent); }
+    .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+    @media (max-width: 980px) {
+      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      table { min-width: 720px; } .table-box { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="back"><a href="APIs.html">← Volver al playbook</a></nav>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="badge">Caso 10 · Difícil pero defendible</div>
+        <h1>Manejador de base de datos (DBMS)</h1>
+        <p class="subtitle">Recibir queries SQL, parsear, planear, ejecutar, manejar transacciones y persistir páginas con durabilidad ACID.</p>
+      </div>
+      <aside class="hero-side">
+        <p class="side-title">Problema central</p>
+        <p class="problem">Storage engine, índices, planner y transacciones, todo coordinado para garantizar ACID y recuperación ante fallas.</p>
+      </aside>
+    </section>
+
+    <section class="quick-grid">
+      <div class="card"><h3>Recursos</h3><p>Query, Transaction, Page, Index, Lock, WAL.</p></div>
+      <div class="card"><h3>Operaciones</h3><p>Parse, plan, execute, commit, rollback, recover.</p></div>
+      <div class="card"><h3>Escala</h3><p>Miles de queries/seg, terabytes en disco, varias replicas.</p></div>
+      <div class="card"><h3>Riesgo</h3><p>Pérdida de datos, deadlocks, lecturas sucias, replication lag.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Endpoints</h2><p>Aunque la mayoría hablan SQL, exponer un API REST es una buena vista para entrevistas.</p></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Método</th><th>Path</th><th>Descripción</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/query</code></td><td>Ejecuta SELECT con isolation level.</td><td>Read-only.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/transactions</code></td><td>Inicia transacción.</td><td>Devuelve txId.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/transactions/{txId}/execute</code></td><td>Ejecuta DML dentro de tx.</td><td></td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/transactions/{txId}/commit</code></td><td>Commit y fsync WAL.</td><td>Durabilidad.</td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/transactions/{txId}/rollback</code></td><td>Deshacer cambios.</td><td>Atomicidad.</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/explain?sql=...</code></td><td>Plan estimado del query.</td><td>Debugging.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Ejemplo</h2></div>
+      <div class="panel">
+<pre>POST /api/transactions
+→ { "txId": "tx_91", "isolation": "REPEATABLE_READ" }
+
+POST /api/transactions/tx_91/execute
+{ "sql": "UPDATE accounts SET balance = balance - 100 WHERE id = 1" }
+→ { "rowsAffected": 1 }
+
+POST /api/transactions/tx_91/execute
+{ "sql": "UPDATE accounts SET balance = balance + 100 WHERE id = 2" }
+→ { "rowsAffected": 1 }
+
+POST /api/transactions/tx_91/commit
+→ { "committed": true, "lsn": 8421192 }</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Arquitectura</h2></div>
+      <div class="panel">
+        <div class="arch-flow">
+          <div class="arch-step"><b>Parser</b>SQL → AST</div>
+          <div class="arch-step"><b>Planner</b>AST → Plan</div>
+          <div class="arch-step"><b>Executor</b>Itera op-tree</div>
+          <div class="arch-step"><b>Buffer Pool</b>Páginas en RAM</div>
+          <div class="arch-step"><b>WAL</b>Log de cambios</div>
+          <div class="arch-step"><b>Storage</b>B+Tree/LSM</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Decisiones técnicas</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Storage engine</td><td>B+Tree para reads-balanced, LSM para write-heavy.</td><td>Cada uno optimiza un patrón distinto.</td></tr>
+            <tr><td>Buffer pool</td><td>Cache de páginas con LRU/Clock.</td><td>Disco es lento; RAM acelera reads y writes.</td></tr>
+            <tr><td>WAL</td><td>Append-only log antes de aplicar a páginas.</td><td>Durabilidad y recuperación tras crash.</td></tr>
+            <tr><td>Concurrencia</td><td>2PL o MVCC.</td><td>2PL es estricto, MVCC da reads sin bloqueo.</td></tr>
+            <tr><td>Replicación</td><td>WAL shipping síncrono o asíncrono.</td><td>Trade durabilidad vs latencia.</td></tr>
+            <tr><td>Recovery</td><td>ARIES (analysis, redo, undo).</td><td>Patrón clásico para volver a un estado consistente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Pitfalls</h2></div>
+      <div class="pitfalls">
+        <div class="pit"><b>Commit sin fsync</b><p>El commit no es durable hasta que el WAL toca disco. Cuidado con fsync deshabilitado.</p></div>
+        <div class="pit"><b>Deadlocks</b><p>Con 2PL, dos tx pueden esperarse infinito. Detecta ciclos y aborta una.</p></div>
+        <div class="pit"><b>Replication lag</b><p>Async ofrece latencia baja pero pierdes datos en failover. Síncrono cuesta latencia.</p></div>
+      </div>
+    </section>
+
+    <section class="section script">
+      <p><strong>Script de respuesta:</strong> “El query entra, se parsea, el planner elige índices y join order, el executor itera el plan. Las páginas viven en buffer pool; toda escritura va primero al WAL antes de modificar la página, así garantizo durabilidad. Para concurrencia uso MVCC para leer sin bloquear y 2PL en escrituras críticas. La replicación va por WAL shipping; recovery sigue ARIES. Mido p99, lock wait, replication lag y cache hit ratio.”</p>
+    </section>
+
+    <p class="footer">Caso 10 de 10 · System Design Interview Playbook</p>
+  </main>
+</body>
+</html>

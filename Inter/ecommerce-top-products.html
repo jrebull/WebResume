@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-commerce Top Productos · System Design</title>
+  <style>
+    :root {
+      --bg: #09090f;
+      --panel: #111827;
+      --text: #f8fafc;
+      --muted: #a1a1aa;
+      --line: rgba(255,255,255,0.12);
+      --accent: #fbbf24;
+      --accent-2: #fb7185;
+      --green: #34d399;
+      --blue: #38bdf8;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --shadow: 0 30px 80px rgba(0,0,0,.42);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(251,191,36,.18), transparent 30%),
+        radial-gradient(circle at 92% 0%, rgba(251,113,133,.16), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 72px; }
+    .back { margin-bottom: 18px; }
+    .back a {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px;
+      padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.03); transition: all .18s ease;
+    }
+    .back a:hover { color: var(--accent); border-color: rgba(251,191,36,.4); }
+    .hero, .quick-grid, .card, .table-box, .panel, .script { border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78)); box-shadow: var(--shadow); }
+    .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 20px; padding: 0; margin-bottom: 22px; border: 0; box-shadow: none; background: none; }
+    .hero-main, .hero-side { border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78)); box-shadow: var(--shadow); padding: 36px; }
+    .badge {
+      display: inline-flex; gap: 8px; padding: 7px 12px; border-radius: 999px;
+      border: 1px solid rgba(251,191,36,.32); background: rgba(251,191,36,.1);
+      color: var(--accent); font-size: 12px; font-weight: 850; letter-spacing: .04em;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(32px, 5.4vw, 60px); line-height: .95; letter-spacing: -.05em; }
+    .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 17px; max-width: 640px; }
+    .hero-side { padding: 26px; display: flex; flex-direction: column; gap: 12px; }
+    .side-title { margin: 0; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .problem { margin: 0; font-size: 17px; color: var(--text); }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 0; border: 0; background: none; box-shadow: none; margin: 8px 0 18px; }
+    .card { padding: 20px; }
+    .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .1em; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .section { margin-top: 28px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+    .section-head p { margin: 0; color: var(--muted); max-width: 480px; }
+    .table-box { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: linear-gradient(90deg, rgba(251,191,36,.16), rgba(251,113,133,.12)); }
+    th, td { padding: 13px 15px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: white; }
+    tr:last-child td { border-bottom: 0; }
+    code { color: #fef3c7; background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.18); padding: 2px 6px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+    .method { font-weight: 900; margin-right: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .get { color: var(--green); } .post { color: var(--blue); } .put { color: var(--accent); } .patch { color: var(--purple); } .delete { color: var(--red); }
+    .panel { padding: 26px; }
+    .arch-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 10px; }
+    .arch-step { padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); text-align: center; font-size: 13px; }
+    .arch-step b { display: block; color: var(--accent); margin-bottom: 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    pre { margin: 0; padding: 18px; border-radius: 14px; background: rgba(0,0,0,.35); border: 1px solid var(--line); overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; color: #e0f2fe; }
+    .pitfalls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .pit { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: rgba(251,113,133,.06); }
+    .pit b { display: block; color: var(--red); margin-bottom: 6px; }
+    .pit p { margin: 0; color: var(--muted); font-size: 14px; }
+    .script { padding: 26px; }
+    .script p { margin: 0; font-size: 17px; }
+    .script strong { color: var(--accent); }
+    .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+    @media (max-width: 980px) {
+      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      table { min-width: 720px; } .table-box { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="back"><a href="APIs.html">← Volver al playbook</a></nav>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="badge">Caso 1 · ClipKart.com</div>
+        <h1>Top productos comprados por ventana</h1>
+        <p class="subtitle">Diseñar una API que devuelve los 10 productos más comprados en la última 1h, 4h o 24h, con baja latencia y bajo costo.</p>
+      </div>
+      <aside class="hero-side">
+        <p class="side-title">Problema central</p>
+        <p class="problem">Ranking en ventanas deslizantes sobre eventos de compra a alta frecuencia, sin escanear toda la tabla de órdenes en cada request.</p>
+      </aside>
+    </section>
+
+    <section class="quick-grid">
+      <div class="card"><h3>Recursos</h3><p>Producto, Orden, EventoCompra, RankingPorVentana.</p></div>
+      <div class="card"><h3>Operaciones</h3><p>Lectura del top, ingestión de eventos, agregación, expiración.</p></div>
+      <div class="card"><h3>Escala</h3><p>Miles de compras/seg, millones de productos, lecturas mucho mayores a escrituras.</p></div>
+      <div class="card"><h3>Riesgo</h3><p>Inconsistencia entre ventanas, hot keys, cache stampede.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Endpoints</h2><p>Lectura cacheada del top y escritura de eventos en path crítico mínimo.</p></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Método</th><th>Path</th><th>Descripción</th><th>Respuesta</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/products/top?window=1h&amp;limit=10</code></td><td>Devuelve top productos de la última hora.</td><td><code>200</code> lista ordenada</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/products/top?window=4h&amp;limit=10</code></td><td>Top 4 horas, lectura de cache.</td><td><code>200</code></td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/products/top?window=24h&amp;limit=10</code></td><td>Top 24 horas, ventana más estable.</td><td><code>200</code></td></tr>
+            <tr><td><span class="method post">POST</span></td><td><code>/api/orders</code></td><td>Crea orden y emite evento de compra al stream.</td><td><code>201</code> con orderId</td></tr>
+            <tr><td><span class="method get">GET</span></td><td><code>/api/products/{id}</code></td><td>Detalle de producto para hidratar el top.</td><td><code>200</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Ejemplo de respuesta</h2><p>El cliente recibe IDs y datos mínimos; los detalles se hidratan con cache aparte.</p></div>
+      <div class="panel">
+<pre>GET /api/products/top?window=1h&amp;limit=10
+
+{
+  "window": "1h",
+  "generatedAt": "2026-05-01T12:30:00Z",
+  "items": [
+    { "productId": "p_8821", "rank": 1, "score": 1842 },
+    { "productId": "p_5510", "rank": 2, "score": 1217 },
+    { "productId": "p_9034", "rank": 3, "score":  998 }
+  ]
+}</pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Arquitectura</h2><p>Path de escritura desacoplado. Las lecturas no tocan la base transaccional.</p></div>
+      <div class="panel">
+        <div class="arch-flow">
+          <div class="arch-step"><b>Cliente</b>Web/Móvil</div>
+          <div class="arch-step"><b>API GW</b>Auth + rate limit</div>
+          <div class="arch-step"><b>Order Service</b>POST /orders</div>
+          <div class="arch-step"><b>Stream</b>Kafka/Kinesis</div>
+          <div class="arch-step"><b>Aggregator</b>Sliding window</div>
+          <div class="arch-step"><b>Cache</b>Redis sorted set</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Decisiones técnicas</h2></div>
+      <div class="table-box">
+        <table>
+          <thead><tr><th>Tema</th><th>Decisión</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Almacenamiento del ranking</td><td>Redis Sorted Set por ventana (<code>top:1h</code>, <code>top:4h</code>, <code>top:24h</code>).</td><td>Escribir y leer top-K en O(log N), TTL natural por ventana.</td></tr>
+            <tr><td>Ingestión</td><td>Eventos asíncronos vía Kafka.</td><td>Desacoplar el checkout del cómputo del ranking.</td></tr>
+            <tr><td>Agregación</td><td>Sliding window con buckets de 1 min.</td><td>Combinar 60 buckets para 1h, 240 para 4h, 1440 para 24h.</td></tr>
+            <tr><td>Cache de lectura</td><td>Edge cache con TTL 5–30s.</td><td>Las consultas son popularmente repetidas y tolerantes a delay.</td></tr>
+            <tr><td>Idempotency</td><td>Clave por <code>orderId</code>.</td><td>Evitar contar la misma compra dos veces si el productor reintenta.</td></tr>
+            <tr><td>Hidratación</td><td>Cliente pide detalles en lote a <code>/api/products/{id}</code>.</td><td>El ranking se queda ligero y no se invalida si cambia el catálogo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Pitfalls</h2></div>
+      <div class="pitfalls">
+        <div class="pit"><b>No escanear la tabla de órdenes</b><p>Cada lectura del top no debe tocar la base transaccional, sólo cache o sorted set.</p></div>
+        <div class="pit"><b>Cuidado con cache stampede</b><p>Si expira el top a la vez en muchas regiones, miles de pods pegan al aggregator a la vez.</p></div>
+        <div class="pit"><b>Hot keys</b><p>Productos virales pueden saturar un solo shard de Redis. Particiona por <code>productId hash</code>.</p></div>
+      </div>
+    </section>
+
+    <section class="section script">
+      <p><strong>Script de respuesta:</strong> “Trato la creación de orden como recurso REST con <code>POST /api/orders</code>, pero emito un evento al stream para que un agregador mantenga sorted sets en Redis con buckets de 1 minuto. La API <code>GET /api/products/top?window=...</code> sólo lee de Redis, no de la DB transaccional. Pongo TTL corto en edge para absorber tráfico, idempotency por <code>orderId</code> para no contar dos veces, y mido p99 más tasa de cache hit.”</p>
+    </section>
+
+    <p class="footer">Caso 1 de 10 · System Design Interview Playbook</p>
+  </main>
+</body>
+</html>
