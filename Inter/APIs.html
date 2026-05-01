@@ -3,408 +3,1631 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Playbook para System Design Interview</title>
+  <title>API Design Cheat Sheet · Google System Design Interview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #09090f;
-      --panel: #111827;
-      --panel-2: #172033;
-      --text: #f8fafc;
-      --muted: #a1a1aa;
-      --line: rgba(255,255,255,0.12);
-      --blue: #38bdf8;
-      --purple: #a78bfa;
-      --green: #34d399;
-      --yellow: #fbbf24;
+      --bg: #0b1020;
+      --bg-2: #0f172a;
+      --card: #111827;
+      --card-2: #1e293b;
+      --text: #e5e7eb;
+      --text-bright: #f8fafc;
+      --muted: #94a3b8;
+      --dim: #64748b;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --google-blue: #4285f4;
+      --google-red: #ea4335;
+      --google-yellow: #fbbc04;
+      --google-green: #34a853;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
       --pink: #f472b6;
-      --red: #fb7185;
-      --shadow: 0 30px 80px rgba(0,0,0,.42);
+
+      /* HTTP method colors */
+      --get: #34d399;
+      --post: #38bdf8;
+      --put: #fbbf24;
+      --patch: #a78bfa;
+      --delete: #fb7185;
+
+      --border: rgba(255, 255, 255, 0.10);
+      --border-bright: rgba(255, 255, 255, 0.18);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
     }
 
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
       background:
-        radial-gradient(circle at 8% 4%, rgba(56,189,248,.18), transparent 30%),
-        radial-gradient(circle at 92% 0%, rgba(167,139,250,.19), transparent 32%),
-        radial-gradient(circle at 70% 85%, rgba(52,211,153,.08), transparent 28%),
+        radial-gradient(circle at 0% 0%, rgba(251, 188, 4, 0.10), transparent 40%),
+        radial-gradient(circle at 100% 0%, rgba(234, 67, 53, 0.10), transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(66, 133, 244, 0.08), transparent 50%),
         var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.55;
+      font-size: 15px;
     }
 
-    .page {
-      width: min(1220px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 42px 0 72px;
-    }
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
 
-    .hero {
+    /* ============ STICKY TOPBAR ============ */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 16, 32, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
       display: grid;
-      grid-template-columns: 1.22fr .78fr;
-      gap: 22px;
-      margin-bottom: 24px;
-    }
-
-    .hero-main, .hero-side, .card, .table-box, .case, .script, .formula {
-      border: 1px solid var(--line);
-      background: linear-gradient(145deg, rgba(17,24,39,.96), rgba(30,41,59,.78));
-      box-shadow: var(--shadow);
-      border-radius: 28px;
-    }
-
-    .hero-main {
-      padding: 42px;
-      overflow: hidden;
-      position: relative;
-      min-height: 360px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .hero-main:after {
-      content: "API";
-      position: absolute;
-      right: -6px;
-      bottom: -42px;
-      font-size: 190px;
-      font-weight: 950;
-      letter-spacing: -.12em;
-      color: rgba(255,255,255,.035);
-      line-height: 1;
-    }
-
-    .badge {
-      display: inline-flex;
+      grid-template-columns: auto 1fr auto;
+      gap: 18px;
       align-items: center;
-      width: fit-content;
-      gap: 8px;
-      padding: 8px 13px;
-      border-radius: 999px;
-      border: 1px solid rgba(56,189,248,.28);
-      background: rgba(56,189,248,.09);
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 850;
-      letter-spacing: .02em;
-      margin-bottom: 18px;
     }
 
-    h1 {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      max-width: 880px;
-      font-size: clamp(40px, 6.3vw, 78px);
-      line-height: .92;
-      letter-spacing: -.07em;
-    }
-
-    .subtitle {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: 24px 0 0;
-      color: var(--muted);
-      font-size: 18px;
-    }
-
-    .hero-side {
-      padding: 26px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .side-title {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      font-weight: 900;
-    }
-
-    .endpoint {
-      padding: 14px 16px;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.045);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 14px;
-    }
-
-    .method { font-weight: 900; margin-right: 8px; }
-    .get { color: var(--green); }
-    .post { color: var(--blue); }
-    .put { color: var(--yellow); }
-    .patch { color: var(--purple); }
-    .delete { color: var(--red); }
-
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin: 24px 0;
-    }
-
-    .card { padding: 22px; }
-    .card h2 { margin: 0 0 8px; font-size: 21px; letter-spacing: -.035em; }
-    .card p { margin: 0; color: var(--muted); font-size: 15px; }
-
-    .section { margin-top: 34px; }
-    .section-head {
+    .brand {
       display: flex;
-      align-items: end;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--google-yellow), var(--google-red));
+      box-shadow: 0 0 12px var(--google-yellow);
+    }
+
+    .brand-back {
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: 4px;
+    }
+
+    .search-wrap {
+      position: relative;
+      max-width: 560px;
+      width: 100%;
+      justify-self: center;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 44px 10px 38px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-bright);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.15s;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--google-yellow);
+      background: rgba(251, 188, 4, 0.06);
+      box-shadow: 0 0 0 3px rgba(251, 188, 4, 0.15);
+    }
+
+    .search-wrap::before {
+      content: "🔍";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      opacity: 0.6;
+    }
+
+    .search-wrap kbd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 2px 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-bright);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .topnav {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .topnav a {
+      padding: 7px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .topnav a:hover {
+      color: var(--text-bright);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* ============ MAIN LAYOUT ============ */
+    .page {
+      width: min(1280px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 80px;
+    }
+
+    .section {
+      margin-top: 36px;
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      display: flex;
       justify-content: space-between;
+      align-items: end;
       gap: 20px;
       margin: 0 0 16px;
     }
-    .section-head h2 { margin: 0; font-size: 32px; letter-spacing: -.045em; }
-    .section-head p { margin: 0; max-width: 560px; color: var(--muted); }
 
-    .table-box { overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; font-size: 15px; }
-    thead { background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(167,139,250,.15)); }
-    th, td { padding: 15px 17px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
-    th { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: white; }
-    tr:last-child td { border-bottom: 0; }
-    tbody tr:hover { background: rgba(255,255,255,.035); }
-    code {
-      color: #e0f2fe;
-      background: rgba(56,189,248,.09);
-      border: 1px solid rgba(56,189,248,.14);
-      padding: 2px 6px;
-      border-radius: 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: .92em;
+    .section-header h2 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .formula { padding: 28px; }
-    .formula-grid {
+    .section-header .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--google-yellow), var(--google-red));
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .section-header p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 560px;
+      font-size: 14px;
+    }
+
+    /* ============ HERO ============ */
+    .hero {
+      padding: 32px 36px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.94), rgba(30, 41, 59, 0.7));
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .hero::after {
+      content: "API";
+      position: absolute;
+      right: -10px;
+      bottom: -50px;
+      font-size: 200px;
+      font-weight: 900;
+      letter-spacing: -0.1em;
+      color: rgba(255, 255, 255, 0.025);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(251, 188, 4, 0.16), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid rgba(251, 188, 4, 0.4);
+      border-radius: 999px;
+      color: var(--google-yellow);
+      background: rgba(251, 188, 4, 0.1);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 14px 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+      max-width: 880px;
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--google-yellow), var(--google-red) 60%, var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero .subtitle {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 720px;
+    }
+
+    /* ============ CARDS / GRIDS ============ */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px; }
+
+    .card {
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.85), rgba(30, 41, 59, 0.6));
+      border-radius: 14px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card .icon { font-size: 18px; }
+
+    .card p, .card li {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .card ul { padding-left: 18px; margin: 6px 0 0; }
+    .card li { margin: 4px 0; }
+
+    /* ============ FRAMEWORK STEPS ============ */
+    .steps {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
       margin-top: 16px;
     }
-    .step {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.045);
-      border-radius: 18px;
-      padding: 16px;
-    }
-    .step b { display: block; color: white; margin-bottom: 4px; }
-    .step span { color: var(--muted); font-size: 14px; }
 
+    .step {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(17, 24, 39, 0.7);
+      transition: all 0.15s;
+    }
+
+    .step:hover {
+      border-color: var(--google-yellow);
+      transform: translateY(-2px);
+    }
+
+    .step .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--google-yellow);
+      letter-spacing: 0.1em;
+    }
+
+    .step .step-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin: 4px 0 6px;
+      letter-spacing: -0.01em;
+      color: var(--text-bright);
+    }
+
+    .step .step-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* ============ TABLES ============ */
+    .table-wrap {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      box-shadow: var(--shadow);
+    }
+
+    .table-wrap.scrollable { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: linear-gradient(90deg, rgba(251, 188, 4, 0.16), rgba(234, 67, 53, 0.12));
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--text-bright);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    tbody tr { transition: background 0.1s; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .category {
+      color: var(--text-bright);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .desc { color: var(--muted); font-size: 13px; }
+
+    /* ============ HTTP METHODS ============ */
+    .method {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      display: inline-block;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .method.get { color: var(--get); background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .method.post { color: var(--post); background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .method.put { color: var(--put); background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3); }
+    .method.patch { color: var(--patch); background: rgba(167, 139, 250, 0.12); border: 1px solid rgba(167, 139, 250, 0.3); }
+    .method.delete { color: var(--delete); background: rgba(251, 113, 133, 0.12); border: 1px solid rgba(251, 113, 133, 0.3); }
+
+    /* ============ STATUS CODES ============ */
+    .status {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: inline-block;
+      min-width: 48px;
+      text-align: center;
+    }
+    .status-2xx { color: var(--get); background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .status-3xx { color: var(--post); background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .status-4xx { color: var(--put); background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3); }
+    .status-5xx { color: var(--delete); background: rgba(251, 113, 133, 0.12); border: 1px solid rgba(251, 113, 133, 0.3); }
+
+    /* ============ TAGS ============ */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tag-rest { background: rgba(56, 189, 248, 0.15); color: var(--post); }
+    .tag-grpc { background: rgba(52, 168, 83, 0.15); color: var(--google-green); }
+    .tag-graphql { background: rgba(244, 114, 182, 0.15); color: var(--pink); }
+    .tag-warn { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .tag-good { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .tag-bad { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+    code {
+      color: #fef3c7;
+      background: rgba(251, 188, 4, 0.08);
+      border: 1px solid rgba(251, 188, 4, 0.18);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9em;
+    }
+
+    pre.codeblock {
+      margin: 10px 0 0;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--text-bright);
+      overflow-x: auto;
+      line-height: 1.55;
+    }
+
+    pre.codeblock .k { color: var(--google-yellow); }
+    pre.codeblock .s { color: var(--get); }
+    pre.codeblock .n { color: var(--patch); }
+    pre.codeblock .c { color: var(--dim); font-style: italic; }
+
+    /* ============ CASES ============ */
     .cases {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
+      gap: 14px;
+      margin-top: 16px;
     }
 
-    .case { padding: 24px; }
+    .case {
+      padding: 22px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.85), rgba(30, 41, 59, 0.6));
+      border-radius: 16px;
+    }
+
     a.case {
       display: block;
       text-decoration: none;
       color: inherit;
       cursor: pointer;
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
       position: relative;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
     a.case:hover {
-      transform: translateY(-4px);
-      border-color: rgba(56,189,248,.45);
-      box-shadow: 0 30px 80px rgba(0,0,0,.42), 0 0 0 1px rgba(56,189,248,.22);
+      transform: translateY(-3px);
+      border-color: rgba(251, 188, 4, 0.45);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(251, 188, 4, 0.22);
     }
     a.case::after {
       content: "↗";
       position: absolute;
-      top: 22px;
-      right: 22px;
-      width: 30px;
-      height: 30px;
+      top: 18px;
+      right: 18px;
+      width: 26px;
+      height: 26px;
       display: grid;
       place-items: center;
       border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(56,189,248,.08);
-      color: var(--blue);
-      font-size: 14px;
-      font-weight: 900;
-      transition: transform .18s ease, background .18s ease;
+      border: 1px solid var(--border);
+      background: rgba(251, 188, 4, 0.08);
+      color: var(--google-yellow);
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform 0.18s ease, background 0.18s ease;
     }
     a.case:hover::after {
       transform: rotate(-12deg);
-      background: rgba(56,189,248,.18);
+      background: rgba(251, 188, 4, 0.2);
     }
-    .case-top { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 14px; padding-right: 40px; }
-    .tag {
-      white-space: nowrap;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.05);
-      color: var(--muted);
-      font-size: 12px;
+    a.case .case-top { padding-right: 36px; }
+
+    .case-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .case h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
       font-weight: 800;
+      color: var(--text-bright);
     }
-    .case h3 { margin: 0; font-size: 23px; letter-spacing: -.035em; }
-    .case p { color: var(--muted); margin: 8px 0 14px; }
-    .case ul { margin: 0; padding-left: 18px; color: var(--muted); }
-    .case li { margin: 8px 0; }
 
-    .api-list { display: grid; gap: 9px; margin-top: 16px; }
-    .api { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; padding: 11px 12px; border-radius: 14px; background: rgba(0,0,0,.22); border: 1px solid var(--line); font-size: 13px; }
+    .case-tag {
+      white-space: nowrap;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-bright);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-    .script { padding: 28px; }
-    .script p { margin: 0; font-size: 18px; color: #f8fafc; }
-    .script strong { color: var(--blue); }
+    .case > p {
+      color: var(--muted);
+      margin: 0 0 12px;
+      font-size: 13.5px;
+    }
 
-    .danger { color: var(--red); font-weight: 900; }
-    .gold { color: var(--yellow); font-weight: 900; }
-    .ok { color: var(--green); font-weight: 900; }
+    .case ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
 
-    .footer { margin-top: 38px; text-align: center; color: var(--muted); font-size: 14px; }
+    .case li { margin: 6px 0; }
 
-    @media (max-width: 980px) {
-      .hero, .quick-grid, .cases, .formula-grid { grid-template-columns: 1fr; }
-      .hero-main { min-height: auto; padding: 30px; }
-      .section-head { flex-direction: column; align-items: start; }
-      table { min-width: 920px; }
-      .table-box { overflow-x: auto; }
+    .case .danger { color: var(--delete); font-weight: 800; }
+    .case .gold { color: var(--google-yellow); font-weight: 800; }
+    .case .ok { color: var(--get); font-weight: 800; }
+
+    .api-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .api {
+      font-family: 'JetBrains Mono', monospace;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ============ QUOTE / SCRIPT BLOCKS ============ */
+    .quote {
+      margin-top: 16px;
+      padding: 18px 22px;
+      border-radius: 14px;
+      border-left: 3px solid var(--google-yellow);
+      background: linear-gradient(90deg, rgba(251, 188, 4, 0.1), rgba(234, 67, 53, 0.05));
+    }
+
+    .quote p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-bright);
+    }
+
+    .quote strong { color: var(--google-yellow); }
+
+    /* ============ KEY BINDING HINT ============ */
+    .kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-bright);
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-bright);
+    }
+
+    /* ============ SEARCH HIGHLIGHTING ============ */
+    .hide { display: none !important; }
+    mark {
+      background: rgba(251, 188, 4, 0.35);
+      color: var(--text-bright);
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    /* ============ COLLAPSIBLE ============ */
+    details > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s;
+    }
+
+    details > summary:hover { background: rgba(255, 255, 255, 0.06); }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::before {
+      content: "▶";
+      font-size: 10px;
+      color: var(--google-yellow);
+      transition: transform 0.15s;
+    }
+    details[open] > summary::before { transform: rotate(90deg); }
+    details[open] > summary { margin-bottom: 10px; }
+
+    /* ============ FOOTER ============ */
+    .footer {
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .footer kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      margin: 0 2px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-bright);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-bright);
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1100px) {
+      .topbar { grid-template-columns: 1fr; gap: 10px; }
+      .topnav { justify-content: center; }
+      .steps { grid-template-columns: repeat(3, 1fr); }
+      .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 760px) {
+      .grid-3, .grid-2, .cases { grid-template-columns: 1fr; }
+      .grid-4, .grid-5 { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .table-wrap { overflow-x: auto; }
+      table { min-width: 620px; }
+      .hero { padding: 22px; }
+    }
+
+    /* ============ PRINT ============ */
+    @media print {
+      .topbar, .topnav, .search-wrap { display: none; }
+      body { background: #fff; color: #111; }
+      .card, .hero, .table-wrap, .case, .step, .quote {
+        background: #fff;
+        border-color: #ccc;
+        box-shadow: none;
+      }
     }
   </style>
 </head>
 <body>
+
+  <!-- ============ STICKY TOP BAR ============ -->
+  <header class="topbar">
+    <a href="index.html" class="brand">
+      <span class="brand-back">←</span>
+      <span class="dot"></span>
+      <span>API Design · Google Interview</span>
+    </a>
+    <div class="search-wrap">
+      <input id="search" type="text" placeholder="Buscar método, status code, patrón, caso..." autocomplete="off" />
+      <kbd>/</kbd>
+    </div>
+    <nav class="topnav">
+      <a href="#framework">Framework</a>
+      <a href="#methods">Métodos</a>
+      <a href="#protocols">REST/gRPC</a>
+      <a href="#auth">Auth</a>
+      <a href="#patterns">Patrones</a>
+      <a href="#realtime">Real-time</a>
+      <a href="#cases">Casos</a>
+      <a href="#scripts">Scripts</a>
+    </nav>
+  </header>
+
   <main class="page">
+
+    <!-- ============ HERO ============ -->
     <section class="hero">
-      <div class="hero-main">
-        <div class="badge">System Design Interview · API Playbook</div>
-        <h1>Cómo usar APIs para defender cualquier diseño</h1>
-        <p class="subtitle">
-          Plantilla práctica para proponer endpoints, explicar decisiones y atacar casos tipo Spotify, TikTok, Google Docs, e-commerce, ride-sharing, YouTube, recommendation systems, DBMS, file system y link shortener.
-        </p>
-      </div>
-
-      <aside class="hero-side">
-        <p class="side-title">Métodos que debes dominar</p>
-        <div class="endpoint"><span class="method get">GET</span>/api/resource/{id}</div>
-        <div class="endpoint"><span class="method post">POST</span>/api/resource</div>
-        <div class="endpoint"><span class="method put">PUT</span>/api/resource/{id}</div>
-        <div class="endpoint"><span class="method patch">PATCH</span>/api/resource/{id}</div>
-        <div class="endpoint"><span class="method delete">DELETE</span>/api/resource/{id}</div>
-      </aside>
+      <span class="hero-badge">★ API Design · System Design Interview</span>
+      <h1>Cómo diseñar APIs para <span class="grad">defender cualquier sistema</span></h1>
+      <p class="subtitle">
+        Plantilla práctica, casos reales y conceptos críticos para Google: REST vs <strong>gRPC</strong> (lo que usan internamente), autenticación, idempotencia, paginación, real-time. Presiona <span class="kbd">/</span> para buscar.
+      </p>
     </section>
 
-    <section class="quick-grid">
-      <div class="card">
-        <h2>1. Empieza por recursos</h2>
-        <p>Identifica sustantivos: users, documents, products, rides, videos, recommendations, links.</p>
+    <!-- ============ FRAMEWORK ============ -->
+    <section class="section" id="framework">
+      <div class="section-header">
+        <h2><span class="num">1</span> Framework para diseñar APIs</h2>
+        <p>Sigue estos 7 pasos cuando te pidan "diseña el API de X". Verbaliza cada uno.</p>
       </div>
-      <div class="card">
-        <h2>2. Define operaciones</h2>
-        <p>Crear, leer, actualizar, borrar, buscar, rankear, publicar, procesar o suscribirse.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">PASO 1</div>
+          <div class="step-title">Recursos</div>
+          <div class="step-desc">Identifica sustantivos: users, documents, rides, videos. Plural, en kebab-case.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 2</div>
+          <div class="step-title">Operaciones</div>
+          <div class="step-desc">CRUD + custom actions. List, Get, Create, Update, Delete, Search.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 3</div>
+          <div class="step-title">Schema</div>
+          <div class="step-desc">Request/response shape. Tipos, campos requeridos, validación.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 4</div>
+          <div class="step-title">Escala</div>
+          <div class="step-desc">Cache, paginación, async (queue), CDN, batch endpoints.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 5</div>
+          <div class="step-title">Seguridad</div>
+          <div class="step-desc">Auth (OAuth/JWT), rate limit, idempotency, input validation.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 6</div>
+          <div class="step-title">Errores & versionado</div>
+          <div class="step-desc">Status codes, error format, /v1 vs header, deprecación.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">PASO 7</div>
+          <div class="step-title">Observabilidad</div>
+          <div class="step-desc">Logs, métricas (p50/p95/p99), tracing, SLO.</div>
+        </div>
       </div>
-      <div class="card">
-        <h2>3. Explica tradeoffs</h2>
-        <p>Latencia, consistencia, escala, cache, colas, rate limit, seguridad y observabilidad.</p>
-      </div>
-      <div class="card">
-        <h2>4. Cierra con flujo</h2>
-        <p>Cliente → API Gateway → Service → Cache/DB/Queue → Storage → Monitoring.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3><span class="icon">📐</span> Resource-oriented (Google AIP)</h3>
+          <p>Google prefiere APIs resource-oriented: las URLs son recursos, los métodos HTTP son verbos. <code>POST /users</code> mejor que <code>POST /createUser</code>.</p>
+        </div>
+        <div class="card">
+          <h3><span class="icon">📛</span> Naming conventions</h3>
+          <ul>
+            <li>Recursos en <strong>plural</strong>: <code>/users</code></li>
+            <li>IDs en path: <code>/users/{userId}</code></li>
+            <li>Sub-recursos: <code>/users/{id}/posts</code></li>
+            <li><code>kebab-case</code> en paths, <code>camelCase</code> en JSON</li>
+            <li>Verbos custom como acciones: <code>POST /videos/{id}:publish</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🎯</span> Frase de oro al iniciar</h3>
+          <p style="color: var(--text-bright); font-style: italic; font-size: 13.5px;">"Voy a empezar identificando los recursos principales, luego las operaciones por recurso, y de ahí derivo los endpoints. Después hablo de paginación, errores, auth y rate limiting."</p>
+        </div>
       </div>
     </section>
 
-    <section class="section formula">
-      <div class="section-head">
-        <h2>Fórmula para contestar APIs</h2>
-        <p>Úsala cuando te pregunten “diseña X”. Te ayuda a sonar estructurado y senior.</p>
+    <!-- ============ HTTP METHODS & STATUS ============ -->
+    <section class="section" id="methods">
+      <div class="section-header">
+        <h2><span class="num">2</span> Métodos HTTP & Status Codes</h2>
+        <p>Los fundamentos. Si confundes idempotencia o status codes, pierdes credibilidad de inmediato.</p>
       </div>
-      <div class="formula-grid">
-        <div class="step"><b>Recurso</b><span>¿Qué entidad central existe?</span></div>
-        <div class="step"><b>Endpoints</b><span>¿Qué operaciones expongo?</span></div>
-        <div class="step"><b>Modelo</b><span>¿Qué campos mínimos guardo?</span></div>
-        <div class="step"><b>Escala</b><span>¿Cache, queue, shard, CDN?</span></div>
-        <div class="step"><b>Seguridad</b><span>Auth, permisos, rate limits.</span></div>
-      </div>
+
+      <details open>
+        <summary>Métodos HTTP — qué hacen, cuándo, idempotencia</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 12%;">Método</th>
+                <th style="width: 26%;">Uso</th>
+                <th style="width: 22%;">Ejemplo</th>
+                <th style="width: 16%;">Idempotente</th>
+                <th>Status típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="method get">GET</span></td>
+                <td class="desc">Leer un recurso o lista. Cacheable. <strong>Nunca</strong> modifica estado.</td>
+                <td><code>GET /api/users/u_42</code></td>
+                <td><span class="tag tag-good">Sí</span> Safe + idempotent</td>
+                <td><span class="status status-2xx">200</span> <span class="status status-4xx">404</span></td>
+              </tr>
+              <tr>
+                <td><span class="method post">POST</span></td>
+                <td class="desc">Crear recurso o disparar acción. Server asigna ID.</td>
+                <td><code>POST /api/users</code></td>
+                <td><span class="tag tag-bad">No</span> Usa <code>Idempotency-Key</code></td>
+                <td><span class="status status-2xx">201</span> <span class="status status-2xx">202</span></td>
+              </tr>
+              <tr>
+                <td><span class="method put">PUT</span></td>
+                <td class="desc">Reemplazar recurso completo. Cliente puede asignar ID.</td>
+                <td><code>PUT /api/users/u_42</code></td>
+                <td><span class="tag tag-good">Sí</span> Mismo body = mismo estado</td>
+                <td><span class="status status-2xx">200</span> <span class="status status-2xx">204</span></td>
+              </tr>
+              <tr>
+                <td><span class="method patch">PATCH</span></td>
+                <td class="desc">Actualizar parcial. Envía solo los campos a cambiar.</td>
+                <td><code>PATCH /api/users/u_42</code></td>
+                <td><span class="tag tag-warn">Depende</span> Si es JSON-Merge: sí</td>
+                <td><span class="status status-2xx">200</span> <span class="status status-4xx">409</span></td>
+              </tr>
+              <tr>
+                <td><span class="method delete">DELETE</span></td>
+                <td class="desc">Eliminar (hard) o soft-delete con tombstone.</td>
+                <td><code>DELETE /api/users/u_42</code></td>
+                <td><span class="tag tag-good">Sí</span> Borrar dos veces = igual</td>
+                <td><span class="status status-2xx">204</span> <span class="status status-4xx">404</span></td>
+              </tr>
+              <tr>
+                <td><span class="method get">HEAD</span></td>
+                <td class="desc">Como GET pero solo headers. Para checks de existencia.</td>
+                <td><code>HEAD /api/files/abc</code></td>
+                <td><span class="tag tag-good">Sí</span></td>
+                <td><span class="status status-2xx">200</span> <span class="status status-4xx">404</span></td>
+              </tr>
+              <tr>
+                <td><span class="method post">OPTIONS</span></td>
+                <td class="desc">Capabilities y CORS preflight.</td>
+                <td><code>OPTIONS /api/users</code></td>
+                <td><span class="tag tag-good">Sí</span></td>
+                <td><span class="status status-2xx">204</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>Status Codes — los que SÍ se preguntan</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 12%;">Código</th>
+                <th style="width: 22%;">Nombre</th>
+                <th style="width: 30%;">Cuándo usarlo</th>
+                <th>Trampa / nota</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="status status-2xx">200</span></td>
+                <td class="category">OK</td>
+                <td class="desc">Éxito con body. Para GET, PUT, PATCH, DELETE con respuesta.</td>
+                <td class="desc">Default success. No abuses si no hay body — usa 204.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-2xx">201</span></td>
+                <td class="category">Created</td>
+                <td class="desc">POST exitoso que creó recurso. Devuelve <code>Location</code> header.</td>
+                <td class="desc">Solo para creación. POST que dispara acción usa 200/202.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-2xx">202</span></td>
+                <td class="category">Accepted</td>
+                <td class="desc">Aceptado para procesamiento async. Devuelve job ID o status URL.</td>
+                <td class="desc">Crítico para uploads, batch, transcoding. Mucho mejor que dejar el cliente colgado.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-2xx">204</span></td>
+                <td class="category">No Content</td>
+                <td class="desc">Éxito sin body. Para DELETE, PUT que no devuelven nada.</td>
+                <td class="desc">Sin body literal. Si quieres devolver el recurso actualizado, usa 200.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-3xx">301</span></td>
+                <td class="category">Moved Permanently</td>
+                <td class="desc">Recurso movido de URL para siempre. Cacheable.</td>
+                <td class="desc">URL shortener clásico usa 301 (cacheado por browser).</td>
+              </tr>
+              <tr>
+                <td><span class="status status-3xx">302</span></td>
+                <td class="category">Found</td>
+                <td class="desc">Redirect temporal. URL puede cambiar después.</td>
+                <td class="desc">Para login flows, A/B test redirects.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-3xx">304</span></td>
+                <td class="category">Not Modified</td>
+                <td class="desc">Cliente envió <code>If-None-Match</code> o <code>If-Modified-Since</code> y el recurso no cambió.</td>
+                <td class="desc">Ahorra bandwidth. Esencial con ETags.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">400</span></td>
+                <td class="category">Bad Request</td>
+                <td class="desc">Request mal formado, JSON inválido, parámetros faltantes.</td>
+                <td class="desc">Genérico. Para validación específica de campos, considera 422.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">401</span></td>
+                <td class="category">Unauthorized</td>
+                <td class="desc">No autenticado o token inválido/expirado.</td>
+                <td class="desc">Mal nombrado: significa "no auth", no "no permiso". Devuelve <code>WWW-Authenticate</code>.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">403</span></td>
+                <td class="category">Forbidden</td>
+                <td class="desc">Autenticado pero sin permiso para este recurso.</td>
+                <td class="desc">Importante distinción con 401. Algunos prefieren 404 para no revelar existencia.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">404</span></td>
+                <td class="category">Not Found</td>
+                <td class="desc">Recurso no existe o user no tiene permiso de saber.</td>
+                <td class="desc">Útil para no filtrar info sobre recursos privados.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">409</span></td>
+                <td class="category">Conflict</td>
+                <td class="desc">Conflicto de estado: duplicate, version mismatch (ETag), resource locked.</td>
+                <td class="desc">Optimistic concurrency con If-Match → 409 si cambió.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">410</span></td>
+                <td class="category">Gone</td>
+                <td class="desc">Recurso existió, fue eliminado intencionalmente, no volverá.</td>
+                <td class="desc">Para deprecation o GDPR delete. Mejor que 404 para SEO.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">422</span></td>
+                <td class="category">Unprocessable Entity</td>
+                <td class="desc">Sintaxis OK pero validación de negocio falló. Email inválido, edad negativa.</td>
+                <td class="desc">Ideal con cuerpo de errores por campo (ver sección 5).</td>
+              </tr>
+              <tr>
+                <td><span class="status status-4xx">429</span></td>
+                <td class="category">Too Many Requests</td>
+                <td class="desc">Rate limit excedido.</td>
+                <td class="desc">Devuelve <code>Retry-After</code>. Imprescindible.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-5xx">500</span></td>
+                <td class="category">Internal Server Error</td>
+                <td class="desc">Bug genérico. NO incluyas stack traces en prod.</td>
+                <td class="desc">Default cuando nada más aplica. Logueas, alertas, regresas correlationId.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-5xx">502</span></td>
+                <td class="category">Bad Gateway</td>
+                <td class="desc">Upstream service devolvió error o no responde.</td>
+                <td class="desc">Reverse proxy / API Gateway clásico cuando backend muere.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-5xx">503</span></td>
+                <td class="category">Service Unavailable</td>
+                <td class="desc">Sobrecarga, maintenance, o circuit breaker abierto.</td>
+                <td class="desc">Devuelve <code>Retry-After</code>. Cliente debe hacer backoff.</td>
+              </tr>
+              <tr>
+                <td><span class="status status-5xx">504</span></td>
+                <td class="category">Gateway Timeout</td>
+                <td class="desc">Upstream no respondió a tiempo.</td>
+                <td class="desc">Diferenciar de 503: aquí sí intentaste, pero timeout.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
     </section>
 
-    <section class="section">
-      <div class="section-head">
-        <h2>Cheat sheet de métodos HTTP</h2>
-        <p>Esto debes defender con claridad. Es de lo primero que evalúan.</p>
+    <!-- ============ REST vs gRPC vs GraphQL ============ -->
+    <section class="section" id="protocols">
+      <div class="section-header">
+        <h2><span class="num">3</span> REST vs gRPC vs GraphQL</h2>
+        <p>Google usa <strong>gRPC internamente</strong>. Mencionar gRPC bien sumará puntos.</p>
       </div>
-      <div class="table-box">
+
+      <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Método</th>
-              <th>Uso</th>
-              <th>Ejemplo</th>
-              <th>Idempotencia</th>
-              <th>Respuesta típica</th>
+              <th style="width: 16%;">Aspecto</th>
+              <th><span class="tag tag-rest">REST</span></th>
+              <th><span class="tag tag-grpc">gRPC</span></th>
+              <th><span class="tag tag-graphql">GraphQL</span></th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><span class="method get">GET</span></td>
-              <td>Leer un recurso o lista de recursos.</td>
-              <td><code>GET /api/documents/doc_123</code></td>
-              <td>Sí. No debe modificar estado.</td>
-              <td><code>200 OK</code>, <code>404 Not Found</code></td>
+              <td class="category">Transporte</td>
+              <td class="desc">HTTP/1.1 (típico)</td>
+              <td class="desc">HTTP/2 (multiplexed, header compression)</td>
+              <td class="desc">HTTP/1.1 (típico)</td>
             </tr>
             <tr>
-              <td><span class="method post">POST</span></td>
-              <td>Crear recurso o disparar una acción.</td>
-              <td><code>POST /api/documents</code></td>
-              <td>No necesariamente. Puede crear duplicados.</td>
-              <td><code>201 Created</code>, <code>202 Accepted</code></td>
+              <td class="category">Formato</td>
+              <td class="desc">JSON (texto)</td>
+              <td class="desc">Protocol Buffers (binario, ~3-10× más pequeño)</td>
+              <td class="desc">JSON</td>
             </tr>
             <tr>
-              <td><span class="method put">PUT</span></td>
-              <td>Reemplazar o actualizar recurso completo.</td>
-              <td><code>PUT /api/documents/doc_123</code></td>
-              <td>Sí. Repetirlo deja el mismo estado.</td>
-              <td><code>200 OK</code>, <code>204 No Content</code></td>
+              <td class="category">Schema</td>
+              <td class="desc">OpenAPI <em>opcional</em></td>
+              <td class="desc"><code>.proto</code> file <strong>obligatorio</strong></td>
+              <td class="desc">GraphQL SDL <strong>obligatorio</strong></td>
             </tr>
             <tr>
-              <td><span class="method patch">PATCH</span></td>
-              <td>Actualizar parcialmente.</td>
-              <td><code>PATCH /api/users/u_1/preferences</code></td>
-              <td>Depende de la operación.</td>
-              <td><code>200 OK</code>, <code>409 Conflict</code></td>
+              <td class="category">Performance</td>
+              <td class="desc">Buena</td>
+              <td class="desc">Excelente (binario + HTTP/2)</td>
+              <td class="desc">Variable (resolver overhead)</td>
             </tr>
             <tr>
-              <td><span class="method delete">DELETE</span></td>
-              <td>Eliminar o marcar como eliminado.</td>
-              <td><code>DELETE /api/links/abc123</code></td>
-              <td>Sí, si borrar dos veces no cambia el resultado.</td>
-              <td><code>204 No Content</code>, <code>404 Not Found</code></td>
+              <td class="category">Streaming</td>
+              <td class="desc">Limitado (SSE, chunked)</td>
+              <td class="desc">Bidirectional nativo (4 modos)</td>
+              <td class="desc">Subscriptions (vía WebSocket)</td>
+            </tr>
+            <tr>
+              <td class="category">Browser support</td>
+              <td class="desc">Nativo</td>
+              <td class="desc">Necesita gRPC-Web + proxy</td>
+              <td class="desc">Nativo</td>
+            </tr>
+            <tr>
+              <td class="category">Caching</td>
+              <td class="desc">Excelente (HTTP cache, CDN, ETag)</td>
+              <td class="desc">No nativo (HTTP/2 push o app-level)</td>
+              <td class="desc">Difícil (queries únicas)</td>
+            </tr>
+            <tr>
+              <td class="category">Code-gen</td>
+              <td class="desc">Manual u OpenAPI generators</td>
+              <td class="desc">Automático en muchos lenguajes</td>
+              <td class="desc">Tools maduras (Apollo, urql)</td>
+            </tr>
+            <tr>
+              <td class="category">Mejor para</td>
+              <td class="desc">APIs públicas, integraciones B2B, mobile.</td>
+              <td class="desc">Microservicios internos, baja latencia, polyglot.</td>
+              <td class="desc">Frontends con muchas vistas, agregación.</td>
+            </tr>
+            <tr>
+              <td class="category">Uso en Google</td>
+              <td class="desc">Cloud APIs públicas (con gRPC subyacente)</td>
+              <td class="desc"><strong>Default interno · Stubby precursor</strong></td>
+              <td class="desc">Menos común</td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <div class="grid-3" style="margin-top: 16px;">
+        <div class="card">
+          <h3><span class="icon">🟦</span> Cuándo elegir REST</h3>
+          <ul>
+            <li>API <strong>pública</strong>, partners externos</li>
+            <li>Necesitas caching agresivo (CDN)</li>
+            <li>Clientes heterogéneos (curl, browsers)</li>
+            <li>Recursos claros, CRUD-heavy</li>
+            <li>Discoverability importa (OpenAPI)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🟩</span> Cuándo elegir gRPC</h3>
+          <ul>
+            <li>Microservicios <strong>internos</strong></li>
+            <li>Latencia crítica (mobile, edge)</li>
+            <li>Streaming bidireccional (chat, video)</li>
+            <li>Polyglot teams (auto-gen clients)</li>
+            <li>Schema evolution importante</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🟪</span> Cuándo elegir GraphQL</h3>
+          <ul>
+            <li>Frontends con <strong>muchas vistas distintas</strong></li>
+            <li>Reducir over-fetching móvil</li>
+            <li>Aggregar múltiples backends (BFF)</li>
+            <li>Schema-driven dev workflow</li>
+            <li>Cuidado: N+1 queries, caching difícil</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="card">
+          <h3><span class="icon">📡</span> gRPC streaming modes</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>Unary:</strong> request → response (como REST normal)</li>
+            <li><strong>Server streaming:</strong> 1 request → N responses (feed, logs)</li>
+            <li><strong>Client streaming:</strong> N requests → 1 response (upload chunks)</li>
+            <li><strong>Bidirectional:</strong> N ↔ N (chat, gaming, real-time)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🇬</span> Tip Google-specific</h3>
+          <p style="font-size: 13.5px;">Google publicó las <strong>API Improvement Proposals (AIP)</strong> en aip.dev — son sus reglas internas. Menciona resource-oriented design, standard methods (List, Get, Create, Update, Delete), <strong>field masks</strong> para updates parciales (en lugar de PATCH), y nombres pluralizados.</p>
+        </div>
+      </div>
     </section>
 
-    <section class="section">
-      <div class="section-head">
-        <h2>Casos problema y APIs sugeridas</h2>
-        <p>Ejemplos tipo entrevista. La clave no es memorizar, sino reconocer recursos y flujos.</p>
+    <!-- ============ AUTH ============ -->
+    <section class="section" id="auth">
+      <div class="section-header">
+        <h2><span class="num">4</span> Autenticación & Autorización</h2>
+        <p>Auth = quién eres. Authz = qué puedes hacer. No los confundas.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 16%;">Mecanismo</th>
+              <th style="width: 30%;">Cómo funciona</th>
+              <th style="width: 26%;">Cuándo usarlo</th>
+              <th>Pros / Contras</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="category">API Keys</td>
+              <td class="desc">Header <code>X-API-Key: abc</code> o query param. Server valida en DB.</td>
+              <td class="desc">APIs server-to-server, integraciones simples, tracking de quotas.</td>
+              <td class="desc">+ Simple · − Sin expiración nativa, mismo nivel de acceso, no auditable a nivel user.</td>
+            </tr>
+            <tr>
+              <td class="category">Basic Auth</td>
+              <td class="desc"><code>Authorization: Basic base64(user:pass)</code></td>
+              <td class="desc">Solo internal/testing sobre TLS.</td>
+              <td class="desc">+ Trivial · − Credenciales en cada request. Evítalo en producción.</td>
+            </tr>
+            <tr>
+              <td class="category">JWT (Bearer)</td>
+              <td class="desc">Token firmado (HS256/RS256) con claims. <code>Authorization: Bearer eyJ...</code>. Stateless.</td>
+              <td class="desc">Microservicios, mobile/web apps, sesiones distribuidas.</td>
+              <td class="desc">+ Stateless, escala · − Revocación difícil, tamaño grande, no incluyas datos sensibles.</td>
+            </tr>
+            <tr>
+              <td class="category">OAuth 2.0</td>
+              <td class="desc">Delegated auth con scopes. Auth Code (web), Client Credentials (s2s), Device (TVs), PKCE (mobile/SPA).</td>
+              <td class="desc">"Login con Google". APIs de terceros. Scopes granulares.</td>
+              <td class="desc">+ Estándar industria · − Complejidad. Implícito está deprecated; usa PKCE.</td>
+            </tr>
+            <tr>
+              <td class="category">OIDC</td>
+              <td class="desc">Capa de identidad sobre OAuth 2.0. ID Token (JWT) + UserInfo endpoint.</td>
+              <td class="desc">Cuando además de auth necesitas saber quién es el user.</td>
+              <td class="desc">+ Identity estándar · − Otra capa más, depende de un IdP.</td>
+            </tr>
+            <tr>
+              <td class="category">Session cookies</td>
+              <td class="desc">Server crea sesión, manda cookie firmada. State server-side.</td>
+              <td class="desc">Web apps tradicionales, mismo dominio.</td>
+              <td class="desc">+ Revocable trivial · − CSRF, escala (Redis sessions), no funciona cross-domain.</td>
+            </tr>
+            <tr>
+              <td class="category">mTLS</td>
+              <td class="desc">Mutual TLS: cliente y servidor presentan certs. Verificación criptográfica.</td>
+              <td class="desc">Service-to-service en zero-trust networks. PCI, banking, GovCloud.</td>
+              <td class="desc">+ Muy seguro, sin secret en banda · − Cert management complejo, rotación.</td>
+            </tr>
+            <tr>
+              <td class="category">IAM (cloud)</td>
+              <td class="desc">Service accounts con roles. GCP/AWS firma requests con SDK.</td>
+              <td class="desc">Apps corriendo en GCP/AWS hablando con APIs cloud.</td>
+              <td class="desc">+ Sin secrets gestionados, audit log automático · − Vendor lock-in.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="card">
+          <h3><span class="icon">🔑</span> JWT structure</h3>
+          <p style="font-size: 13px;">3 partes <code>base64</code> separadas por puntos:</p>
+          <pre class="codeblock"><span class="c">// Header</span>
+<span class="k">{</span> <span class="n">"alg"</span>: <span class="s">"RS256"</span>, <span class="n">"typ"</span>: <span class="s">"JWT"</span> <span class="k">}</span>
+
+<span class="c">// Payload (claims)</span>
+<span class="k">{</span>
+  <span class="n">"sub"</span>: <span class="s">"user_42"</span>,
+  <span class="n">"iss"</span>: <span class="s">"auth.example.com"</span>,
+  <span class="n">"aud"</span>: <span class="s">"api.example.com"</span>,
+  <span class="n">"exp"</span>: <span class="s">1735689600</span>,
+  <span class="n">"iat"</span>: <span class="s">1735686000</span>,
+  <span class="n">"scope"</span>: <span class="s">"read:users write:posts"</span>
+<span class="k">}</span>
+
+<span class="c">// Signature: RSA-sign(header.payload, private_key)</span></pre>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🛂</span> Authorization (RBAC vs ABAC)</h3>
+          <ul style="font-size: 13.5px;">
+            <li><strong>RBAC:</strong> Roles → Permissions. Simple. <em>"Editor puede actualizar posts"</em></li>
+            <li><strong>ABAC:</strong> Atributos contextuales. <em>"Puede leer SI: dueño OR rol = admin OR documento es público"</em></li>
+            <li><strong>ReBAC (Zanzibar):</strong> Google Drive style — relaciones (owner, editor, viewer) entre user y recurso. Spanner-backed.</li>
+            <li><strong>Tip:</strong> En Google interview, menciona Zanzibar si el problema involucra permisos complejos (Drive, Docs).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PATTERNS: PAGINATION, VERSIONING, ERRORS, IDEMPOTENCY, RATE LIMIT ============ -->
+    <section class="section" id="patterns">
+      <div class="section-header">
+        <h2><span class="num">5</span> Patrones API críticos</h2>
+        <p>Paginación, versionado, errores, idempotencia, rate limiting. Lo que diferencia diseño junior de senior.</p>
+      </div>
+
+      <details open>
+        <summary>📑 Paginación — 4 estrategias</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 14%;">Estrategia</th>
+                <th style="width: 28%;">Ejemplo</th>
+                <th style="width: 28%;">Pros</th>
+                <th>Contras</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category">Offset/Limit</td>
+                <td><code>GET /items?offset=100&amp;limit=20</code></td>
+                <td class="desc">Simple, jump a página N.</td>
+                <td class="desc">Lento en datasets grandes (DB skip), inconsistente si insertas/borras durante pagination.</td>
+              </tr>
+              <tr>
+                <td class="category">Page-based</td>
+                <td><code>GET /items?page=5&amp;size=20</code></td>
+                <td class="desc">Como offset, más amigable para UI.</td>
+                <td class="desc">Mismos problemas que offset.</td>
+              </tr>
+              <tr>
+                <td class="category"><span class="tag tag-good">Cursor</span></td>
+                <td><code>GET /items?cursor=eyJpZCI6MTIzfQ&amp;limit=20</code></td>
+                <td class="desc">Estable, escala, opaco al cliente.</td>
+                <td class="desc">No puedes saltar a página N; solo siguiente/anterior.</td>
+              </tr>
+              <tr>
+                <td class="category"><span class="tag tag-good">Keyset (seek)</span></td>
+                <td><code>GET /items?after_id=123&amp;limit=20</code></td>
+                <td class="desc">Más rápido (índice), determinístico.</td>
+                <td class="desc">Requiere campo ordenable único; tampoco hay "ir a página 5".</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top: 12px;">
+          <h3><span class="icon">📤</span> Response shape recomendado</h3>
+          <pre class="codeblock"><span class="k">{</span>
+  <span class="n">"data"</span>: [ <span class="c">/* items */</span> ],
+  <span class="n">"pagination"</span>: <span class="k">{</span>
+    <span class="n">"next_cursor"</span>: <span class="s">"eyJpZCI6MTQzfQ=="</span>,
+    <span class="n">"has_more"</span>: <span class="s">true</span>,
+    <span class="n">"total"</span>: <span class="s">10000</span>  <span class="c">// opcional, costoso</span>
+  <span class="k">}</span>
+<span class="k">}</span></pre>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>🔢 Versionado — 4 estrategias</summary>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 16%;">Estrategia</th>
+                <th style="width: 28%;">Ejemplo</th>
+                <th style="width: 28%;">Pros</th>
+                <th>Contras</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="category"><span class="tag tag-good">URL path</span></td>
+                <td><code>/v1/users · /v2/users</code></td>
+                <td class="desc">Visible, fácil debug, fácil routing. <strong>Default Google Cloud</strong>.</td>
+                <td class="desc">"REST puristas" objetan que la versión está en el recurso.</td>
+              </tr>
+              <tr>
+                <td class="category">Query param</td>
+                <td><code>/users?v=2</code></td>
+                <td class="desc">Fácil rollback con feature flag.</td>
+                <td class="desc">Cache complica, fácil olvidar.</td>
+              </tr>
+              <tr>
+                <td class="category">Header custom</td>
+                <td><code>Accept-Version: 2</code></td>
+                <td class="desc">URL limpia, separación de concerns.</td>
+                <td class="desc">No visible en logs/curl, harder debug.</td>
+              </tr>
+              <tr>
+                <td class="category">Media type</td>
+                <td><code>Accept: application/vnd.api.v2+json</code></td>
+                <td class="desc">"REST puro", content negotiation.</td>
+                <td class="desc">Verbose, casi nadie lo usa, herramientas no lo respetan.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="quote">
+          <p><strong>Recomendación:</strong> URL path (<code>/v1/</code>). Es lo que Google, Stripe, Twilio y AWS usan. Solo hace breaking changes en major versions; cambios aditivos compatibles van en v1. Anuncia deprecation con header <code>Sunset</code> + 6-12 meses de aviso.</p>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>❌ Formato de errores — RFC 7807 + estilo Google</summary>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3><span class="icon">📋</span> RFC 7807 (Problem Details)</h3>
+            <pre class="codeblock"><span class="k">HTTP/1.1 422 Unprocessable Entity</span>
+<span class="k">Content-Type:</span> application/problem+json
+
+<span class="k">{</span>
+  <span class="n">"type"</span>: <span class="s">"https://api.x/errors/validation"</span>,
+  <span class="n">"title"</span>: <span class="s">"Validation failed"</span>,
+  <span class="n">"status"</span>: <span class="s">422</span>,
+  <span class="n">"detail"</span>: <span class="s">"Email format invalid"</span>,
+  <span class="n">"instance"</span>: <span class="s">"/users/u_42"</span>,
+  <span class="n">"errors"</span>: [
+    <span class="k">{</span> <span class="n">"field"</span>: <span class="s">"email"</span>, <span class="n">"code"</span>: <span class="s">"format"</span> <span class="k">}</span>
+  ]
+<span class="k">}</span></pre>
+          </div>
+          <div class="card">
+            <h3><span class="icon">🇬</span> Google API Error Format</h3>
+            <pre class="codeblock"><span class="k">HTTP/1.1 404 Not Found</span>
+
+<span class="k">{</span>
+  <span class="n">"error"</span>: <span class="k">{</span>
+    <span class="n">"code"</span>: <span class="s">404</span>,
+    <span class="n">"message"</span>: <span class="s">"User not found"</span>,
+    <span class="n">"status"</span>: <span class="s">"NOT_FOUND"</span>,
+    <span class="n">"details"</span>: [<span class="k">{</span>
+      <span class="n">"@type"</span>: <span class="s">"...ErrorInfo"</span>,
+      <span class="n">"reason"</span>: <span class="s">"USER_NOT_FOUND"</span>,
+      <span class="n">"domain"</span>: <span class="s">"googleapis.com"</span>
+    <span class="k">}</span>]
+  <span class="k">}</span>
+<span class="k">}</span></pre>
+          </div>
+        </div>
+
+        <div class="quote">
+          <p><strong>Reglas de oro:</strong> (1) Status code HTTP correcto · (2) Mensaje legible para humano · (3) Código de error machine-readable estable · (4) <code>correlationId</code> para soporte · (5) <strong>NUNCA</strong> stack traces en prod · (6) En 4xx ayuda al cliente a corregir; en 5xx solo loguea internamente.</p>
+        </div>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>🔁 Idempotencia — el patrón que SIEMPRE preguntan</summary>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3><span class="icon">🤔</span> Por qué importa</h3>
+            <p style="font-size: 13.5px;">El cliente pierde la conexión justo cuando el server procesó el POST. ¿Reintenta? Si lo hace, ¿creará 2 órdenes? <strong>La idempotencia previene duplicados</strong> en pagos, órdenes, transferencias.</p>
+            <ul style="font-size: 13px; margin-top: 8px;">
+              <li>GET, PUT, DELETE: idempotentes <strong>por definición</strong></li>
+              <li>POST: <strong>NO</strong>. Necesita <code>Idempotency-Key</code></li>
+              <li>PATCH: depende de la operación</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3><span class="icon">⚙️</span> Implementación</h3>
+            <ol style="font-size: 13px; padding-left: 18px; margin: 0;">
+              <li>Cliente genera UUID en <code>Idempotency-Key</code> header</li>
+              <li>Server hash(key + request_fingerprint) → busca en Redis/DB</li>
+              <li>Si existe + mismo body → devuelve respuesta cacheada</li>
+              <li>Si existe + body distinto → <span class="status status-4xx">409</span> Conflict</li>
+              <li>Si no existe → procesa, guarda (key, response, hash) por 24h</li>
+              <li>TTL típico: 24-72h</li>
+            </ol>
+          </div>
+        </div>
+
+        <pre class="codeblock" style="margin-top: 12px;"><span class="k">POST</span> /api/payments
+<span class="k">Idempotency-Key:</span> <span class="s">"client-generated-uuid-abc-123"</span>
+<span class="k">Content-Type:</span> application/json
+
+<span class="k">{</span> <span class="n">"amount"</span>: <span class="s">5000</span>, <span class="n">"to"</span>: <span class="s">"acct_xyz"</span> <span class="k">}</span>
+
+<span class="c">// Server: si ya vió esa key con mismo body → devuelve la response original</span>
+<span class="c">// Si vió la key con body distinto → 409 Conflict</span>
+<span class="c">// Si nunca vió la key → procesa, guarda (key → response) en Redis 24h</span></pre>
+      </details>
+
+      <details open style="margin-top: 12px;">
+        <summary>🚦 Rate Limiting — algoritmos & headers</summary>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3><span class="icon">🪣</span> Algoritmos</h3>
+            <ul style="font-size: 13.5px;">
+              <li><strong>Token bucket:</strong> permite bursts, refill constante. Default.</li>
+              <li><strong>Leaky bucket:</strong> tasa fija de salida, suaviza tráfico.</li>
+              <li><strong>Fixed window:</strong> simple, problema de doble pico al borde.</li>
+              <li><strong>Sliding window log:</strong> preciso, mucha memoria.</li>
+              <li><strong>Sliding window counter:</strong> aproximación buena con poca memoria.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3><span class="icon">📨</span> Headers obligatorios</h3>
+            <pre class="codeblock"><span class="k">HTTP/1.1 200 OK</span>
+<span class="k">X-RateLimit-Limit:</span> <span class="s">100</span>
+<span class="k">X-RateLimit-Remaining:</span> <span class="s">37</span>
+<span class="k">X-RateLimit-Reset:</span> <span class="s">1735689600</span>
+
+<span class="c">// Cuando excedes:</span>
+<span class="k">HTTP/1.1 429 Too Many Requests</span>
+<span class="k">Retry-After:</span> <span class="s">42</span>  <span class="c">// segundos</span></pre>
+          </div>
+        </div>
+
+        <div class="quote">
+          <p><strong>Rate limit por:</strong> user, API key, IP, endpoint, o combinación. <strong>Distribuido:</strong> Redis con <code>INCR + EXPIRE</code> atómico (Lua script). <strong>Tiers:</strong> free (10 RPM), basic (100), pro (1K), enterprise (custom). Documenta los límites en docs públicas.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ REAL-TIME ============ -->
+    <section class="section" id="realtime">
+      <div class="section-header">
+        <h2><span class="num">6</span> Real-time & comunicación bidireccional</h2>
+        <p>Chat, notificaciones, live updates, multiplayer. Cuándo elegir cada tecnología.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 14%;">Tecnología</th>
+              <th style="width: 22%;">Cómo funciona</th>
+              <th style="width: 22%;">Cuándo usar</th>
+              <th>Pros / Contras</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="category">Short polling</td>
+              <td class="desc">Cliente hace <code>GET</code> cada N segundos.</td>
+              <td class="desc">Updates de baja frecuencia (status de un job, dashboard refresh).</td>
+              <td class="desc">+ Trivial, funciona con cualquier infra · − Wasteful (la mayoría devuelve nada).</td>
+            </tr>
+            <tr>
+              <td class="category">Long polling</td>
+              <td class="desc">Server retiene la request hasta que hay update o timeout.</td>
+              <td class="desc">Cuando WS no es opción (firewalls), updates ocasionales.</td>
+              <td class="desc">+ Real-time-ish sobre HTTP simple · − Conexiones largas, server resources.</td>
+            </tr>
+            <tr>
+              <td class="category"><span class="tag tag-good">SSE</span></td>
+              <td class="desc">Server-Sent Events. HTTP/1.1 stream. Solo server → client.</td>
+              <td class="desc">Notificaciones, live feed, AI tokens streaming, stock prices.</td>
+              <td class="desc">+ Auto-reconnect, simple, funciona con CDN · − Unidireccional.</td>
+            </tr>
+            <tr>
+              <td class="category"><span class="tag tag-good">WebSocket</span></td>
+              <td class="desc">Upgrade desde HTTP. TCP persistente bidireccional.</td>
+              <td class="desc">Chat, gaming, colaboración (Docs), trading, multiplayer.</td>
+              <td class="desc">+ Full duplex, baja latencia · − Stateful (sticky LB), proxies a veces, no caching.</td>
+            </tr>
+            <tr>
+              <td class="category"><span class="tag tag-grpc">gRPC streaming</span></td>
+              <td class="desc">HTTP/2 streams. 4 modos (unary, server, client, bidi).</td>
+              <td class="desc">Servicio interno con streaming + tipos fuertes.</td>
+              <td class="desc">+ Eficiente, schema, multiplexing · − Browser necesita gRPC-Web.</td>
+            </tr>
+            <tr>
+              <td class="category">Webhooks</td>
+              <td class="desc">Server A llama a un endpoint público de server B (HTTP POST).</td>
+              <td class="desc">Stripe → tu app, GitHub events, async callbacks B2B.</td>
+              <td class="desc">+ Server-to-server, simple · − Tu endpoint debe ser público + idempotente + verificar firma.</td>
+            </tr>
+            <tr>
+              <td class="category">Push (FCM/APNs)</td>
+              <td class="desc">Notificación a OS de mobile/desktop. Vendor-mediated.</td>
+              <td class="desc">App cerrada, ahorro de batería.</td>
+              <td class="desc">+ Funciona offline · − No garantizado, latencia variable.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-3" style="margin-top: 16px;">
+        <div class="card">
+          <h3><span class="icon">📡</span> SSE en 30 segundos</h3>
+          <pre class="codeblock"><span class="c">// Server response:</span>
+<span class="k">Content-Type:</span> text/event-stream
+<span class="k">Cache-Control:</span> no-cache
+
+event: update
+data: <span class="k">{</span><span class="n">"price"</span>: <span class="s">42.5</span><span class="k">}</span>
+
+event: update
+data: <span class="k">{</span><span class="n">"price"</span>: <span class="s">42.7</span><span class="k">}</span></pre>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🔌</span> WebSocket scaling</h3>
+          <ul>
+            <li><strong>Sticky LB</strong> (mismo cliente → misma instancia)</li>
+            <li><strong>Pub/Sub backplane</strong> (Redis/Pub-Sub) para fan-out</li>
+            <li><strong>Heartbeat</strong> (ping/pong) cada 30s</li>
+            <li><strong>Reconnect con exponential backoff</strong></li>
+            <li><strong>Auth en query/cookie</strong> (no header en handshake)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🪝</span> Webhooks bien hechos</h3>
+          <ul>
+            <li>HMAC signature en header (verifica origen)</li>
+            <li>Endpoint <strong>idempotente</strong> + dedup por event_id</li>
+            <li>Retry con exponential backoff (24h)</li>
+            <li>Dead letter queue tras N fallos</li>
+            <li>Devuelve <span class="status status-2xx">200</span> rápido, procesa async</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CASES ============ -->
+    <section class="section" id="cases">
+      <div class="section-header">
+        <h2><span class="num">7</span> Casos típicos & APIs sugeridas</h2>
+        <p>10 problemas frecuentes. La clave no es memorizar, es reconocer recursos y flujos.</p>
       </div>
 
       <div class="cases">
+
         <a class="case" href="ecommerce-top-products.html">
           <div class="case-top">
-            <h3>1. E-commerce: top productos comprados</h3>
-            <span class="tag">ClipKart.com</span>
+            <h3>1. E-commerce: top productos</h3>
+            <span class="case-tag">Ranking</span>
           </div>
-          <p>Mostrar top 10 productos más comprados en la última 1h, 4h o 24h.</p>
+          <p>Top 10 productos más comprados en 1h, 4h o 24h.</p>
           <ul>
             <li><span class="gold">Problema central:</span> ranking en ventanas de tiempo.</li>
-            <li><span class="ok">Solución:</span> eventos de compra → stream/queue → agregador → cache.</li>
-            <li><span class="danger">No hagas:</span> calcular el top 10 escaneando toda la tabla de órdenes cada click.</li>
+            <li><span class="ok">Solución:</span> eventos de compra → Pub/Sub → agregador (Dataflow) → Bigtable counters → cache.</li>
+            <li><span class="danger">No hagas:</span> SCAN sobre tabla de orders en cada click.</li>
           </ul>
           <div class="api-list">
             <div class="api"><span class="method get">GET</span> /api/products/top?window=1h&amp;limit=10</div>
@@ -416,74 +1639,74 @@
 
         <a class="case" href="ride-sharing.html">
           <div class="case-top">
-            <h3>2. Ride-sharing service</h3>
-            <span class="tag">Uber/Lyft</span>
+            <h3>2. Ride-sharing</h3>
+            <span class="case-tag">Uber/Lyft</span>
           </div>
           <p>Clientes piden viaje; drivers cercanos reciben notificación en segundos.</p>
           <ul>
             <li><span class="gold">Problema central:</span> matching geoespacial en tiempo real.</li>
-            <li><span class="ok">Solución:</span> location updates, geohash, pub/sub, WebSocket/push.</li>
-            <li><span class="danger">Riesgo:</span> ubicación vieja o drivers duplicados aceptando el mismo ride.</li>
+            <li><span class="ok">Solución:</span> location updates, geohash/S2, Pub/Sub, WebSocket/push.</li>
+            <li><span class="danger">Riesgo:</span> ubicación vieja, drivers duplicados aceptando el mismo ride (race condition).</li>
           </ul>
           <div class="api-list">
-            <div class="api"><span class="method post">POST</span> /api/rides</div>
+            <div class="api"><span class="method post">POST</span> /api/rides <span style="color:var(--muted)">(con Idempotency-Key)</span></div>
             <div class="api"><span class="method patch">PATCH</span> /api/drivers/{driverId}/location</div>
-            <div class="api"><span class="method get">GET</span> /api/drivers/nearby?lat=...&amp;lng=...</div>
-            <div class="api"><span class="method post">POST</span> /api/rides/{rideId}/accept</div>
+            <div class="api"><span class="method get">GET</span> /api/drivers/nearby?lat=&amp;lng=&amp;radius=</div>
+            <div class="api"><span class="method post">POST</span> /api/rides/{rideId}:accept</div>
           </div>
         </a>
 
         <a class="case" href="youtube-streaming.html">
           <div class="case-top">
-            <h3>3. YouTube / streaming service</h3>
-            <span class="tag">Video</span>
+            <h3>3. YouTube / streaming</h3>
+            <span class="case-tag">Video</span>
           </div>
-          <p>Subir, procesar, almacenar y reproducir videos a gran escala.</p>
+          <p>Subir, transcodificar, almacenar y reproducir videos a gran escala.</p>
           <ul>
-            <li><span class="gold">Problema central:</span> ingestión pesada y entrega de baja latencia.</li>
-            <li><span class="ok">Solución:</span> object storage, transcoding async, CDN, metadata DB.</li>
-            <li><span class="danger">No hagas:</span> servir videos directamente desde el app server.</li>
+            <li><span class="gold">Problema central:</span> ingestión pesada + entrega de baja latencia.</li>
+            <li><span class="ok">Solución:</span> signed URL upload → Cloud Storage → Pub/Sub → transcoding workers → CDN.</li>
+            <li><span class="danger">No hagas:</span> servir videos directo desde el app server. Eso es CDN territory.</li>
           </ul>
           <div class="api-list">
             <div class="api"><span class="method post">POST</span> /api/videos/upload-url</div>
-            <div class="api"><span class="method post">POST</span> /api/videos/{videoId}/complete-upload</div>
+            <div class="api"><span class="method post">POST</span> /api/videos/{videoId}:complete-upload</div>
             <div class="api"><span class="method get">GET</span> /api/videos/{videoId}</div>
-            <div class="api"><span class="method get">GET</span> /api/videos/{videoId}/stream</div>
+            <div class="api"><span class="method get">GET</span> /api/videos/{videoId}/manifest.m3u8</div>
           </div>
         </a>
 
         <a class="case" href="spotify.html">
           <div class="case-top">
             <h3>4. Spotify</h3>
-            <span class="tag">Music</span>
+            <span class="case-tag">Music</span>
           </div>
           <p>Reproducir música, playlists, búsqueda y recomendaciones.</p>
           <ul>
-            <li><span class="gold">Problema central:</span> catálogo, streaming, personalización.</li>
-            <li><span class="ok">Solución:</span> metadata DB, object storage/CDN para audio, search index, reco service.</li>
-            <li><span class="danger">Cuidado:</span> licencias, región, cache por usuario y derechos.</li>
+            <li><span class="gold">Problema central:</span> catálogo + streaming + personalización.</li>
+            <li><span class="ok">Solución:</span> metadata DB + Cloud Storage/CDN para audio + search index + reco service.</li>
+            <li><span class="danger">Cuidado:</span> licencias por región, cache por usuario, derechos.</li>
           </ul>
           <div class="api-list">
             <div class="api"><span class="method get">GET</span> /api/tracks/{trackId}</div>
-            <div class="api"><span class="method get">GET</span> /api/search?q=...</div>
-            <div class="api"><span class="method post">POST</span> /api/playlists/{playlistId}/tracks</div>
-            <div class="api"><span class="method get">GET</span> /api/recommendations?userId=...</div>
+            <div class="api"><span class="method get">GET</span> /api/search?q=&amp;type=track</div>
+            <div class="api"><span class="method post">POST</span> /api/playlists/{id}/tracks</div>
+            <div class="api"><span class="method get">GET</span> /api/recommendations?seed=...</div>
           </div>
         </a>
 
         <a class="case" href="tiktok-feed.html">
           <div class="case-top">
             <h3>5. TikTok feed</h3>
-            <span class="tag">Feed ranking</span>
+            <span class="case-tag">Feed ranking</span>
           </div>
           <p>Mostrar videos cortos personalizados con scroll infinito.</p>
           <ul>
             <li><span class="gold">Problema central:</span> ranking personalizado en baja latencia.</li>
-            <li><span class="ok">Solución:</span> candidate generation, ranking model, feature store, cache.</li>
-            <li><span class="danger">Cuidado:</span> cold start, diversidad, duplicados y freshness.</li>
+            <li><span class="ok">Solución:</span> candidate generation + ranking model + feature store + cache.</li>
+            <li><span class="danger">Cuidado:</span> cold start, diversidad, duplicados, freshness.</li>
           </ul>
           <div class="api-list">
-            <div class="api"><span class="method get">GET</span> /api/feed?cursor=...</div>
+            <div class="api"><span class="method get">GET</span> /api/feed?cursor=...&amp;limit=10</div>
             <div class="api"><span class="method post">POST</span> /api/events/watch</div>
             <div class="api"><span class="method post">POST</span> /api/events/like</div>
             <div class="api"><span class="method get">GET</span> /api/videos/{videoId}</div>
@@ -493,35 +1716,35 @@
         <a class="case" href="google-docs.html">
           <div class="case-top">
             <h3>6. Google Docs</h3>
-            <span class="tag">Collaboration</span>
+            <span class="case-tag">Collaboration</span>
           </div>
           <p>Documentos editados por varios usuarios al mismo tiempo.</p>
           <ul>
-            <li><span class="gold">Problema central:</span> concurrencia y colaboración en tiempo real.</li>
-            <li><span class="ok">Solución:</span> operaciones incrementales, WebSocket, versioning, conflict resolution.</li>
-            <li><span class="danger">Cuidado:</span> lost updates, permisos y audit log.</li>
+            <li><span class="gold">Problema central:</span> concurrencia y colaboración real-time.</li>
+            <li><span class="ok">Solución:</span> OT/CRDT, WebSocket, version vector, conflict resolution.</li>
+            <li><span class="danger">Cuidado:</span> lost updates, permisos (Zanzibar), audit log.</li>
           </ul>
           <div class="api-list">
             <div class="api"><span class="method post">POST</span> /api/documents</div>
             <div class="api"><span class="method get">GET</span> /api/documents/{documentId}</div>
             <div class="api"><span class="method post">POST</span> /api/documents/{documentId}/operations</div>
-            <div class="api"><span class="method get">GET</span> /api/documents/{documentId}/changes?since=...</div>
+            <div class="api">WebSocket /ws/documents/{documentId}</div>
           </div>
         </a>
 
         <a class="case" href="recommendation-systems.html">
           <div class="case-top">
-            <h3>7. Recommendation Systems</h3>
-            <span class="tag">Tu mero mole</span>
+            <h3>7. Recommendations</h3>
+            <span class="case-tag">ML</span>
           </div>
           <p>Recomendar productos, videos, canciones o documentos relevantes.</p>
           <ul>
             <li><span class="gold">Problema central:</span> candidates + ranking + feedback loop.</li>
-            <li><span class="ok">Solución:</span> eventos de usuario, feature store, modelo offline/online, cache.</li>
-            <li><span class="danger">Cuidado:</span> latencia, sesgo, cold start y métricas.</li>
+            <li><span class="ok">Solución:</span> eventos de usuario, feature store, modelo offline+online, cache.</li>
+            <li><span class="danger">Cuidado:</span> latencia (&lt;100ms), sesgo, cold start, métricas A/B.</li>
           </ul>
           <div class="api-list">
-            <div class="api"><span class="method get">GET</span> /api/recommendations?userId=...&amp;context=home</div>
+            <div class="api"><span class="method get">GET</span> /api/recommendations?userId=&amp;context=home</div>
             <div class="api"><span class="method post">POST</span> /api/events/impression</div>
             <div class="api"><span class="method post">POST</span> /api/events/click</div>
             <div class="api"><span class="method post">POST</span> /api/events/purchase</div>
@@ -531,17 +1754,17 @@
         <a class="case" href="link-shortener.html">
           <div class="case-top">
             <h3>8. Link shortener</h3>
-            <span class="tag">TinyURL/Bitly</span>
+            <span class="case-tag">TinyURL/Bitly</span>
           </div>
-          <p>Convertir URLs largas en links cortos y redirigir con baja latencia.</p>
+          <p>URLs largas → links cortos, redirección de baja latencia.</p>
           <ul>
-            <li><span class="gold">Problema central:</span> generar IDs cortos únicos y redirigir rápido.</li>
-            <li><span class="ok">Solución:</span> key generator, cache, DB key-value, analytics async.</li>
-            <li><span class="danger">Cuidado:</span> colisiones, links maliciosos y rate limits.</li>
+            <li><span class="gold">Problema central:</span> generar IDs cortos únicos, redirigir rápido.</li>
+            <li><span class="ok">Solución:</span> base62 de counter (Spanner) o hash + colisión-check; cache; analytics async.</li>
+            <li><span class="danger">Cuidado:</span> colisiones, links maliciosos, rate limits.</li>
           </ul>
           <div class="api-list">
             <div class="api"><span class="method post">POST</span> /api/links</div>
-            <div class="api"><span class="method get">GET</span> /{shortCode}</div>
+            <div class="api"><span class="method get">GET</span> /{shortCode} <span style="color:var(--muted)">(301 redirect)</span></div>
             <div class="api"><span class="method get">GET</span> /api/links/{shortCode}/stats</div>
             <div class="api"><span class="method delete">DELETE</span> /api/links/{shortCode}</div>
           </div>
@@ -549,119 +1772,292 @@
 
         <a class="case" href="file-system.html">
           <div class="case-top">
-            <h3>9. File system</h3>
-            <span class="tag">Dropbox/GDrive core</span>
+            <h3>9. File system (Drive)</h3>
+            <span class="case-tag">Dropbox/GDrive</span>
           </div>
-          <p>Crear carpetas, subir archivos, leer metadata, versionar y compartir.</p>
+          <p>Carpetas, uploads, metadata, versionado, sharing.</p>
           <ul>
             <li><span class="gold">Problema central:</span> metadata tree + blobs grandes + permisos.</li>
-            <li><span class="ok">Solución:</span> metadata DB, object storage, chunk upload, versioning.</li>
-            <li><span class="danger">Cuidado:</span> rename/move atómico, permisos heredados y deduplicación.</li>
+            <li><span class="ok">Solución:</span> Spanner/Firestore metadata, Cloud Storage blobs, chunk upload, dedup por hash.</li>
+            <li><span class="danger">Cuidado:</span> rename/move atómico, permisos heredados, dedup chunk-level.</li>
           </ul>
           <div class="api-list">
-            <div class="api"><span class="method post">POST</span> /api/files/upload-url</div>
+            <div class="api"><span class="method post">POST</span> /api/files:initiate-upload</div>
             <div class="api"><span class="method post">POST</span> /api/folders</div>
-            <div class="api"><span class="method get">GET</span> /api/files/{fileId}/metadata</div>
-            <div class="api"><span class="method post">POST</span> /api/files/{fileId}/share</div>
+            <div class="api"><span class="method get">GET</span> /api/files/{fileId}</div>
+            <div class="api"><span class="method post">POST</span> /api/files/{fileId}:share</div>
           </div>
         </a>
 
         <a class="case" href="dbms.html">
           <div class="case-top">
-            <h3>10. DBMS / manejador de base de datos</h3>
-            <span class="tag">Difícil pero defendible</span>
+            <h3>10. DBMS / motor de BD</h3>
+            <span class="case-tag">Difícil pero defendible</span>
           </div>
-          <p>Diseñar un sistema que recibe queries, guarda páginas, indexa y responde transacciones.</p>
+          <p>Sistema que recibe queries, indexa, transacciona.</p>
           <ul>
-            <li><span class="gold">Problema central:</span> storage engine, indexes, query planner, transactions.</li>
+            <li><span class="gold">Problema central:</span> storage engine + indexes + query planner + transactions.</li>
             <li><span class="ok">Solución:</span> B+ trees/LSM, buffer pool, WAL, locks/MVCC, replication.</li>
-            <li><span class="danger">Cuidado:</span> ACID, recuperación ante fallas y consistencia.</li>
+            <li><span class="danger">Cuidado:</span> ACID, recuperación tras crash, isolation levels.</li>
           </ul>
           <div class="api-list">
             <div class="api"><span class="method post">POST</span> /api/query</div>
             <div class="api"><span class="method post">POST</span> /api/transactions</div>
-            <div class="api"><span class="method post">POST</span> /api/transactions/{txId}/commit</div>
-            <div class="api"><span class="method post">POST</span> /api/transactions/{txId}/rollback</div>
+            <div class="api"><span class="method post">POST</span> /api/transactions/{txId}:commit</div>
+            <div class="api"><span class="method post">POST</span> /api/transactions/{txId}:rollback</div>
           </div>
         </a>
+
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-head">
-        <h2>Qué mencionar para verte fuerte</h2>
+    <!-- ============ KEYWORDS / FRASES ============ -->
+    <section class="section" id="keywords">
+      <div class="section-header">
+        <h2><span class="num">8</span> Qué mencionar para verte fuerte</h2>
         <p>Estas palabras elevan tu respuesta si las conectas con el problema correcto.</p>
       </div>
-      <div class="table-box">
+
+      <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Tema</th>
-              <th>Cuándo lo mencionas</th>
+              <th style="width: 18%;">Tema</th>
+              <th style="width: 32%;">Cuándo lo mencionas</th>
               <th>Frase de entrevista</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="ok">Cache</td>
-              <td>Lecturas frecuentes, rankings, perfiles, feed, metadata.</td>
-              <td>“Cachearía respuestas calientes y pondría TTL para no servir datos eternamente viejos.”</td>
+              <td class="category" style="color: var(--get);">Cache</td>
+              <td class="desc">Lecturas frecuentes, rankings, perfiles, feed, metadata.</td>
+              <td class="desc">"Cachearía respuestas calientes con TTL para no servir datos eternamente viejos."</td>
             </tr>
             <tr>
-              <td class="ok">Queue / PubSub</td>
-              <td>Procesos pesados, emails, transcoding, analytics, indexing.</td>
-              <td>“Lo haría asíncrono para desacoplar el request del procesamiento pesado.”</td>
+              <td class="category" style="color: var(--get);">Queue / Pub/Sub</td>
+              <td class="desc">Procesos pesados, emails, transcoding, analytics, indexing.</td>
+              <td class="desc">"Lo haría asíncrono con Pub/Sub para desacoplar el request del procesamiento pesado."</td>
             </tr>
             <tr>
-              <td class="ok">CDN</td>
-              <td>Videos, imágenes, audio, archivos públicos o estáticos.</td>
-              <td>“El app server no debe servir blobs grandes; uso object storage más CDN.”</td>
+              <td class="category" style="color: var(--get);">CDN</td>
+              <td class="desc">Videos, imágenes, audio, archivos públicos o estáticos.</td>
+              <td class="desc">"El app server no debe servir blobs grandes; uso Cloud Storage + Cloud CDN."</td>
             </tr>
             <tr>
-              <td class="ok">Idempotency key</td>
-              <td>Pagos, órdenes, creación de rides, retries del cliente.</td>
-              <td>“Para evitar duplicados en retries, aceptaría una idempotency key por request.”</td>
+              <td class="category" style="color: var(--get);">Idempotency-Key</td>
+              <td class="desc">Pagos, órdenes, creación de rides, retries del cliente.</td>
+              <td class="desc">"Para evitar duplicados en retries, acepto un Idempotency-Key por request."</td>
             </tr>
             <tr>
-              <td class="ok">Rate limit</td>
-              <td>APIs públicas, login, short links, feed, scraping.</td>
-              <td>“Aplicaría rate limit por usuario, IP o API key para proteger disponibilidad.”</td>
+              <td class="category" style="color: var(--get);">Rate limit</td>
+              <td class="desc">APIs públicas, login, short links, feed, scraping.</td>
+              <td class="desc">"Aplicaría rate limit por user/IP/key con token bucket en Redis para protección."</td>
             </tr>
             <tr>
-              <td class="ok">Versioning / ETag</td>
-              <td>Docs, archivos, edición colaborativa, updates concurrentes.</td>
-              <td>“Para evitar lost updates, usaría version o ETag con If-Match.”</td>
+              <td class="category" style="color: var(--get);">ETag / If-Match</td>
+              <td class="desc">Docs, archivos, edición colaborativa, updates concurrentes.</td>
+              <td class="desc">"Para evitar lost updates, uso ETag con If-Match — devuelve 412 si cambió."</td>
             </tr>
             <tr>
-              <td class="ok">Pagination / cursor</td>
-              <td>Feeds, búsquedas, listas grandes, historial.</td>
-              <td>“Usaría cursor pagination porque escala mejor que offset en datasets grandes.”</td>
+              <td class="category" style="color: var(--get);">Cursor pagination</td>
+              <td class="desc">Feeds, búsquedas, listas grandes, historial.</td>
+              <td class="desc">"Uso cursor pagination porque escala mejor que offset en datasets grandes."</td>
             </tr>
             <tr>
-              <td class="ok">Observability</td>
-              <td>Siempre.</td>
-              <td>“Mediría latencia p50/p95/p99, tasa de errores, saturación y throughput.”</td>
+              <td class="category" style="color: var(--get);">Field masks</td>
+              <td class="desc">Update parciales, GET con campos selectivos.</td>
+              <td class="desc">"Usaría field mask <code>?fields=id,name</code> al estilo Google APIs para reducir payload."</td>
+            </tr>
+            <tr>
+              <td class="category" style="color: var(--get);">Observability</td>
+              <td class="desc">Siempre.</td>
+              <td class="desc">"Mediría latencia p50/p95/p99, error rate, saturación y throughput. SLO 99.9%."</td>
+            </tr>
+            <tr>
+              <td class="category" style="color: var(--get);">gRPC / protobuf</td>
+              <td class="desc">Microservicios internos, mobile, streaming.</td>
+              <td class="desc">"Para servicio interno usaría gRPC sobre HTTP/2 — schema fuerte y mejor performance."</td>
+            </tr>
+            <tr>
+              <td class="category" style="color: var(--get);">Circuit breaker</td>
+              <td class="desc">Llamadas a servicios externos o críticos.</td>
+              <td class="desc">"Aplico circuit breaker para evitar cascada de fallos cuando un upstream se degrade."</td>
+            </tr>
+            <tr>
+              <td class="category" style="color: var(--get);">Backoff + jitter</td>
+              <td class="desc">Cualquier retry — cliente o entre servicios.</td>
+              <td class="desc">"Retry con exponential backoff y jitter para no causar thundering herd."</td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <section class="section script">
-      <p>
-        <strong>Script para abrir cualquier respuesta:</strong><br />
-        “Voy a empezar definiendo los recursos principales y las APIs. Después explico el flujo de escritura y lectura, dónde usaría cache o colas, cómo manejaría consistencia, seguridad, rate limits y observabilidad. Finalmente, reviso los tradeoffs y los posibles bottlenecks.”
-      </p>
+    <!-- ============ SCRIPTS ============ -->
+    <section class="section" id="scripts">
+      <div class="section-header">
+        <h2><span class="num">9</span> Scripts listos para usar</h2>
+        <p>Aprénde estas frases de memoria. Te ahorran 30 segundos de tartamudeo.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3><span class="icon">🎬</span> Apertura: cualquier "diseña X"</h3>
+          <p style="color: var(--text-bright); font-size: 13.5px; font-style: italic;">
+            "Voy a empezar identificando los recursos principales y las APIs por recurso. Después explico el flujo de escritura y lectura, dónde uso cache o colas, cómo manejo consistencia, seguridad, rate limits y observabilidad. Finalmente reviso tradeoffs y posibles bottlenecks."
+          </p>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🎯</span> Cierre fuerte (escala)</h3>
+          <p style="color: var(--text-bright); font-size: 13.5px; font-style: italic;">
+            "El diseño funciona para escala moderada. Para 10× tráfico: separo ruta crítica de procesos asíncronos, agrego cache para lecturas calientes, particiono por <code>userId</code> o <code>region</code>, y mido p95/p99 para detectar bottlenecks. Plan B: read replicas y CDN edge caching."
+          </p>
+        </div>
+        <div class="card">
+          <h3><span class="icon">⚡</span> Defender una decisión técnica</h3>
+          <p style="color: var(--text-bright); font-size: 13.5px; font-style: italic;">
+            "Hay un trade-off entre [X] y [Y]. Yo elegiría [X] porque [razón concreta]. Si los requisitos cambian a [escenario], reconsideraría [Y]. Esto se monitorea con [métrica]."
+          </p>
+        </div>
+        <div class="card">
+          <h3><span class="icon">🛡️</span> Cuando preguntan "¿y si falla?"</h3>
+          <p style="color: var(--text-bright); font-size: 13.5px; font-style: italic;">
+            "Para failure de [componente]: timeout corto + retry con exponential backoff + circuit breaker. Si persiste, fallback a [degraded mode]. El cliente ve un error claro, no un cuelgue. Alertamos con SLO budget burn."
+          </p>
+        </div>
+      </div>
+
+      <div class="quote">
+        <p><strong>Pro tip Google:</strong> Cuando hables de APIs públicas, menciona que seguirías las <strong>Google API Improvement Proposals (AIP.dev)</strong>: resource-oriented design, standard methods (List, Get, Create, Update, Delete, custom como <code>:cancel</code>), field masks para updates, error model estándar. Esto demuestra que conoces sus estándares internos.</p>
+      </div>
     </section>
 
-    <section class="section script">
-      <p>
-        <strong>Script para cerrar fuerte:</strong><br />
-        “El diseño inicial funciona para escala moderada. Para escalarlo, separaría la ruta crítica de los procesos asíncronos, agregaría cache para lecturas calientes, particionaría por claves naturales como userId, productId o region, y mediría p95/p99 para detectar cuellos de botella.”
-      </p>
-    </section>
-
-    <p class="footer">API System Design Interview Playbook · Casos: Spotify, TikTok, Google Docs, E-commerce, Ride-sharing, YouTube, Recommender Systems, DBMS, File System, Link Shortener</p>
+    <p class="footer">
+      API Design Cheat Sheet · Optimizado para Google System Design Interview ·
+      Atajos: <kbd>/</kbd> buscar · <kbd>Esc</kbd> limpiar · <kbd>Ctrl</kbd>+<kbd>P</kbd> imprimir ·
+      <a href="index.html" style="color: var(--google-yellow); text-decoration: none;">← volver al hub</a>
+    </p>
   </main>
+
+  <script>
+    // ============ LIVE SEARCH ============
+    const searchInput = document.getElementById('search');
+
+    // Capture original HTML once for highlight reset
+    const originalCells = new Map();
+    document.querySelectorAll('td, li, .step-desc, .step-title, .case > p, .card p').forEach(el => {
+      originalCells.set(el, el.innerHTML);
+    });
+
+    function clearHighlights() {
+      originalCells.forEach((html, el) => {
+        if (el.innerHTML !== html) el.innerHTML = html;
+      });
+    }
+
+    function highlightTerm(el, term) {
+      if (!term) return;
+      const original = originalCells.get(el);
+      if (!original) return;
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`(${escaped})(?![^<]*>)`, 'gi');
+      el.innerHTML = original.replace(re, '<mark>$1</mark>');
+    }
+
+    function filter(query) {
+      const q = query.trim().toLowerCase();
+      clearHighlights();
+
+      if (!q) {
+        document.querySelectorAll('.hide').forEach(el => el.classList.remove('hide'));
+        return;
+      }
+
+      // Filter table rows
+      document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(q)) {
+          row.classList.remove('hide');
+          row.querySelectorAll('td').forEach(td => highlightTerm(td, q));
+        } else {
+          row.classList.add('hide');
+        }
+      });
+
+      // Filter cards
+      document.querySelectorAll('.card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(q)) {
+          card.classList.remove('hide');
+          card.querySelectorAll('p, li').forEach(el => highlightTerm(el, q));
+        } else {
+          card.classList.add('hide');
+        }
+      });
+
+      // Filter steps
+      document.querySelectorAll('.step').forEach(step => {
+        const text = step.textContent.toLowerCase();
+        if (text.includes(q)) {
+          step.classList.remove('hide');
+          step.querySelectorAll('.step-desc, .step-title').forEach(el => highlightTerm(el, q));
+        } else {
+          step.classList.add('hide');
+        }
+      });
+
+      // Filter cases
+      document.querySelectorAll('.case').forEach(c => {
+        const text = c.textContent.toLowerCase();
+        if (text.includes(q)) {
+          c.classList.remove('hide');
+        } else {
+          c.classList.add('hide');
+        }
+      });
+
+      // Hide empty sections
+      document.querySelectorAll('section.section').forEach(sec => {
+        const visibleRows = sec.querySelectorAll('tbody tr:not(.hide)');
+        const visibleCards = sec.querySelectorAll('.card:not(.hide)');
+        const visibleSteps = sec.querySelectorAll('.step:not(.hide)');
+        const visibleCases = sec.querySelectorAll('.case:not(.hide)');
+        const total = visibleRows.length + visibleCards.length + visibleSteps.length + visibleCases.length;
+        if (total === 0) sec.classList.add('hide');
+        else sec.classList.remove('hide');
+      });
+
+      // Auto-open all <details> when searching
+      document.querySelectorAll('details').forEach(d => d.open = true);
+    }
+
+    searchInput.addEventListener('input', e => filter(e.target.value));
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = '';
+        filter('');
+        searchInput.blur();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
+    document.querySelectorAll('.topnav a').forEach(a => {
+      a.addEventListener('click', () => {
+        searchInput.value = '';
+        filter('');
+      });
+    });
+  </script>
 </body>
 </html>
