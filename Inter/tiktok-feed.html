@@ -134,6 +134,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -316,6 +326,35 @@ flowchart LR
             <li><b>Pre-warming</b> de candidates de viajes/sesiones esperadas.</li>
             <li><b>Edge inference</b> para queries simples sin round-trip al ranker central.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">FAISS / HNSW / ScaNN</span><span class="svc-tag">embeddings ANN</span>
+          <p class="why-line"><b>Por qué:</b> retrieval de top-K vecinos en embeddings de ~100M videos en sub-10 ms. HNSW soporta updates incrementales (videos nuevos aparecen rápido). Recall &gt; 95% con tuning.</p>
+          <p class="alt-line"><b>vs Postgres + pgvector:</b> insuficiente a 100M items y 600K QPS. <b>vs Elasticsearch dense_vector:</b> aceptable pero menos óptimo en recall/latencia. <b>vs Vertex AI Matching Engine:</b> managed equivalente (GCP-only).</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Apache Kafka</span><span class="svc-tag">events watch/like/share</span>
+          <p class="why-line"><b>Por qué:</b> 10K+ events/s por usuario activo. Particionado por <code>user_id</code> mantiene orden de sesión. Stream alimenta feature store online (rápido) y training pipeline (batch).</p>
+          <p class="alt-line"><b>vs Kinesis:</b> AWS-only, throughput por shard limitado. <b>vs Pub/Sub:</b> menos control de retention/order. <b>vs SQS:</b> queue, no escala a múltiples consumers independientes.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Feature Store (Bigtable / DynamoDB / Redis)</span><span class="svc-tag">user + item features</span>
+          <p class="why-line"><b>Por qué:</b> bulk MGET de ~500 items en &lt;30 ms para alimentar el ranker. Bigtable para volumen, Redis para hot keys frequently read.</p>
+          <p class="alt-line"><b>vs Postgres:</b> sin chance a 6M req/s. <b>vs DynamoDB:</b> aceptable, más caro a este volumen. <b>vs Cassandra:</b> aceptable pero tunable más complejo.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Model Serving (TF Serving / Triton / ONNX Runtime)</span><span class="svc-tag">online ranker</span>
+          <p class="why-line"><b>Por qué:</b> serve inference con GPU/CPU optimized, batching de requests, model versioning, A/B sin redeployar el código de la app.</p>
+          <p class="alt-line"><b>vs SageMaker / Vertex AI:</b> managed, más caro y menos custom batching. <b>vs FastAPI con torch.load:</b> sin batching ni warm-up adecuado, latencia inaceptable.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">CDN (CloudFront / Cloud CDN / Akamai)</span><span class="svc-tag">video bytes</span>
+          <p class="why-line"><b>Por qué:</b> entrega de video por POPs globales. Pre-fetching del siguiente video en feed reduce buffering. Egress cost contenido por cache hit alto.</p>
+          <p class="alt-line"><b>vs servir desde object storage:</b> latencia y costo prohibitivo. <b>vs P2P only:</b> falla en cold start de videos virales.</p>
         </div>
       </div>
     </section>

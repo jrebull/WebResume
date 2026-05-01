@@ -134,6 +134,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -318,6 +328,40 @@ flowchart LR
             <li><b>Pack files</b> para muchos archivos pequeños (write amplification reduction).</li>
             <li><b>Hot tier vs cold tier</b> automático según último access (Glacier para old).</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">S3 / GCS / Azure Blob</span><span class="svc-tag">chunks storage</span>
+          <p class="why-line"><b>Por qué:</b> 11×9 durabilidad, multipart upload con resume, lifecycle a Glacier para archives, server-side encryption nativo, pre-signed URLs para upload directo del cliente.</p>
+          <p class="alt-line"><b>vs HDFS / MinIO self-hosted:</b> ops del cluster, replication manual, scaling complejo. <b>vs filesystem en VM:</b> imposible a EB. <b>vs Cassandra:</b> no es para blobs grandes.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Spanner / CockroachDB / Postgres</span><span class="svc-tag">metadata DB</span>
+          <p class="why-line"><b>Por qué:</b> ACID estricto en move/rename atómico (cambia <code>parent_id</code> de N hijos en una tx). Spanner si multi-region; CockroachDB SQL-compatible self-managed; Postgres si single region es suficiente.</p>
+          <p class="alt-line"><b>vs DynamoDB:</b> sin transacciones multi-row complejas; rename de carpeta con 1000 hijos es problemático. <b>vs Cassandra:</b> last-write-wins rompe atomicidad. <b>vs MongoDB:</b> aceptable pero menos garantías.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Pub/Sub / Kafka</span><span class="svc-tag">sync events</span>
+          <p class="why-line"><b>Por qué:</b> stream de cambios para alimentar el sync delta de cada device. Particionado por <code>user_id</code> mantiene orden de cambios por usuario. Cliente con cursor que avanza monotónicamente.</p>
+          <p class="alt-line"><b>vs WebSocket directo:</b> imposible mantener N conexiones por user activo (laptop, móvil, web). <b>vs polling:</b> ~10B sync events/día → polling sería &gt;100K req/s desperdiciados.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Permissions (Zanzibar / SpiceDB)</span><span class="svc-tag">ACL granular</span>
+          <p class="why-line"><b>Por qué:</b> modelo basado en relaciones para sharing granular (viewer/editor/owner) con herencia (folder → archivos). Escala a billones de tuples; lookups con cache.</p>
+          <p class="alt-line"><b>vs ACL en columnas SQL:</b> queries recursivas son inviables. <b>vs IAM cloud:</b> diseñado para recursos de infra, no para 1B+ archivos por usuarios externos. <b>vs RBAC simple:</b> no captura "compartido conmigo" granular.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">CDN para downloads</span><span class="svc-tag">file delivery</span>
+          <p class="why-line"><b>Por qué:</b> downloads grandes (videos, PDFs) servidos por POP regional. Reduce egress cost del object storage en ~70%.</p>
+          <p class="alt-line"><b>vs servir directo desde S3:</b> egress fees prohibitivos a EB scale. <b>vs P2P:</b> falla en archivos cold (sin peers).</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">GC Worker (cron / Cloud Scheduler)</span><span class="svc-tag">orphan chunks</span>
+          <p class="why-line"><b>Por qué:</b> nightly batch que escanea chunks con <code>ref_count = 0</code> y los borra (después de TTL de 5 días por seguridad). Sin esto, storage waste crece sin límite.</p>
+          <p class="alt-line"><b>vs reference counting síncrono:</b> contención en hot chunks comunes. <b>vs sin GC:</b> EB de chunks huérfanos en años.</p>
         </div>
       </div>
     </section>

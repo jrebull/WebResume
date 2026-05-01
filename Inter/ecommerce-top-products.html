@@ -135,6 +135,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -309,6 +319,35 @@ flowchart LR
             <li><b>HyperLogLog / Count-Min Sketch</b> en ventanas de 24h para conteo aproximado y memoria fija.</li>
             <li><b>Active-active multi-region</b> con sorted set por región y merge para vista global.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">Apache Kafka</span><span class="svc-tag">stream events</span>
+          <p class="why-line"><b>Por qué:</b> high-throughput append-only log con particionado por <code>productId</code>, replay desde offset, multi-consumer fan-out (aggregator + analytics + audit) sobre el mismo stream.</p>
+          <p class="alt-line"><b>vs Kinesis (AWS):</b> equivalente pero AWS-only, retention max 365d, throughput por shard limitado. <b>vs Pub/Sub (GCP):</b> más simple pero menos control de retention y partition keys. <b>vs SQS / RabbitMQ:</b> queue point-to-point — no permite replay ni múltiples consumers leyendo independientemente.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Redis (ElastiCache / Memorystore)</span><span class="svc-tag">sorted sets + cache</span>
+          <p class="why-line"><b>Por qué:</b> sorted sets nativos con <code>ZRANGE</code>/<code>ZINCRBY</code> en O(log N), TTL granular, scripts Lua para operaciones atómicas multi-comando. Es <em>el</em> data structure server.</p>
+          <p class="alt-line"><b>vs Memcached:</b> sin estructuras ordenadas — habría que reconstruir top-K en cada request. <b>vs DynamoDB:</b> latencia P99 ~10 ms vs &lt;1 ms; no tiene primitivas de sorted set. <b>vs Postgres:</b> escanear la tabla cada query mata el SLO.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">PostgreSQL (RDS / Cloud SQL)</span><span class="svc-tag">orders DB</span>
+          <p class="why-line"><b>Por qué:</b> ACID estricto en checkout, foreign keys, partial indexes, JSONB para campos semi-estructurados, <code>SERIALIZABLE</code> isolation cuando hace falta. Mature y bien soportado en cloud-managed.</p>
+          <p class="alt-line"><b>vs MySQL:</b> equivalente pero PG tiene mejor soporte para JSONB, partial indexes y CTEs. <b>vs DynamoDB:</b> sin joins ni transacciones multi-row complejas — mal fit para checkout. <b>vs CockroachDB / Spanner:</b> overkill para single-region; agrega latencia.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">BigQuery / Snowflake / Redshift</span><span class="svc-tag">cold storage analytics</span>
+          <p class="why-line"><b>Por qué:</b> data warehouse columnar serverless, SQL nativo, escala a PB sin provisioning. Reportes históricos sin presionar la DB operacional.</p>
+          <p class="alt-line"><b>vs cargar en Postgres:</b> imposible a escala — el OLAP destruiría el OLTP. <b>vs Hadoop / Spark sobre S3:</b> más operativo, requiere ETL. <b>vs ClickHouse:</b> aceptable y más barato pero requiere ops propio.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">CloudFront / Cloud CDN / Fastly</span><span class="svc-tag">edge cache</span>
+          <p class="why-line"><b>Por qué:</b> POPs globales, TTL granular con stale-while-revalidate, cache key por <code>(window, region)</code>, headers de control fáciles de configurar.</p>
+          <p class="alt-line"><b>vs servir desde el origin:</b> 95% del tráfico de lectura saturaría el sistema. <b>vs Varnish self-hosted:</b> requiere ops y no escala globalmente sin trabajo.</p>
         </div>
       </div>
     </section>

@@ -134,6 +134,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -315,6 +325,35 @@ flowchart LR
             <li><b>CRDT</b> en lugar de OT si necesitas multi-master geográfico.</li>
             <li><b>Local-first</b> con sync diferido para offline-first.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">Spanner / Postgres</span><span class="svc-tag">metadata + op log</span>
+          <p class="why-line"><b>Por qué:</b> ACID en append del op log + actualización de <code>current_version</code>. Spanner si quieres multi-region con strong consistency; Postgres si single-region es suficiente.</p>
+          <p class="alt-line"><b>vs DynamoDB:</b> sin transacciones multi-row complejas, append + counter no son atómicos. <b>vs Cassandra:</b> last-write-wins rompe el OT. <b>vs MongoDB:</b> aceptable pero menos garantías ACID históricamente.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Pub/Sub / Kafka</span><span class="svc-tag">broadcast de ops</span>
+          <p class="why-line"><b>Por qué:</b> fan-out de operaciones a N clientes conectados al doc. Sin esto, el Doc Service tendría que conocer cada conexión WebSocket y mantener referencias.</p>
+          <p class="alt-line"><b>vs Redis Pub/Sub:</b> aceptable, sin durabilidad. <b>vs WebSocket relay propio:</b> reinventar broker. <b>vs SQS:</b> queue, no broadcast multicast.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">WebSocket Gateway sticky</span><span class="svc-tag">canal de edición</span>
+          <p class="why-line"><b>Por qué:</b> sticky session por <code>documentId</code> garantiza que todas las ops de un doc lleguen al mismo pod (state local del transformador OT). Sin sticky, los logs divergen.</p>
+          <p class="alt-line"><b>vs HTTP polling:</b> latencia inaceptable para colaboración en vivo. <b>vs SSE:</b> unidireccional, no permite enviar ops del cliente. <b>vs gRPC streaming:</b> aceptable pero sin browser nativo.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Snapshot Store (S3 / GCS)</span><span class="svc-tag">snapshots periódicos</span>
+          <p class="why-line"><b>Por qué:</b> blobs grandes (snapshot de doc) en object storage barato y durable. Lifecycle a cold tier para snapshots viejos.</p>
+          <p class="alt-line"><b>vs guardar en la DB:</b> infla la DB con blobs grandes que rara vez se leen. <b>vs filesystem:</b> sin redundancia ni escala.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Permissions (Zanzibar / SpiceDB / OpenFGA)</span><span class="svc-tag">ACL granular</span>
+          <p class="why-line"><b>Por qué:</b> modelo basado en relaciones (object-relation-subject) escala a billones de tuples. Soporta herencia (folder → docs), grupos, sharing por link, todo en un mismo modelo.</p>
+          <p class="alt-line"><b>vs ACL en columnas de Postgres:</b> queries recursivas matan performance. <b>vs IAM cloud-native:</b> diseñado para recursos de infra, no para 1B+ docs por usuarios externos. <b>vs RBAC simple:</b> no captura "compartido conmigo" granular.</p>
         </div>
       </div>
     </section>

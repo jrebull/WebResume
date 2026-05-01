@@ -134,6 +134,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -321,6 +331,41 @@ flowchart LR
             <li><b>Sharding</b> por clave natural (user_id, tenant_id) cuando un nodo no alcanza.</li>
             <li><b>Connection pooling</b> (PgBouncer) — abrir conexiones es caro.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estas decisiones internas (vs alternativas)</h2></div>
+      <p style="color: var(--muted); font-size: 13.5px; margin: 0 0 14px;">En este caso no usamos servicios cloud — estamos diseñando el motor de DB. La pregunta es: por qué cada estructura interna y no las otras.</p>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">B+Tree</span><span class="svc-tag">storage engine para read-balanced</span>
+          <p class="why-line"><b>Por qué:</b> reads y range scans en O(log N), updates in-place, escala bien con índices. Es el default de Postgres, MySQL/InnoDB, Oracle.</p>
+          <p class="alt-line"><b>vs LSM-Tree:</b> mejor para write-heavy (Cassandra, RocksDB) pero compaction periódica genera write amplification y read amplification por niveles. <b>vs Hash Index:</b> O(1) en point lookup pero no soporta range scans. <b>vs Skip List:</b> simpler pero peor disk locality.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">WAL append-only + fsync at commit</span><span class="svc-tag">durabilidad</span>
+          <p class="why-line"><b>Por qué:</b> escritura secuencial en disco es ~100× más rápida que random. Single source of truth para recovery. Replicable a réplicas streaming bytes del WAL.</p>
+          <p class="alt-line"><b>vs no-WAL (in-place writes):</b> un crash con escritura parcial corrompe páginas. <b>vs shadow paging:</b> simpler conceptualmente pero overhead de copy. <b>vs synchronous replication sin WAL:</b> requiere consenso costoso por escritura.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">MVCC + 2PL strict</span><span class="svc-tag">concurrencia</span>
+          <p class="why-line"><b>Por qué:</b> MVCC permite que reads no bloqueen writes (cada tx ve un snapshot del momento que empezó); 2PL strict en escrituras críticas garantiza serializable. Combinación estándar.</p>
+          <p class="alt-line"><b>vs solo 2PL:</b> reads largos bloquean writes — inaceptable para OLTP moderno. <b>vs solo MVCC sin lock en writes:</b> permite write skew y otras anomalías. <b>vs OCC (Optimistic Concurrency Control):</b> aceptable para conflict-rate bajo, malo si hay contención alta.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Buffer Pool con LRU/Clock</span><span class="svc-tag">caché de páginas</span>
+          <p class="why-line"><b>Por qué:</b> RAM es ~100K× más rápida que SSD. LRU evict las páginas frías; Clock es aproximación con menos overhead que LRU puro. Hit ratio &gt; 99% en hot working set.</p>
+          <p class="alt-line"><b>vs ARC (Adaptive Replacement Cache):</b> mejor en algunos workloads pero más complejo. <b>vs FIFO simple:</b> mucho peor hit ratio. <b>vs OS page cache solo:</b> el DB sabe mejor qué páginas son hot.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">ARIES Recovery</span><span class="svc-tag">crash recovery</span>
+          <p class="why-line"><b>Por qué:</b> algoritmo probado matemáticamente: analysis (reconstruir tx_table desde último checkpoint), redo (reaplicar todo en WAL), undo (deshacer no-committed). Garantiza estado consistente tras cualquier crash.</p>
+          <p class="alt-line"><b>vs shadow paging recovery:</b> simpler pero menos eficiente para writes. <b>vs no-undo / no-redo:</b> requiere force-write, lento. <b>vs custom ad-hoc:</b> garantías débiles, bug factory.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">WAL Shipping (replicación)</span><span class="svc-tag">read replicas + HA</span>
+          <p class="why-line"><b>Por qué:</b> stream el WAL del primary a réplicas; éstas re-aplican para mantener consistencia. Sync para durabilidad cross-node, async para latencia.</p>
+          <p class="alt-line"><b>vs Logical Replication:</b> más flexible (filtros, esquemas distintos) pero overhead mayor. <b>vs Multi-master con consenso (Raft/Paxos):</b> serializability garantizada pero +RTT por escritura, complejidad alta. <b>vs Snapshot replication:</b> no realtime.</p>
         </div>
       </div>
     </section>

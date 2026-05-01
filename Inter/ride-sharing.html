@@ -135,6 +135,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -317,6 +327,35 @@ flowchart LR
             <li><b>Surge pricing local</b> para balancear oferta/demanda en zonas hot.</li>
             <li><b>Pre-asignar pool</b> de drivers para zonas con alta predicibilidad (aeropuerto a las 8 AM).</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">Redis (ElastiCache / Memorystore)</span><span class="svc-tag">geo index + lock</span>
+          <p class="why-line"><b>Por qué:</b> primitivas <code>GEOADD</code>/<code>GEORADIUS</code> nativas con sub-ms latency. <code>SETNX</code> con TTL para CAS distribuido en accept atómico. Lua scripts para combinar geo + lock atómico.</p>
+          <p class="alt-line"><b>vs PostGIS:</b> queries más expresivas pero ~10× latencia, transacciones caras para 250K updates/s. <b>vs Elasticsearch geo_point:</b> overkill, indexado costoso. <b>vs Quadtree custom:</b> reinventar la rueda y operar el cluster.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">PostgreSQL (RDS / Cloud SQL)</span><span class="svc-tag">rides DB</span>
+          <p class="why-line"><b>Por qué:</b> ACID en transición de estados del ride (pending → matched → in_progress → completed), tipo <code>GEOGRAPHY</code> con PostGIS para almacenar pickups, foreign keys a users/drivers/vehicles.</p>
+          <p class="alt-line"><b>vs Spanner / CockroachDB:</b> overkill para single-city; agrega ~10 ms a cada commit. <b>vs DynamoDB:</b> sin transacciones multi-row; el ciclo del ride se vuelve frágil. <b>vs Cassandra:</b> last-write-wins no funciona para state machines.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Apache Kafka</span><span class="svc-tag">ride_events stream</span>
+          <p class="why-line"><b>Por qué:</b> múltiples consumers (matcher, payment, rating, analytics) consumen el mismo stream sin coordinar. Particionado por <code>city</code> aísla regiones. Replay para debugging y backfill.</p>
+          <p class="alt-line"><b>vs Pub/Sub (GCP):</b> aceptable, pero menos control granular de retention y orden por partition. <b>vs Kinesis (AWS):</b> equivalente pero AWS-only y cuotas más rígidas. <b>vs SQS:</b> queue, no stream multi-consumer.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">FCM + APNs</span><span class="svc-tag">push notifications</span>
+          <p class="why-line"><b>Por qué:</b> proveedores oficiales de Google/Apple — única forma de despertar app cerrada con baja latencia y batería razonable. Soporte de prioridades, collapse keys, voice push.</p>
+          <p class="alt-line"><b>vs SNS (AWS):</b> agrega un hop, latencia +50–100 ms, sin features avanzadas de plataforma. <b>vs Pusher / OneSignal:</b> third-party, dependes de su SLA. <b>vs solo WebSocket:</b> falla cuando la app está en background.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">WebSocket Gateway sticky</span><span class="svc-tag">real-time channel</span>
+          <p class="why-line"><b>Por qué:</b> conexión persistente bidireccional para location updates y ride offers. Sticky LB garantiza que la misma conexión hit el mismo pod (state local del ride/driver).</p>
+          <p class="alt-line"><b>vs HTTP polling:</b> ~250K req/s extra, batería del driver muerta. <b>vs Server-Sent Events:</b> unidireccional. <b>vs gRPC bidi-streaming:</b> aceptable pero requiere cliente compatible y proxy.</p>
         </div>
       </div>
     </section>

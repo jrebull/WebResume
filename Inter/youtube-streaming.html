@@ -134,6 +134,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -313,6 +323,40 @@ flowchart LR
             <li><b>Two-pass encoding</b> en videos con alto watch time (mejor quality/byte).</li>
             <li><b>P2P assist</b> (CDN edge serving via clients) para eventos en vivo masivos.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">S3 / GCS / Azure Blob</span><span class="svc-tag">object storage</span>
+          <p class="why-line"><b>Por qué:</b> 11×9 durabilidad nativa, multipart upload con resume, lifecycle policies (hot → cold → archive automático), pre-signed URLs para upload directo desde el cliente. Es el patrón estándar para blobs masivos.</p>
+          <p class="alt-line"><b>vs HDFS / MinIO self-hosted:</b> tienes que operar el cluster, manejar disk failures, replication. <b>vs servir desde un filesystem en VM:</b> imposible a escala, no escala horizontal. <b>vs Cassandra / DynamoDB:</b> no diseñados para blobs &gt; 1 MB.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Pub/Sub / Kafka</span><span class="svc-tag">video.uploaded events</span>
+          <p class="why-line"><b>Por qué:</b> desacopla el upload del transcoding pesado. Los workers consumen al ritmo que pueden, autoscaling por backlog. Permite re-procesar (re-encode) si cambias de codec.</p>
+          <p class="alt-line"><b>vs SQS:</b> queue point-to-point — no soporta múltiples consumers consumiendo el mismo evento (transcoder + analytics + content moderation). <b>vs llamada síncrona al transcoder:</b> el upload se queda bloqueado minutos.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">CloudFront / Cloud CDN / Akamai / Cloudflare</span><span class="svc-tag">video delivery</span>
+          <p class="why-line"><b>Por qué:</b> POPs globales, latencia &lt;100 ms global, cache hit ratio del 95%+ define el costo del negocio. Adaptive bitrate funciona naturalmente (cada segmento es una URL cacheable).</p>
+          <p class="alt-line"><b>vs servir desde object storage directo:</b> egress costaría 10–100×, latencia inaceptable fuera de la región. <b>vs CDN self-hosted:</b> imposible a escala global. <b>vs P2P only:</b> falla en eventos cold (no hay peers todavía).</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Transcoder workers (FFmpeg)</span><span class="svc-tag">media processing</span>
+          <p class="why-line"><b>Por qué:</b> FFmpeg es estándar de industria para transcoding. Lo corres en Kubernetes / ECS / Cloud Run con autoscaling según cola pendiente. Un worker = un video a la vez, paralelismo natural.</p>
+          <p class="alt-line"><b>vs MediaConvert (AWS) / Transcoder API (GCP):</b> managed services aceptables pero más caros y menos flexibles para custom encoding ladders. <b>vs hardware encoders dedicados:</b> rentables solo a escala extrema.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Metadata DB (Spanner / Postgres / Cassandra)</span><span class="svc-tag">video metadata</span>
+          <p class="why-line"><b>Por qué:</b> lecturas masivas con joins (video + channel + comments), índices full-text para search, ACID en operaciones de canal/upload. Postgres/Spanner para joins, Cassandra si write-heavy y multi-region.</p>
+          <p class="alt-line"><b>vs DynamoDB:</b> sin joins ni full-text — tendrías que duplicar data. <b>vs MongoDB:</b> aceptable pero performance se degrada con joins via $lookup.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">BigQuery / Snowflake</span><span class="svc-tag">analytics warehouse</span>
+          <p class="why-line"><b>Por qué:</b> serverless OLAP, escala a EB sin provisioning. Eventos de view/click se sinkan vía Dataflow / Streaming. Reportes para creators (analytics dashboard) y ML (training pipelines).</p>
+          <p class="alt-line"><b>vs ClickHouse:</b> aceptable, más barato pero requiere ops. <b>vs Redshift:</b> requiere provisioning capacity. <b>vs Postgres:</b> ni de cerca a esta escala.</p>
         </div>
       </div>
     </section>

@@ -152,6 +152,16 @@
     .recommendation b { color: var(--accent); }
     .recommendation code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .reco-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -333,6 +343,35 @@ flowchart LR
             <li><b>Feature Definition compartida</b> (mismo código de transformación en train y serve).</li>
             <li><b>Modelo ligero en path crítico</b>, modelo pesado para refresh batch.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">FAISS / HNSW / ScaNN / Vertex AI Matching Engine</span><span class="svc-tag">embeddings ANN</span>
+          <p class="why-line"><b>Por qué:</b> top-K vecinos en embeddings de 100M+ items en sub-10 ms. HNSW soporta inserts incrementales para items nuevos. Recall &gt; 95% con tuning correcto.</p>
+          <p class="alt-line"><b>vs pgvector:</b> insuficiente a esta escala. <b>vs Elasticsearch dense_vector:</b> aceptable, menos óptimo. <b>vs Pinecone / Weaviate:</b> managed equivalentes pero costosos.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Feature Store (Bigtable / DynamoDB / Redis / Feast)</span><span class="svc-tag">user + item features</span>
+          <p class="why-line"><b>Por qué:</b> bulk MGET de features en &lt;30 ms. Bigtable/Dynamo para volumen + Redis para hot keys. Feast como capa de abstracción para train/serve consistency.</p>
+          <p class="alt-line"><b>vs Postgres:</b> no escala a 6M req/s. <b>vs DynamoDB sin Redis:</b> aceptable pero hot keys saturan. <b>vs custom in-memory:</b> sin durabilidad ni replicación.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Apache Kafka / Pub/Sub</span><span class="svc-tag">events impr/click/conv</span>
+          <p class="why-line"><b>Por qué:</b> stream con dedup por <code>event_id</code>, particionado por <code>user_id</code>, alimenta feature store online y warehouse para training. Múltiples consumers (training, attribution, fraud, BI).</p>
+          <p class="alt-line"><b>vs Kinesis:</b> AWS-only. <b>vs SQS:</b> point-to-point, no escala a múltiples consumers. <b>vs llamadas síncronas:</b> path crítico se rompe si downstream falla.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Model Serving (TF Serving / Triton / Vertex AI Predictions)</span><span class="svc-tag">online ranker</span>
+          <p class="why-line"><b>Por qué:</b> inference con batching, model versioning, A/B sticky por user, GPU/CPU optimization, warm-up al deploy. Crítico para mantener p99 sub-100 ms.</p>
+          <p class="alt-line"><b>vs SageMaker (managed):</b> aceptable, más caro y menos custom batching. <b>vs FastAPI con torch.load:</b> sin batching ni warm-up serio, latencia inaceptable.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Training Pipeline (Airflow / Kubeflow / Vertex AI / SageMaker)</span><span class="svc-tag">batch training</span>
+          <p class="why-line"><b>Por qué:</b> orquestación de pipelines con dependencias (data ingestion → feature gen → train → eval → deploy), schedules, retries, observability del DAG.</p>
+          <p class="alt-line"><b>vs cron + scripts:</b> sin observability, retries inexistentes, debugging penoso. <b>vs MLflow solo:</b> tracking pero no orquesta el DAG.</p>
         </div>
       </div>
     </section>

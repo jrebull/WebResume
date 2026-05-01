@@ -134,6 +134,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -315,6 +325,40 @@ flowchart LR
             <li><b>Replicación de features</b> hot a múltiples regiones.</li>
             <li><b>Indexación incremental</b> en search engine para releases en tiempo casi real.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">Elasticsearch / OpenSearch</span><span class="svc-tag">search index</span>
+          <p class="why-line"><b>Por qué:</b> full-text con synonyms, fuzzy matching, BM25 ranking, custom analyzers por idioma, geo filters por región. Manejas 50K QPS de búsqueda con response time &lt;100 ms.</p>
+          <p class="alt-line"><b>vs Solr:</b> equivalente, ES tiene mejor stack y cloud managed. <b>vs Algolia:</b> excelente DX pero costo prohibitivo a esta escala. <b>vs Postgres FTS:</b> queda corto a 50K QPS y ranking inferior.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Catalog DB (Postgres / Cassandra)</span><span class="svc-tag">tracks/albums</span>
+          <p class="why-line"><b>Por qué:</b> joins entre tracks, albums, artists, ISRC unique. Cassandra si quieres write-heavy multi-region; Postgres si lectures dominan y cabe en uno.</p>
+          <p class="alt-line"><b>vs DynamoDB:</b> sin joins, replicarías metadata en muchos lugares. <b>vs MongoDB:</b> aceptable pero performance de joins con $lookup es pobre.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Object Storage + CDN regional</span><span class="svc-tag">audio delivery</span>
+          <p class="why-line"><b>Por qué:</b> S3/GCS guarda los segmentos de audio en múltiples bitrates; CDN los entrega desde POP regional con manifest firmado por licencia. Geo-fencing en el signing evita reproducir tracks no licenciados en un país.</p>
+          <p class="alt-line"><b>vs streaming server propio:</b> imposible a 60K listen events/s globales. <b>vs servir desde la DB:</b> destruirías ancho de banda y latencia.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">FAISS / ScaNN / HNSW</span><span class="svc-tag">embeddings ANN</span>
+          <p class="why-line"><b>Por qué:</b> vecinos cercanos sobre embeddings de ~100M tracks en sub-10 ms. Recall &gt;95% con HNSW configurado bien. Crítico para Discover Weekly y "you may also like".</p>
+          <p class="alt-line"><b>vs Postgres + pgvector:</b> aceptable para &lt;1M items, no escala a 100M. <b>vs Elasticsearch dense_vector:</b> funciona pero menos óptimo en recall/latencia. <b>vs brute force kNN:</b> impensable a esta escala.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Apache Kafka</span><span class="svc-tag">listen_events stream</span>
+          <p class="why-line"><b>Por qué:</b> partitioning por <code>user_id</code> mantiene orden por usuario. Múltiples consumers (royalties, analytics, recommendations, fraud) sobre el mismo stream. Replay para corregir bugs en pipelines downstream.</p>
+          <p class="alt-line"><b>vs Pub/Sub:</b> aceptable, menos control de retention. <b>vs Kinesis:</b> AWS-only, cuotas más rígidas. <b>vs SQS:</b> queue, no permite múltiples consumers independientes.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Feature Store (Bigtable / DynamoDB / Redis)</span><span class="svc-tag">recos online</span>
+          <p class="why-line"><b>Por qué:</b> latencia &lt;10 ms en bulk MGET de features de user e items para servir recos. Bigtable/Dynamo para volumen, Redis para hot features.</p>
+          <p class="alt-line"><b>vs Postgres:</b> latencia mayor, no escalable a 12K QPS de bulk reads. <b>vs solo cache:</b> sin persistencia se pierde el feature store.</p>
         </div>
       </div>
     </section>

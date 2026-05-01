@@ -134,6 +134,16 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .cloud-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+    .cloud-item { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .cloud-item .svc { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--accent); font-weight: 800; font-size: 14px; }
+    .cloud-item .svc-tag { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-left: 10px; }
+    .cloud-item p.why-line { margin: 8px 0 4px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .cloud-item p.alt-line { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.55; }
+    .cloud-item b { color: var(--accent); }
+    .cloud-item code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .cloud-item .alt-line b { color: #fb7185; }
+
     @media (max-width: 980px) {
       .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
@@ -313,6 +323,40 @@ flowchart LR
             <li><b>Sampling</b> en analytics para picos, agregando 100% al final del día.</li>
             <li><b>Multi-region</b> con KV replicado, redirect siempre local.</li>
           </ul>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2 style="font-size:20px">Por qué estos servicios cloud (vs alternativas)</h2></div>
+      <div class="cloud-grid">
+        <div class="cloud-item">
+          <span class="svc">DynamoDB / Cassandra / Bigtable</span><span class="svc-tag">KV store</span>
+          <p class="why-line"><b>Por qué:</b> lookup O(1) por <code>short_code</code>, escala lineal a billones de rows, latencia P99 ~10 ms. Particionado natural por hash, sin coordinación cross-shard.</p>
+          <p class="alt-line"><b>vs Postgres:</b> 100M+ rows con random reads y power-law devuelve hot tablespace. <b>vs MongoDB:</b> aceptable pero performance menos predecible. <b>vs MySQL:</b> mismo problema que Postgres a esta escala.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Redis (ElastiCache / Memorystore)</span><span class="svc-tag">cache hot links</span>
+          <p class="why-line"><b>Por qué:</b> sub-ms latency para top 1% de links que reciben 80% del tráfico (power-law). LRU + TTL keep RAM bajo control.</p>
+          <p class="alt-line"><b>vs Memcached:</b> aceptable pero sin persistencia opcional ni primitivas avanzadas. <b>vs cache solo en CDN:</b> a veces necesitas filtros (block, expired) que el CDN no entiende.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">CDN (CloudFront / Cloud CDN / Cloudflare)</span><span class="svc-tag">edge redirect</span>
+          <p class="why-line"><b>Por qué:</b> 99%+ del tráfico nunca llega al origen. Edge ejecuta el 302 directamente con cache hit. Latencia &lt;10 ms global, costo predecible.</p>
+          <p class="alt-line"><b>vs origin directo:</b> ~3K QPS al origen vs ~30/s con cache; bandwidth y latencia disparan. <b>vs Varnish self-hosted:</b> sin POPs globales.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Kafka / Kinesis</span><span class="svc-tag">click_events stream</span>
+          <p class="why-line"><b>Por qué:</b> analytics async desacoplado del redirect. Si el pipeline falla, el redirect sigue funcionando. Múltiples consumers (BigQuery sink, ClickHouse, fraud detection) sobre mismo stream.</p>
+          <p class="alt-line"><b>vs llamada síncrona a la DB:</b> bloquearía el redirect (latencia inaceptable). <b>vs SQS:</b> queue, no permite múltiples consumers independientes.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">BigQuery / ClickHouse</span><span class="svc-tag">analytics warehouse</span>
+          <p class="why-line"><b>Por qué:</b> billones de eventos al año, queries OLAP por geo/referrer/device. BigQuery serverless; ClickHouse más barato pero con ops propio.</p>
+          <p class="alt-line"><b>vs Postgres analytics:</b> insuficiente para 100B clicks. <b>vs Druid:</b> aceptable, más operativo. <b>vs Snowflake:</b> aceptable, más caro.</p>
+        </div>
+        <div class="cloud-item">
+          <span class="svc">Bloom filter en Redis</span><span class="svc-tag">safe browsing check</span>
+          <p class="why-line"><b>Por qué:</b> verifica si un dominio está en blocklist sin llamar a Safe Browsing API en cada request. False positive 0.1% es aceptable; falsos positivos van a verificación dura.</p>
+          <p class="alt-line"><b>vs llamar a Safe Browsing en cada redirect:</b> rate limits + latencia +200 ms. <b>vs hash table en RAM:</b> 100M dominios × 32 bytes = 3.2 GB; bloom filter usa ~150 MB.</p>
         </div>
       </div>
     </section>
