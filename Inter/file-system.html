@@ -82,8 +82,37 @@
     .script p { margin: 0; font-size: 17px; }
     .script strong { color: var(--accent); }
     .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .req { padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .req h3 { margin: 0 0 10px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .req ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .req li { margin: 5px 0; }
+    .req li b { color: var(--text); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+    .metric .num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -.04em; line-height: 1.05; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; font-weight: 800; }
+    .metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+
+    .mermaid-box { padding: 22px; border-radius: 18px; background: rgba(0,0,0,.32); border: 1px solid var(--line); overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 220px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tbl { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .tbl-name { color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 10px; letter-spacing: .04em; }
+    .tbl-row { font-size: 12px; color: var(--text); display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .tbl-row:last-of-type { border-bottom: 0; }
+    .tbl-type { color: var(--muted); font-size: 11px; }
+    .tbl-pk { color: var(--accent); }
+    .tbl-fk { color: #38bdf8; }
+    .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -109,6 +138,46 @@
       <div class="card"><h3>Operaciones</h3><p>Upload chunked, mover, renombrar, compartir, dedup.</p></div>
       <div class="card"><h3>Escala</h3><p>Petabytes, miles de millones de archivos, sync continuo.</p></div>
       <div class="card"><h3>Riesgo</h3><p>Renames no atómicos, permisos rotos, costos de egress.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Requisitos</h2><p>Lo crítico: jerarquía consistente, blobs duraderos, sync confiable.</p></div>
+      <div class="req-grid">
+        <div class="req">
+          <h3>Funcionales</h3>
+          <ul>
+            <li><b>Upload chunked</b> y resumable.</li>
+            <li><b>Carpetas, mover, renombrar</b> atómicamente.</li>
+            <li><b>Compartir</b> por usuario, grupo o link público.</li>
+            <li><b>Versionado</b> y restore.</li>
+            <li><b>Sync delta</b> entre dispositivos.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3>No funcionales</h3>
+          <ul>
+            <li><b>Durabilidad 11×9</b> en blobs.</li>
+            <li><b>Listar carpeta &lt; 300 ms p95</b>.</li>
+            <li><b>Sync delta &lt; 5 s</b> tras cambio.</li>
+            <li><b>Disponibilidad 99.95%</b>.</li>
+            <li><b>Privacidad</b>: cifrado en reposo y en tránsito.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Lo que justifica chunks dedup + metadata DB independiente.</p></div>
+      <div class="metrics">
+        <div class="metric"><div class="num">1B</div><div class="label">MAU</div><div class="note">~50 GB / user promedio.</div></div>
+        <div class="metric"><div class="num">~50 EB</div><div class="label">Storage total</div><div class="note">Antes de dedup y compresión.</div></div>
+        <div class="metric"><div class="num">~30%</div><div class="label">Ahorro por dedup</div><div class="note">Hash por chunk de 4–8 MB.</div></div>
+        <div class="metric"><div class="num">~1B</div><div class="label">Uploads / día</div><div class="note">~12K/s avg.</div></div>
+        <div class="metric"><div class="num">~10B</div><div class="label">Sync events / día</div><div class="note">~120K/s avg.</div></div>
+        <div class="metric"><div class="num">~50–500 KB</div><div class="label">Metadata por archivo</div><div class="note">Path, ACL, versions.</div></div>
+        <div class="metric"><div class="num">5 días</div><div class="label">TTL chunks huérfanos</div><div class="note">GC asíncrono.</div></div>
+        <div class="metric"><div class="num">99.95%</div><div class="label">SLO disponibilidad</div><div class="note">~4.4 h / año.</div></div>
+      </div>
     </section>
 
     <section class="section">
@@ -151,14 +220,62 @@ POST /api/files/fi_72/complete
 
     <section class="section">
       <div class="section-head"><h2>Arquitectura</h2></div>
-      <div class="panel">
-        <div class="arch-flow">
-          <div class="arch-step"><b>Cliente</b>App/Sync</div>
-          <div class="arch-step"><b>API</b>Pre-signed URLs</div>
-          <div class="arch-step"><b>Object Storage</b>Chunks</div>
-          <div class="arch-step"><b>Metadata DB</b>Tree + ACL</div>
-          <div class="arch-step"><b>Dedup</b>Hash de chunks</div>
-          <div class="arch-step"><b>Sync Stream</b>Eventos</div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["App / Sync Daemon"] -->|pre-signed| API["API Service"]
+    Client -->|chunks directo| Store[("Object Storage<br/>S3 / GCS")]
+    API --> Meta[("Metadata DB<br/>Spanner / Postgres<br/>tree + ACL")]
+    API --> Dedup["Dedup<br/>chunk hash check"]
+    Dedup --> Store
+    API -. eventos .-> Sync[("Sync Stream<br/>change events")]
+    Sync --> Notify["Sync Notification Svc"]
+    Notify --> Client
+    Meta --> ACL["Permissions<br/>Zanzibar-style"]
+    Store --> GC["GC<br/>chunks huérfanos"]
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Diseño de base de datos</h2><p>Metadata transaccional separada de blobs, dedup por hash, sync incremental.</p></div>
+      <div class="schema-grid">
+        <div class="tbl">
+          <div class="tbl-name">files</div>
+          <div class="tbl-row"><span class="tbl-pk">file_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">parent_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">owner_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>name</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>type</span><span class="tbl-type">ENUM file/folder</span></div>
+          <div class="tbl-row"><span>current_version</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>updated_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">idx <code>(parent_id, name)</code> UNIQUE<br/>idx <code>(owner_id, updated_at DESC)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">file_versions</div>
+          <div class="tbl-row"><span class="tbl-pk">file_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-pk">version</span><span class="tbl-type">BIGINT PK</span></div>
+          <div class="tbl-row"><span>size_bytes</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>chunk_ids</span><span class="tbl-type">UUID[]</span></div>
+          <div class="tbl-row"><span>created_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">PK <code>(file_id, version)</code><br/>idx <code>(created_at)</code> para retention</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">chunks</div>
+          <div class="tbl-row"><span class="tbl-pk">chunk_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span>sha256</span><span class="tbl-type">CHAR(64) UNIQUE</span></div>
+          <div class="tbl-row"><span>size_bytes</span><span class="tbl-type">INT</span></div>
+          <div class="tbl-row"><span>storage_url</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>ref_count</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-idx">idx <code>(sha256 UNIQUE)</code> para dedup<br/>GC cuando ref_count = 0</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">permissions / sync_cursor</div>
+          <div class="tbl-row"><span>object</span><span class="tbl-type">file:UUID</span></div>
+          <div class="tbl-row"><span>relation</span><span class="tbl-type">viewer/editor/owner</span></div>
+          <div class="tbl-row"><span>subject</span><span class="tbl-type">user/group</span></div>
+          <div class="tbl-row"><span>cursor:{user}</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-idx">Permisos heredados; cache decisiones<br/>Cursor de sync incremental por device</div>
         </div>
       </div>
     </section>
@@ -195,5 +312,24 @@ POST /api/files/fi_72/complete
 
     <p class="footer">Caso 9 de 10 · System Design Interview Playbook</p>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#fbbf24',
+        lineColor: '#94a3b8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+    });
+  </script>
 </body>
 </html>

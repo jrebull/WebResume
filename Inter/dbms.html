@@ -82,8 +82,37 @@
     .script p { margin: 0; font-size: 17px; }
     .script strong { color: var(--accent); }
     .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .req { padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .req h3 { margin: 0 0 10px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .req ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .req li { margin: 5px 0; }
+    .req li b { color: var(--text); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+    .metric .num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -.04em; line-height: 1.05; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; font-weight: 800; }
+    .metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+
+    .mermaid-box { padding: 22px; border-radius: 18px; background: rgba(0,0,0,.32); border: 1px solid var(--line); overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 220px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tbl { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .tbl-name { color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 10px; letter-spacing: .04em; }
+    .tbl-row { font-size: 12px; color: var(--text); display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .tbl-row:last-of-type { border-bottom: 0; }
+    .tbl-type { color: var(--muted); font-size: 11px; }
+    .tbl-pk { color: var(--accent); }
+    .tbl-fk { color: #38bdf8; }
+    .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -109,6 +138,46 @@
       <div class="card"><h3>Operaciones</h3><p>Parse, plan, execute, commit, rollback, recover.</p></div>
       <div class="card"><h3>Escala</h3><p>Miles de queries/seg, terabytes en disco, varias replicas.</p></div>
       <div class="card"><h3>Riesgo</h3><p>Pérdida de datos, deadlocks, lecturas sucias, replication lag.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Requisitos</h2><p>Un DBMS firma garantías ACID; ahí se gana o se pierde la entrevista.</p></div>
+      <div class="req-grid">
+        <div class="req">
+          <h3>Funcionales</h3>
+          <ul>
+            <li><b>SELECT</b> con índices, joins y agregaciones.</li>
+            <li><b>INSERT/UPDATE/DELETE</b> dentro de transacciones.</li>
+            <li><b>Begin / Commit / Rollback</b> con isolation niveles.</li>
+            <li><b>EXPLAIN</b> y plan estimado.</li>
+            <li><b>Replicación</b> sync o async, point-in-time recovery.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3>No funcionales</h3>
+          <ul>
+            <li><b>ACID</b> con isolation snapshot / serializable.</li>
+            <li><b>Durabilidad</b>: WAL fsync antes de ack commit.</li>
+            <li><b>p99 query indexado &lt; 50 ms.</b></li>
+            <li><b>Disponibilidad 99.99%</b> con failover &lt; 30 s.</li>
+            <li><b>Recovery</b> ARIES tras crash sin pérdida.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Lo que separa un B-Tree de un LSM y define el tamaño del buffer pool.</p></div>
+      <div class="metrics">
+        <div class="metric"><div class="num">10K QPS</div><div class="label">Por instancia</div><div class="note">Mix read/write típico.</div></div>
+        <div class="metric"><div class="num">~1–10 TB</div><div class="label">Storage por nodo</div><div class="note">Antes de sharding.</div></div>
+        <div class="metric"><div class="num">~25–50%</div><div class="label">RAM como buffer pool</div><div class="note">Hot pages residentes.</div></div>
+        <div class="metric"><div class="num">~30 ms</div><div class="label">fsync típico SSD</div><div class="note">Lo que pagas por durabilidad.</div></div>
+        <div class="metric"><div class="num">~1 KB</div><div class="label">Tamaño de WAL record</div><div class="note">Append-only secuencial.</div></div>
+        <div class="metric"><div class="num">3</div><div class="label">Réplicas mínimas</div><div class="note">Quorum para failover.</div></div>
+        <div class="metric"><div class="num">&lt; 1 s</div><div class="label">Replication lag</div><div class="note">Async; sync penaliza p99.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min / año.</div></div>
+      </div>
     </section>
 
     <section class="section">
@@ -149,14 +218,57 @@ POST /api/transactions/tx_91/commit
 
     <section class="section">
       <div class="section-head"><h2>Arquitectura</h2></div>
-      <div class="panel">
-        <div class="arch-flow">
-          <div class="arch-step"><b>Parser</b>SQL → AST</div>
-          <div class="arch-step"><b>Planner</b>AST → Plan</div>
-          <div class="arch-step"><b>Executor</b>Itera op-tree</div>
-          <div class="arch-step"><b>Buffer Pool</b>Páginas en RAM</div>
-          <div class="arch-step"><b>WAL</b>Log de cambios</div>
-          <div class="arch-step"><b>Storage</b>B+Tree/LSM</div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["Cliente / driver"] -->|SQL| Parser["Parser<br/>SQL → AST"]
+    Parser --> Planner["Planner / Optimizer<br/>AST → plan + costos"]
+    Planner --> Executor["Executor<br/>itera op-tree"]
+    Executor --> TxMgr["Tx Manager<br/>locks / MVCC"]
+    Executor --> Buffer["Buffer Pool<br/>páginas en RAM"]
+    Buffer <--> Storage[("Storage Engine<br/>B+Tree / LSM")]
+    TxMgr --> WAL[("WAL<br/>append-only<br/>fsync en commit")]
+    Storage --> Disk[("Disk pages")]
+    WAL --> Replica[("Read Replicas<br/>WAL shipping")]
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Diseño de estructuras internas</h2><p>No hay "tablas de usuario" aquí — son las estructuras que hacen funcionar el motor.</p></div>
+      <div class="schema-grid">
+        <div class="tbl">
+          <div class="tbl-name">page (heap / index)</div>
+          <div class="tbl-row"><span>page_id</span><span class="tbl-type">UINT32</span></div>
+          <div class="tbl-row"><span>lsn</span><span class="tbl-type">UINT64</span></div>
+          <div class="tbl-row"><span>checksum</span><span class="tbl-type">CRC32</span></div>
+          <div class="tbl-row"><span>tuples / nodes</span><span class="tbl-type">VAR</span></div>
+          <div class="tbl-row"><span>free_space_map</span><span class="tbl-type">BITMAP</span></div>
+          <div class="tbl-idx">Tamaño 4–16 KB típico<br/>LSN para recovery (ARIES)</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">b+tree index node</div>
+          <div class="tbl-row"><span>keys[ ]</span><span class="tbl-type">sorted</span></div>
+          <div class="tbl-row"><span>children[ ]</span><span class="tbl-type">page_id refs</span></div>
+          <div class="tbl-row"><span>leaf?</span><span class="tbl-type">BOOLEAN</span></div>
+          <div class="tbl-row"><span>next_leaf</span><span class="tbl-type">page_id</span></div>
+          <div class="tbl-idx">Lookup O(log<sub>k</sub> N)<br/>Range scan recorre next_leaf</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">WAL record</div>
+          <div class="tbl-row"><span>lsn</span><span class="tbl-type">UINT64</span></div>
+          <div class="tbl-row"><span>txid</span><span class="tbl-type">UINT64</span></div>
+          <div class="tbl-row"><span>op</span><span class="tbl-type">ENUM update/begin/commit</span></div>
+          <div class="tbl-row"><span>page_id</span><span class="tbl-type">UINT32</span></div>
+          <div class="tbl-row"><span>before / after image</span><span class="tbl-type">BYTES</span></div>
+          <div class="tbl-idx">Append-only, fsync antes de ack commit<br/>Replicado a réplicas y archivado</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">tx table + lock table</div>
+          <div class="tbl-row"><span>tx:{id}</span><span class="tbl-type">state, snapshot xmin/xmax</span></div>
+          <div class="tbl-row"><span>lock:{key}</span><span class="tbl-type">mode S/X, holders</span></div>
+          <div class="tbl-row"><span>wait_for_graph</span><span class="tbl-type">deadlock detection</span></div>
+          <div class="tbl-idx">MVCC: cada tx ve un snapshot<br/>Wait-for graph para abortar deadlocks</div>
         </div>
       </div>
     </section>
@@ -193,5 +305,24 @@ POST /api/transactions/tx_91/commit
 
     <p class="footer">Caso 10 de 10 · System Design Interview Playbook</p>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#a78bfa',
+        lineColor: '#94a3b8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+    });
+  </script>
 </body>
 </html>

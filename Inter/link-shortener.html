@@ -82,8 +82,37 @@
     .script p { margin: 0; font-size: 17px; }
     .script strong { color: var(--accent); }
     .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .req { padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .req h3 { margin: 0 0 10px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .req ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .req li { margin: 5px 0; }
+    .req li b { color: var(--text); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+    .metric .num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -.04em; line-height: 1.05; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; font-weight: 800; }
+    .metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+
+    .mermaid-box { padding: 22px; border-radius: 18px; background: rgba(0,0,0,.32); border: 1px solid var(--line); overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 220px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tbl { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .tbl-name { color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 10px; letter-spacing: .04em; }
+    .tbl-row { font-size: 12px; color: var(--text); display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .tbl-row:last-of-type { border-bottom: 0; }
+    .tbl-type { color: var(--muted); font-size: 11px; }
+    .tbl-pk { color: var(--accent); }
+    .tbl-fk { color: #38bdf8; }
+    .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -109,6 +138,46 @@
       <div class="card"><h3>Operaciones</h3><p>Crear, redirigir, ver stats, expirar, borrar.</p></div>
       <div class="card"><h3>Escala</h3><p>Lecturas mucho mayores a escrituras (1000:1 típico).</p></div>
       <div class="card"><h3>Riesgo</h3><p>Colisiones, abuso/spam, links a malware, hot keys.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Requisitos</h2><p>Pequeño en superficie pero con SLOs estrictos: el redirect es público y muy hot.</p></div>
+      <div class="req-grid">
+        <div class="req">
+          <h3>Funcionales</h3>
+          <ul>
+            <li><b>Crear</b> short link con TTL opcional.</li>
+            <li><b>Redirigir</b> 301/302 a la URL destino.</li>
+            <li><b>Stats</b>: clicks, geo, referrer, device.</li>
+            <li><b>Custom alias</b> para tier paid.</li>
+            <li><b>Soft delete</b> y blocklists.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3>No funcionales</h3>
+          <ul>
+            <li><b>Redirect p95 &lt; 50 ms</b>.</li>
+            <li><b>99.99% disponibilidad</b> del redirect.</li>
+            <li><b>Read:Write &gt; 1000:1</b>.</li>
+            <li><b>IDs únicos</b> sin colisiones a escala.</li>
+            <li><b>Anti-abuso</b>: rate limit + block de phishing.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>El número clave es el cache hit ratio del redirect.</p></div>
+      <div class="metrics">
+        <div class="metric"><div class="num">~100M</div><div class="label">Links / año</div><div class="note">~3/s avg de creación.</div></div>
+        <div class="metric"><div class="num">~100B</div><div class="label">Redirects / año</div><div class="note">~3K/s avg, ~30K en pico.</div></div>
+        <div class="metric"><div class="num">~7</div><div class="label">Caracteres base62</div><div class="note">62⁷ ≈ 3.5 trillón IDs.</div></div>
+        <div class="metric"><div class="num">~500 B</div><div class="label">Tamaño por link</div><div class="note">~50 GB / 100M links.</div></div>
+        <div class="metric"><div class="num">~99% hit</div><div class="label">Cache redirect</div><div class="note">Power-law en links virales.</div></div>
+        <div class="metric"><div class="num">~10 GB</div><div class="label">Cache caliente</div><div class="note">~20M links top.</div></div>
+        <div class="metric"><div class="num">100 GB/día</div><div class="label">Click events</div><div class="note">Pipeline analítico.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO redirect</div><div class="note">~52 min / año.</div></div>
+      </div>
     </section>
 
     <section class="section">
@@ -148,14 +217,59 @@ Location: https://example.com/articulo-largo</pre>
 
     <section class="section">
       <div class="section-head"><h2>Arquitectura</h2></div>
-      <div class="panel">
-        <div class="arch-flow">
-          <div class="arch-step"><b>Cliente</b>Web/API</div>
-          <div class="arch-step"><b>API</b>Crear/leer</div>
-          <div class="arch-step"><b>ID Gen</b>Snowflake/range</div>
-          <div class="arch-step"><b>KV Store</b>Redis + DB</div>
-          <div class="arch-step"><b>CDN</b>Edge redirect</div>
-          <div class="arch-step"><b>Analytics</b>Stream</div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    User["Usuario / cliente"] --> Edge["Edge / CDN<br/>redirect cache"]
+    Edge -->|miss| API["Redirect Service"]
+    API --> Cache[("Redis<br/>shortCode → URL")]
+    Cache -->|miss| KV[("KV Store<br/>DynamoDB / Cassandra")]
+    Creator["Creator API"] --> IDGen["ID Generator<br/>Snowflake / counter base62"]
+    IDGen --> KV
+    Creator --> Block["Block / Safe Browsing"]
+    User -. click event .-> Stream[("Kafka<br/>click_events")]
+    Stream --> Stats[("Analytics DB<br/>BigQuery")]
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Diseño de base de datos</h2><p>KV con cache agresivo, eventos a stream, base62 sin colisiones.</p></div>
+      <div class="schema-grid">
+        <div class="tbl">
+          <div class="tbl-name">links (KV)</div>
+          <div class="tbl-row"><span class="tbl-pk">short_code</span><span class="tbl-type">VARCHAR(10) PK</span></div>
+          <div class="tbl-row"><span>long_url</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span class="tbl-fk">owner_id</span><span class="tbl-type">UUID NULL</span></div>
+          <div class="tbl-row"><span>expires_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-row"><span>created_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-row"><span>deleted</span><span class="tbl-type">BOOLEAN</span></div>
+          <div class="tbl-idx">DynamoDB / Cassandra<br/>Lookup O(1) por <code>short_code</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">id_ranges</div>
+          <div class="tbl-row"><span class="tbl-pk">range_id</span><span class="tbl-type">BIGINT PK</span></div>
+          <div class="tbl-row"><span>start</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>end</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>worker</span><span class="tbl-type">VARCHAR</span></div>
+          <div class="tbl-row"><span>state</span><span class="tbl-type">ENUM</span></div>
+          <div class="tbl-idx">Reservar bloques de 100K IDs<br/>Evita coordinación por request</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">click_events (stream)</div>
+          <div class="tbl-row"><span>short_code</span><span class="tbl-type">VARCHAR</span></div>
+          <div class="tbl-row"><span>ts</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-row"><span>ip_country</span><span class="tbl-type">CHAR(2)</span></div>
+          <div class="tbl-row"><span>device, ua</span><span class="tbl-type">…</span></div>
+          <div class="tbl-row"><span>referrer</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-idx">Tópico Kafka particionado por <code>short_code</code><br/>Sink: BigQuery o ClickHouse</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">blocklist + cache</div>
+          <div class="tbl-row"><span>blocklist:hash</span><span class="tbl-type">SET (Bloom)</span></div>
+          <div class="tbl-row"><span>hot:{code}</span><span class="tbl-type">STRING</span></div>
+          <div class="tbl-row"><span>rl:{user}:{1m}</span><span class="tbl-type">COUNTER</span></div>
+          <div class="tbl-idx">Bloom filter para safe browsing<br/>Hot cache con LRU + TTL refresh</div>
         </div>
       </div>
     </section>
@@ -192,5 +306,24 @@ Location: https://example.com/articulo-largo</pre>
 
     <p class="footer">Caso 8 de 10 · System Design Interview Playbook</p>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#94a3b8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+    });
+  </script>
 </body>
 </html>

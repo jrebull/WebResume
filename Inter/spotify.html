@@ -82,8 +82,37 @@
     .script p { margin: 0; font-size: 17px; }
     .script strong { color: var(--accent); }
     .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .req { padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .req h3 { margin: 0 0 10px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .req ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .req li { margin: 5px 0; }
+    .req li b { color: var(--text); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+    .metric .num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -.04em; line-height: 1.05; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; font-weight: 800; }
+    .metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+
+    .mermaid-box { padding: 22px; border-radius: 18px; background: rgba(0,0,0,.32); border: 1px solid var(--line); overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 220px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tbl { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .tbl-name { color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 10px; letter-spacing: .04em; }
+    .tbl-row { font-size: 12px; color: var(--text); display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .tbl-row:last-of-type { border-bottom: 0; }
+    .tbl-type { color: var(--muted); font-size: 11px; }
+    .tbl-pk { color: var(--accent); }
+    .tbl-fk { color: #38bdf8; }
+    .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -109,6 +138,46 @@
       <div class="card"><h3>Operaciones</h3><p>Catálogo, búsqueda, playback, playlists, recomendaciones.</p></div>
       <div class="card"><h3>Escala</h3><p>Cientos de millones de usuarios, decenas de millones de tracks.</p></div>
       <div class="card"><h3>Riesgo</h3><p>Licencias por región, cold start, tiempo de primer byte.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Requisitos</h2><p>Lo primero que aclaras: el alcance funcional y los SLOs no negociables.</p></div>
+      <div class="req-grid">
+        <div class="req">
+          <h3>Funcionales</h3>
+          <ul>
+            <li><b>Reproducir</b> tracks bajo demanda con scrub/seek.</li>
+            <li><b>Búsqueda</b> de tracks, artistas, álbumes, podcasts.</li>
+            <li><b>Playlists</b> propias y colaborativas.</li>
+            <li><b>Recomendaciones</b> personalizadas (Discover Weekly).</li>
+            <li><b>Modo offline</b> con descargas cifradas.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3>No funcionales</h3>
+          <ul>
+            <li><b>Time-to-first-byte &lt; 200 ms</b> global.</li>
+            <li><b>99.95% disponibilidad</b> de playback.</li>
+            <li><b>Geo-fencing</b> por licencias regionales.</li>
+            <li><b>Skips/seeks instantáneos</b> con prefetch.</li>
+            <li><b>DRM</b> / token de stream con expiración corta.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Datos reales del dominio para defender la elección de search engine y CDN dedicado.</p></div>
+      <div class="metrics">
+        <div class="metric"><div class="num">600M</div><div class="label">MAU</div><div class="note">~250M premium.</div></div>
+        <div class="metric"><div class="num">100M</div><div class="label">Tracks</div><div class="note">+podcasts y audiolibros.</div></div>
+        <div class="metric"><div class="num">~5B/día</div><div class="label">Listen events</div><div class="note">~60K/s avg.</div></div>
+        <div class="metric"><div class="num">~50K QPS</div><div class="label">Search</div><div class="note">Pico tarde-noche.</div></div>
+        <div class="metric"><div class="num">~2 PB</div><div class="label">Audio storage</div><div class="note">100M tracks × varias bitrates.</div></div>
+        <div class="metric"><div class="num">96–320 kbps</div><div class="label">Bitrates</div><div class="note">Adaptive según red.</div></div>
+        <div class="metric"><div class="num">15 min</div><div class="label">TTL stream token</div><div class="note">Con refresh silencioso.</div></div>
+        <div class="metric"><div class="num">99.95%</div><div class="label">SLO playback</div><div class="note">~4.4 h / año.</div></div>
+      </div>
     </section>
 
     <section class="section">
@@ -148,14 +217,63 @@ Authorization: Bearer ...
 
     <section class="section">
       <div class="section-head"><h2>Arquitectura</h2></div>
-      <div class="panel">
-        <div class="arch-flow">
-          <div class="arch-step"><b>Cliente</b>App/Web</div>
-          <div class="arch-step"><b>API GW</b>Auth + region</div>
-          <div class="arch-step"><b>Catalog</b>Tracks/Albums DB</div>
-          <div class="arch-step"><b>Search</b>Elastic index</div>
-          <div class="arch-step"><b>Reco</b>ML feature store</div>
-          <div class="arch-step"><b>CDN</b>Audio segments</div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["App / Web / Speaker"] --> GW["API Gateway<br/>Auth + Region routing"]
+    GW --> Cat["Catalog Service"]
+    Cat --> CatDB[("Catalog DB<br/>Tracks/Albums/Artists")]
+    GW --> Search["Search Service"]
+    Search --> SIdx[("Search Index<br/>Elasticsearch")]
+    GW --> Reco["Recommendation Service"]
+    Reco --> FS[("Feature Store")]
+    Reco --> Embed[("Embeddings ANN")]
+    GW --> Stream["Stream Service<br/>token signer"]
+    Stream --> CDN["CDN POPs"]
+    CDN -->|miss| AudioStore[("Object Storage<br/>audio segments")]
+    Client -. listen events .-> Pipe[("Kafka<br/>analytics + reco loop")]
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Diseño de base de datos</h2><p>Catálogo en DB relacional, search engine dedicado, eventos en stream para reco loop.</p></div>
+      <div class="schema-grid">
+        <div class="tbl">
+          <div class="tbl-name">tracks</div>
+          <div class="tbl-row"><span class="tbl-pk">track_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">album_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>title</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>duration_ms</span><span class="tbl-type">INT</span></div>
+          <div class="tbl-row"><span>isrc</span><span class="tbl-type">VARCHAR(12)</span></div>
+          <div class="tbl-row"><span>licensed_regions</span><span class="tbl-type">TEXT[]</span></div>
+          <div class="tbl-idx">idx <code>(album_id)</code>, idx <code>(isrc UNIQUE)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">playlists</div>
+          <div class="tbl-row"><span class="tbl-pk">playlist_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">owner_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>name</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>collaborative</span><span class="tbl-type">BOOLEAN</span></div>
+          <div class="tbl-row"><span>tracks</span><span class="tbl-type">JSONB[ord]</span></div>
+          <div class="tbl-idx">idx <code>(owner_id, updated_at)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">artists / albums</div>
+          <div class="tbl-row"><span class="tbl-pk">artist_id / album_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span>name / title</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>genres</span><span class="tbl-type">TEXT[]</span></div>
+          <div class="tbl-row"><span>release_date</span><span class="tbl-type">DATE</span></div>
+          <div class="tbl-idx">idx GIN <code>(genres)</code> para filtros</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">listen_events (stream)</div>
+          <div class="tbl-row"><span>user_id</span><span class="tbl-type">UUID</span></div>
+          <div class="tbl-row"><span>track_id</span><span class="tbl-type">UUID</span></div>
+          <div class="tbl-row"><span>ms_played</span><span class="tbl-type">INT</span></div>
+          <div class="tbl-row"><span>context</span><span class="tbl-type">JSONB</span></div>
+          <div class="tbl-row"><span>ts</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">Tópico Kafka particionado por <code>user_id</code><br/>Sink: feature store + analytics</div>
         </div>
       </div>
     </section>
@@ -192,5 +310,24 @@ Authorization: Bearer ...
 
     <p class="footer">Caso 4 de 10 · System Design Interview Playbook</p>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#34d399',
+        lineColor: '#94a3b8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+    });
+  </script>
 </body>
 </html>

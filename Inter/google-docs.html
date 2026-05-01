@@ -82,8 +82,37 @@
     .script p { margin: 0; font-size: 17px; }
     .script strong { color: var(--accent); }
     .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .req { padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .req h3 { margin: 0 0 10px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .req ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .req li { margin: 5px 0; }
+    .req li b { color: var(--text); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+    .metric .num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -.04em; line-height: 1.05; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; font-weight: 800; }
+    .metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+
+    .mermaid-box { padding: 22px; border-radius: 18px; background: rgba(0,0,0,.32); border: 1px solid var(--line); overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 220px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tbl { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .tbl-name { color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 10px; letter-spacing: .04em; }
+    .tbl-row { font-size: 12px; color: var(--text); display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .tbl-row:last-of-type { border-bottom: 0; }
+    .tbl-type { color: var(--muted); font-size: 11px; }
+    .tbl-pk { color: var(--accent); }
+    .tbl-fk { color: #38bdf8; }
+    .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -109,6 +138,46 @@
       <div class="card"><h3>Operaciones</h3><p>Editar, sincronizar, versionar, compartir, ver historial.</p></div>
       <div class="card"><h3>Escala</h3><p>Miles de operaciones por documento por minuto en sesiones activas.</p></div>
       <div class="card"><h3>Riesgo</h3><p>Lost updates, conflictos, permisos rotos, audit débil.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Requisitos</h2><p>Lo que distingue un editor colaborativo de un CRUD: concurrencia y trazabilidad.</p></div>
+      <div class="req-grid">
+        <div class="req">
+          <h3>Funcionales</h3>
+          <ul>
+            <li><b>Edición concurrente</b> en vivo entre N usuarios.</li>
+            <li><b>Cursores remotos</b> y avatares (presence).</li>
+            <li><b>Comentarios</b> y suggestions con resolución.</li>
+            <li><b>Permisos</b> granulares (viewer/commenter/editor).</li>
+            <li><b>Historial</b> de versiones y revert.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3>No funcionales</h3>
+          <ul>
+            <li><b>Latencia op &lt; 100 ms</b> entre clientes.</li>
+            <li><b>Strong eventual consistency</b> (OT / CRDT).</li>
+            <li><b>Disponibilidad 99.99%</b>.</li>
+            <li><b>Durabilidad</b> de cada op (append-only log).</li>
+            <li><b>Modo offline</b> con resync automático.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Lo que justifica sticky session por documentId y snapshots periódicos.</p></div>
+      <div class="metrics">
+        <div class="metric"><div class="num">100M</div><div class="label">MAU</div><div class="note">Suite Google Workspace.</div></div>
+        <div class="metric"><div class="num">~10M</div><div class="label">Editores concurrentes</div><div class="note">En hora pico oficina.</div></div>
+        <div class="metric"><div class="num">~10K ops/s</div><div class="label">Doc caliente</div><div class="note">Reunión grande con 100 cursores.</div></div>
+        <div class="metric"><div class="num">~50–200 B</div><div class="label">Tamaño de op</div><div class="note">Insert/delete pequeño.</div></div>
+        <div class="metric"><div class="num">~5 min</div><div class="label">Snapshot interval</div><div class="note">Acelera carga inicial.</div></div>
+        <div class="metric"><div class="num">~10–50 MB</div><div class="label">Doc + history</div><div class="note">Para 1 año de edición activa.</div></div>
+        <div class="metric"><div class="num">100M+</div><div class="label">Permisos</div><div class="note">Modelo Zanzibar-style.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min / año.</div></div>
+      </div>
     </section>
 
     <section class="section">
@@ -149,14 +218,59 @@
 
     <section class="section">
       <div class="section-head"><h2>Arquitectura</h2></div>
-      <div class="panel">
-        <div class="arch-flow">
-          <div class="arch-step"><b>Cliente</b>Editor + WS</div>
-          <div class="arch-step"><b>Gateway</b>Sticky por doc</div>
-          <div class="arch-step"><b>Doc Svc</b>OT/CRDT engine</div>
-          <div class="arch-step"><b>Op Log</b>Append-only</div>
-          <div class="arch-step"><b>Snapshot</b>Periódico</div>
-          <div class="arch-step"><b>Permissions</b>ACL/RBAC</div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Editor["Editor Web/Móvil<br/>local OT/CRDT"] -- WS --> GW["Gateway<br/>sticky by docId"]
+    GW --> Doc["Doc Service<br/>OT/CRDT engine"]
+    Doc --> Log[("Op Log<br/>append-only")]
+    Doc --> Snap[("Snapshot Store<br/>cada 5 min")]
+    Doc --> Bcast["Broadcast<br/>Pub/Sub"]
+    Bcast --> Editor
+    GW --> Auth["Permissions Service<br/>ACL / Zanzibar"]
+    Auth --> AuthDB[("ACL store")]
+    Doc --> Search[("Search Index<br/>full-text")]
+    Editor -. presence .-> Pres["Presence Service"]
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Diseño de base de datos</h2><p>Op log como fuente de verdad, snapshots como aceleración, ACL granular.</p></div>
+      <div class="schema-grid">
+        <div class="tbl">
+          <div class="tbl-name">documents</div>
+          <div class="tbl-row"><span class="tbl-pk">document_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">owner_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>title</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>current_version</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>updated_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">idx <code>(owner_id, updated_at DESC)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">operations (op log)</div>
+          <div class="tbl-row"><span class="tbl-pk">document_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-pk">version</span><span class="tbl-type">BIGINT PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">author_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>op_type</span><span class="tbl-type">ENUM</span></div>
+          <div class="tbl-row"><span>payload</span><span class="tbl-type">JSONB</span></div>
+          <div class="tbl-row"><span>ts</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">PK <code>(document_id, version)</code> append-only<br/>partition por <code>document_id</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">snapshots</div>
+          <div class="tbl-row"><span class="tbl-pk">document_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-pk">version</span><span class="tbl-type">BIGINT PK</span></div>
+          <div class="tbl-row"><span>blob_url</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>created_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">Latest snapshot acelera "abrir doc"</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">permissions (Zanzibar-style)</div>
+          <div class="tbl-row"><span>object</span><span class="tbl-type">TEXT (doc:123)</span></div>
+          <div class="tbl-row"><span>relation</span><span class="tbl-type">ENUM viewer/editor/owner</span></div>
+          <div class="tbl-row"><span>subject</span><span class="tbl-type">TEXT (user:42 / group:eng)</span></div>
+          <div class="tbl-idx">idx <code>(object, relation)</code><br/>cache por user para evitar lookup recursivo</div>
         </div>
       </div>
     </section>
@@ -193,5 +307,24 @@
 
     <p class="footer">Caso 6 de 10 · System Design Interview Playbook</p>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#94a3b8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+    });
+  </script>
 </body>
 </html>

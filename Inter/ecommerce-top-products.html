@@ -83,8 +83,37 @@
     .script p { margin: 0; font-size: 17px; }
     .script strong { color: var(--accent); }
     .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .req { padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .req h3 { margin: 0 0 10px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .req ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .req li { margin: 5px 0; }
+    .req li b { color: var(--text); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+    .metric .num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -.04em; line-height: 1.05; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; font-weight: 800; }
+    .metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+
+    .mermaid-box { padding: 22px; border-radius: 18px; background: rgba(0,0,0,.32); border: 1px solid var(--line); overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 220px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tbl { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .tbl-name { color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 10px; letter-spacing: .04em; }
+    .tbl-row { font-size: 12px; color: var(--text); display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .tbl-row:last-of-type { border-bottom: 0; }
+    .tbl-type { color: var(--muted); font-size: 11px; }
+    .tbl-pk { color: var(--accent); }
+    .tbl-fk { color: #38bdf8; }
+    .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -110,6 +139,46 @@
       <div class="card"><h3>Operaciones</h3><p>Lectura del top, ingestión de eventos, agregación, expiración.</p></div>
       <div class="card"><h3>Escala</h3><p>Miles de compras/seg, millones de productos, lecturas mucho mayores a escrituras.</p></div>
       <div class="card"><h3>Riesgo</h3><p>Inconsistencia entre ventanas, hot keys, cache stampede.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Requisitos</h2><p>Lo primero que pides al entrevistador: aclarar qué es funcional y qué es de calidad.</p></div>
+      <div class="req-grid">
+        <div class="req">
+          <h3>Funcionales</h3>
+          <ul>
+            <li><b>Crear orden</b> con N productos, monto y región.</li>
+            <li><b>Listar top productos</b> por ventana 1h / 4h / 24h.</li>
+            <li><b>Cancelar orden</b> y reflejar la baja en el ranking.</li>
+            <li><b>Detalle de producto</b> con stock y precio.</li>
+            <li><b>Multi-región</b> con catálogos parcialmente independientes.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3>No funcionales</h3>
+          <ul>
+            <li><b>p99 lectura del top &lt; 100 ms.</b></li>
+            <li><b>Eventual consistency</b> en ranking (segundos OK).</li>
+            <li><b>Disponibilidad 99.9%</b>; órdenes nunca se pierden.</li>
+            <li><b>10× picos</b> de Black Friday sin degradar.</li>
+            <li><b>Reads ≫ Writes</b> (~1000:1).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Back-of-the-envelope que justifica las decisiones de almacenamiento y caching.</p></div>
+      <div class="metrics">
+        <div class="metric"><div class="num">10M</div><div class="label">DAU</div><div class="note">Usuarios activos por día.</div></div>
+        <div class="metric"><div class="num">1M</div><div class="label">Órdenes/día</div><div class="note">~12/s avg, ~150/s peak.</div></div>
+        <div class="metric"><div class="num">1K QPS</div><div class="label">Lectura del top</div><div class="note">10K en flash sale.</div></div>
+        <div class="metric"><div class="num">~730 GB</div><div class="label">Storage / año</div><div class="note">Órdenes ≈ 2 KB × 1M/día.</div></div>
+        <div class="metric"><div class="num">~24 MB</div><div class="label">Redis (sorted sets)</div><div class="note">3 ventanas × 1M productos.</div></div>
+        <div class="metric"><div class="num">60/s</div><div class="label">Eventos al stream</div><div class="note">Peak con 5 items/orden.</div></div>
+        <div class="metric"><div class="num">5–30 s</div><div class="label">Edge cache TTL</div><div class="note">Trade frescura vs tráfico.</div></div>
+        <div class="metric"><div class="num">99.9%</div><div class="label">SLO disponibilidad</div><div class="note">~8.7 h / año.</div></div>
+      </div>
     </section>
 
     <section class="section">
@@ -147,14 +216,63 @@
 
     <section class="section">
       <div class="section-head"><h2>Arquitectura</h2><p>Path de escritura desacoplado. Las lecturas no tocan la base transaccional.</p></div>
-      <div class="panel">
-        <div class="arch-flow">
-          <div class="arch-step"><b>Cliente</b>Web/Móvil</div>
-          <div class="arch-step"><b>API GW</b>Auth + rate limit</div>
-          <div class="arch-step"><b>Order Service</b>POST /orders</div>
-          <div class="arch-step"><b>Stream</b>Kafka/Kinesis</div>
-          <div class="arch-step"><b>Aggregator</b>Sliding window</div>
-          <div class="arch-step"><b>Cache</b>Redis sorted set</div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    Client["fa:fa-user Cliente Web/Móvil"] --> Edge["CDN / Edge Cache<br/>TTL 5–30s"]
+    Edge -->|GET top| GW["API Gateway<br/>Auth + Rate Limit"]
+    GW -->|read| Cache[("Redis<br/>Sorted Sets<br/>top:1h / 4h / 24h")]
+    GW -->|POST /orders| Order["Order Service"]
+    Order --> DB[("Orders DB<br/>Postgres")]
+    Order -->|emit event| Stream[("Kafka<br/>order_events")]
+    Stream --> Agg["Aggregator<br/>1-min buckets<br/>sliding window"]
+    Agg --> Cache
+    Agg --> Cold[("Cold Storage<br/>BigQuery / S3")]
+    Cache -. cache miss .-> Agg
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Diseño de base de datos</h2><p>Postgres para órdenes, Redis para rankings, Kafka para eventos.</p></div>
+      <div class="schema-grid">
+        <div class="tbl">
+          <div class="tbl-name">orders</div>
+          <div class="tbl-row"><span class="tbl-pk">order_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">user_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>region</span><span class="tbl-type">VARCHAR(8)</span></div>
+          <div class="tbl-row"><span>status</span><span class="tbl-type">ENUM</span></div>
+          <div class="tbl-row"><span>total_cents</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>currency</span><span class="tbl-type">CHAR(3)</span></div>
+          <div class="tbl-row"><span>created_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">idx <code>(user_id, created_at DESC)</code><br/>idx <code>(status, created_at)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">order_items</div>
+          <div class="tbl-row"><span class="tbl-pk">order_id</span><span class="tbl-type">UUID PK,FK</span></div>
+          <div class="tbl-row"><span class="tbl-pk">line_no</span><span class="tbl-type">SMALLINT PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">product_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>qty</span><span class="tbl-type">INT</span></div>
+          <div class="tbl-row"><span>price_cents</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-idx">idx <code>(product_id)</code> para análisis por producto</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">products</div>
+          <div class="tbl-row"><span class="tbl-pk">product_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span>name</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span class="tbl-fk">category_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>price_cents</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>inventory</span><span class="tbl-type">INT</span></div>
+          <div class="tbl-row"><span>region</span><span class="tbl-type">VARCHAR(8)</span></div>
+          <div class="tbl-idx">idx <code>(category_id)</code>, idx <code>(region)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">Redis · sorted sets</div>
+          <div class="tbl-row"><span>top:1h:{region}</span><span class="tbl-type">ZSET</span></div>
+          <div class="tbl-row"><span>top:4h:{region}</span><span class="tbl-type">ZSET</span></div>
+          <div class="tbl-row"><span>top:24h:{region}</span><span class="tbl-type">ZSET</span></div>
+          <div class="tbl-row"><span>bucket:1m:{ts}</span><span class="tbl-type">HASH</span></div>
+          <div class="tbl-idx">score = count, member = product_id<br/>ZRANGEBYSCORE / ZREVRANGE para top-K en O(log N)</div>
         </div>
       </div>
     </section>
@@ -191,5 +309,24 @@
 
     <p class="footer">Caso 1 de 10 · System Design Interview Playbook</p>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#fbbf24',
+        lineColor: '#94a3b8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+    });
+  </script>
 </body>
 </html>

@@ -83,8 +83,37 @@
     .script p { margin: 0; font-size: 17px; }
     .script strong { color: var(--accent); }
     .footer { margin-top: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .req { padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .req h3 { margin: 0 0 10px; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .req ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .req li { margin: 5px 0; }
+    .req li b { color: var(--text); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .metric { padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
+    .metric .num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -.04em; line-height: 1.05; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-top: 6px; font-weight: 800; }
+    .metric .note { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.45; }
+
+    .mermaid-box { padding: 22px; border-radius: 18px; background: rgba(0,0,0,.32); border: 1px solid var(--line); overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 220px; }
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    .schema-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tbl { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .tbl-name { color: var(--accent); font-size: 13px; font-weight: 800; margin-bottom: 10px; letter-spacing: .04em; }
+    .tbl-row { font-size: 12px; color: var(--text); display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
+    .tbl-row:last-of-type { border-bottom: 0; }
+    .tbl-type { color: var(--muted); font-size: 11px; }
+    .tbl-pk { color: var(--accent); }
+    .tbl-fk { color: #38bdf8; }
+    .tbl-idx { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08); font-size: 11px; color: var(--muted); line-height: 1.6; }
+    .tbl-idx code { background: rgba(255,255,255,.04); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -110,6 +139,46 @@
       <div class="card"><h3>Operaciones</h3><p>Solicitar ride, broadcast a drivers, accept atómico, tracking.</p></div>
       <div class="card"><h3>Escala</h3><p>Cientos de miles de drivers activos, location updates por segundo.</p></div>
       <div class="card"><h3>Riesgo</h3><p>Doble accept, ubicación stale, partición regional caída.</p></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Requisitos</h2><p>Define qué es funcional y qué garantías de calidad firmas con el negocio.</p></div>
+      <div class="req-grid">
+        <div class="req">
+          <h3>Funcionales</h3>
+          <ul>
+            <li><b>Solicitar viaje</b> con pickup/dropoff y tipo de vehículo.</li>
+            <li><b>Match</b> con driver cercano disponible.</li>
+            <li><b>Tracking</b> en vivo del driver y del rider.</li>
+            <li><b>Aceptar / cancelar</b> ride (con políticas).</li>
+            <li><b>Cobro y rating</b> al terminar el viaje.</li>
+          </ul>
+        </div>
+        <div class="req">
+          <h3>No funcionales</h3>
+          <ul>
+            <li><b>Match &lt; 5 s p95</b> en zona con cobertura.</li>
+            <li><b>Strong consistency</b> en accept (no doble assign).</li>
+            <li><b>Disponibilidad 99.99%</b> por ciudad.</li>
+            <li><b>Location updates</b> cada 3–5 s por driver.</li>
+            <li><b>Privacidad</b>: ubicación con TTL corto.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Order-of-magnitude para defender la elección de geo index, WebSocket y particionado por ciudad.</p></div>
+      <div class="metrics">
+        <div class="metric"><div class="num">10M</div><div class="label">MAU</div><div class="note">~1M drivers activos.</div></div>
+        <div class="metric"><div class="num">5M</div><div class="label">Rides / día</div><div class="note">~60/s avg, ~600/s peak.</div></div>
+        <div class="metric"><div class="num">~250K/s</div><div class="label">Location updates</div><div class="note">1M drivers × 1 update / 4 s.</div></div>
+        <div class="metric"><div class="num">~1M</div><div class="label">WS concurrentes</div><div class="note">En hora pico.</div></div>
+        <div class="metric"><div class="num">~1.8 TB</div><div class="label">Storage / año</div><div class="note">Rides ≈ 1 KB × 5M/día.</div></div>
+        <div class="metric"><div class="num">~100 MB</div><div class="label">Redis GEO</div><div class="note">1M drivers × ~100 B.</div></div>
+        <div class="metric"><div class="num">30 s</div><div class="label">TTL ubicación</div><div class="note">Marca driver stale.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min / año.</div></div>
+      </div>
     </section>
 
     <section class="section">
@@ -149,14 +218,65 @@ Idempotency-Key: 5f8a-...
 
     <section class="section">
       <div class="section-head"><h2>Arquitectura</h2></div>
-      <div class="panel">
-        <div class="arch-flow">
-          <div class="arch-step"><b>Apps</b>Rider/Driver</div>
-          <div class="arch-step"><b>API GW</b>+ WebSocket</div>
-          <div class="arch-step"><b>Ride Svc</b>state machine</div>
-          <div class="arch-step"><b>Geo Svc</b>geohash/QuadTree</div>
-          <div class="arch-step"><b>Matcher</b>broadcast a candidatos</div>
-          <div class="arch-step"><b>Push</b>FCM/APNs</div>
+      <div class="mermaid-box">
+        <div class="mermaid">
+flowchart LR
+    R["Rider App"] -- WS / HTTP --> GW["API Gateway<br/>WebSocket + REST"]
+    D["Driver App"] -- WS --> GW
+    GW --> Ride["Ride Service<br/>state machine"]
+    GW --> Loc["Location Service"]
+    Loc --> Geo[("Redis GEO<br/>geohash / S2")]
+    Ride --> Match["Matcher<br/>candidate ranking"]
+    Match --> Geo
+    Match --> Push["Push Service<br/>FCM / APNs"]
+    Push --> D
+    Ride --> RDB[("Rides DB<br/>Postgres")]
+    Ride -. eventos .-> Stream[("Kafka<br/>ride_events")]
+    Stream --> Pay["Payment Service"]
+    Stream --> Rate["Rating Service"]
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Diseño de base de datos</h2><p>Postgres para rides y usuarios, Redis GEO para posiciones, particionado por ciudad/región.</p></div>
+      <div class="schema-grid">
+        <div class="tbl">
+          <div class="tbl-name">rides</div>
+          <div class="tbl-row"><span class="tbl-pk">ride_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">rider_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span class="tbl-fk">driver_id</span><span class="tbl-type">UUID FK NULL</span></div>
+          <div class="tbl-row"><span>status</span><span class="tbl-type">ENUM</span></div>
+          <div class="tbl-row"><span>pickup</span><span class="tbl-type">GEOGRAPHY</span></div>
+          <div class="tbl-row"><span>dropoff</span><span class="tbl-type">GEOGRAPHY</span></div>
+          <div class="tbl-row"><span>fare_cents</span><span class="tbl-type">BIGINT</span></div>
+          <div class="tbl-row"><span>created_at</span><span class="tbl-type">TIMESTAMPTZ</span></div>
+          <div class="tbl-idx">idx <code>(rider_id, created_at DESC)</code><br/>idx <code>(driver_id, status)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">drivers</div>
+          <div class="tbl-row"><span class="tbl-pk">driver_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span>name</span><span class="tbl-type">TEXT</span></div>
+          <div class="tbl-row"><span>license_no</span><span class="tbl-type">VARCHAR</span></div>
+          <div class="tbl-row"><span class="tbl-fk">vehicle_id</span><span class="tbl-type">UUID FK</span></div>
+          <div class="tbl-row"><span>status</span><span class="tbl-type">ENUM</span></div>
+          <div class="tbl-row"><span>rating_avg</span><span class="tbl-type">NUMERIC(2,1)</span></div>
+          <div class="tbl-idx">idx <code>(status)</code> para filtrar online/idle</div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">vehicles</div>
+          <div class="tbl-row"><span class="tbl-pk">vehicle_id</span><span class="tbl-type">UUID PK</span></div>
+          <div class="tbl-row"><span>plate</span><span class="tbl-type">VARCHAR(16)</span></div>
+          <div class="tbl-row"><span>type</span><span class="tbl-type">ENUM</span></div>
+          <div class="tbl-row"><span>color</span><span class="tbl-type">VARCHAR</span></div>
+          <div class="tbl-idx">idx <code>(plate UNIQUE)</code></div>
+        </div>
+        <div class="tbl">
+          <div class="tbl-name">Redis · GEO + lock</div>
+          <div class="tbl-row"><span>geo:drivers:{city}</span><span class="tbl-type">GEOSET</span></div>
+          <div class="tbl-row"><span>lock:ride:{ride_id}</span><span class="tbl-type">STRING SETNX</span></div>
+          <div class="tbl-row"><span>session:driver:{id}</span><span class="tbl-type">HASH</span></div>
+          <div class="tbl-idx">GEOADD / GEORADIUS para nearby<br/>SETNX para CAS en accept (TTL 30 s)</div>
         </div>
       </div>
     </section>
@@ -193,5 +313,24 @@ Idempotency-Key: 5f8a-...
 
     <p class="footer">Caso 2 de 10 · System Design Interview Playbook</p>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#34d399',
+        lineColor: '#94a3b8',
+        secondaryColor: '#0f172a',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSize: '14px'
+      },
+      flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+    });
+  </script>
 </body>
 </html>
