@@ -187,19 +187,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> Free vs Premium tier (con/sin ads), modo offline (descargas cifradas), Family plan compartido, podcasts y audiolibros, lyrics sincronizadas, social (lo que escuchan tus amigos), Discover Weekly / Daily Mix, audio en TV / smart speakers / car play, gapless playback.</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>Music + podcasts + audiolibros</b> o solo music?<br/>
+        • ¿<b>Free con ads y Premium</b>, o un solo tier?<br/>
+        • ¿<b>Soporte offline</b> con cifrado y expiración? Cuántos devices simultáneos.<br/>
+        • ¿<b>Recomendaciones</b> dentro de este alcance o se asume otro sistema?<br/>
+        • ¿<b>Multi-device</b> sincronizado (continuar donde dejaste)?<br/>
+        • ¿<b>Social features</b>: ver lo que escuchan tus amigos?<br/>
+        • ¿<b>Karaoke / lyrics</b> sincronizadas?<br/>
+        • ¿<b>Royalties</b> a labels: en este alcance o aparte?<br/>
+        • ¿<b>Hi-Fi (FLAC)</b> además de OGG/AAC?</p>
+        <p><b>Frase clave:</b> "Asumo music streaming, free + premium tiers, sin podcasts ni offline. Recomendaciones las trato como caja negra. Royalties los menciono pero no los detallo."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Datos reales del dominio para defender la elección de search engine y CDN dedicado.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Resoluciones año/día/seg para defender search engine, CDN y tier dedicado.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">600M</div><div class="label">MAU</div><div class="note">~250M premium.</div></div>
-        <div class="metric"><div class="num">100M</div><div class="label">Tracks</div><div class="note">+podcasts y audiolibros.</div></div>
-        <div class="metric"><div class="num">~5B/día</div><div class="label">Listen events</div><div class="note">~60K/s avg.</div></div>
-        <div class="metric"><div class="num">~50K QPS</div><div class="label">Search</div><div class="note">Pico tarde-noche.</div></div>
-        <div class="metric"><div class="num">~2 PB</div><div class="label">Audio storage</div><div class="note">100M tracks × varias bitrates.</div></div>
-        <div class="metric"><div class="num">96–320 kbps</div><div class="label">Bitrates</div><div class="note">Adaptive según red.</div></div>
-        <div class="metric"><div class="num">15 min</div><div class="label">TTL stream token</div><div class="note">Con refresh silencioso.</div></div>
-        <div class="metric"><div class="num">99.95%</div><div class="label">SLO playback</div><div class="note">~4.4 h / año.</div></div>
+        <div class="metric"><div class="num">600M</div><div class="label">MAU</div><div class="note">~250M premium · ~350M ad-supported.<br/>~150M DAU · ~5M concurrentes en peak.</div></div>
+        <div class="metric"><div class="num">100M</div><div class="label">Tracks</div><div class="note">+ ~5M podcasts + audiolibros.<br/>~60K nuevos tracks/día (~22M/año).</div></div>
+        <div class="metric"><div class="num">~5B/día</div><div class="label">Listen events</div><div class="note">~1.8T/año · ~60K/s avg.<br/>~150K/s en peak global tarde.</div></div>
+        <div class="metric"><div class="num">~50K QPS</div><div class="label">Search</div><div class="note">~4.3B/día · ~1.6T/año.<br/>Pico tarde-noche por timezone.</div></div>
+        <div class="metric"><div class="num">~2 PB</div><div class="label">Audio storage</div><div class="note">~100M tracks × ~3 bitrates × 5 MB.<br/>+~3 PB/año por crecimiento de catálogo.</div></div>
+        <div class="metric"><div class="num">96–320 kbps</div><div class="label">Bitrates</div><div class="note">Adaptive según red y tier.<br/>Hi-Fi 1411 kbps para tier premium plus.</div></div>
+        <div class="metric"><div class="num">15 min</div><div class="label">TTL stream token</div><div class="note">~150M tokens generados/día.<br/>Refresh silencioso antes de expirar.</div></div>
+        <div class="metric"><div class="num">99.95%</div><div class="label">SLO playback</div><div class="note">~4.4 h/año · ~21 min/mes.<br/>~43 s/día permitidos.</div></div>
       </div>
     </section>
 

@@ -188,19 +188,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> Pico aeroportuario (alta demanda + drivers waiting), evento masivo (concierto, estadio) con surge, madrugada con baja densidad de oferta, ride compartido (Pool/UberX/Black), viaje programado a futuro, ride para alguien más (regalo / corporativo), ride con paradas múltiples, ride en zona con mala señal.</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>Tier único</b> (UberX) o múltiples (Pool, Black, XL, paquetes)? Cambia el matching.<br/>
+        • ¿<b>Soportas viajes programados</b> a futuro? Implica scheduler queue separado.<br/>
+        • ¿<b>Multi-stop</b> en un mismo ride?<br/>
+        • ¿<b>Pagos in-app, efectivo, o ambos</b>? Ojo con flujos cash y reconciliación.<br/>
+        • ¿<b>Surge pricing</b> dinámico o estático?<br/>
+        • ¿Hay <b>cancellation fee</b>, en qué condiciones?<br/>
+        • ¿<b>Drivers full-time o gig</b>? Cambia incentivos y SLA.<br/>
+        • ¿<b>Ride compartido</b> con detour máximo permitido?<br/>
+        • ¿<b>Cobertura geográfica</b>: una ciudad, país, global multi-region?</p>
+        <p><b>Frase clave:</b> "Voy a asumir UberX único, pago in-app, una ciudad. Si me pides multi-tier o multi-stop, lo agrego como extensión al final."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Order-of-magnitude para defender la elección de geo index, WebSocket y particionado por ciudad.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Order-of-magnitude por año/día/segundo. Lo que justifica geo index, WebSocket y particionado por ciudad.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">10M</div><div class="label">MAU</div><div class="note">~1M drivers activos.</div></div>
-        <div class="metric"><div class="num">5M</div><div class="label">Rides / día</div><div class="note">~60/s avg, ~600/s peak.</div></div>
-        <div class="metric"><div class="num">~250K/s</div><div class="label">Location updates</div><div class="note">1M drivers × 1 update / 4 s.</div></div>
-        <div class="metric"><div class="num">~1M</div><div class="label">WS concurrentes</div><div class="note">En hora pico.</div></div>
-        <div class="metric"><div class="num">~1.8 TB</div><div class="label">Storage / año</div><div class="note">Rides ≈ 1 KB × 5M/día.</div></div>
-        <div class="metric"><div class="num">~100 MB</div><div class="label">Redis GEO</div><div class="note">1M drivers × ~100 B.</div></div>
-        <div class="metric"><div class="num">30 s</div><div class="label">TTL ubicación</div><div class="note">Marca driver stale.</div></div>
-        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min / año.</div></div>
+        <div class="metric"><div class="num">10M</div><div class="label">MAU riders</div><div class="note">~120M MAU/año estimado de uso.<br/>~1M drivers activos · ~50K concurrentes online.</div></div>
+        <div class="metric"><div class="num">5M</div><div class="label">Rides / día</div><div class="note">~150M/mes · ~1.8B/año.<br/>~60/s avg · ~600/s peak (hora pico).</div></div>
+        <div class="metric"><div class="num">~250K/s</div><div class="label">Location updates</div><div class="note">~21B/día · ~7.7T/año.<br/>1M drivers × update / 4 s.</div></div>
+        <div class="metric"><div class="num">~1M</div><div class="label">WS concurrentes</div><div class="note">Riders + drivers en hora pico.<br/>~50K nuevos handshakes/min.</div></div>
+        <div class="metric"><div class="num">~1.8 TB</div><div class="label">Storage rides/año</div><div class="note">1 KB × 5M/día = 5 GB/día.<br/>~150 GB/mes; +location traces archivadas.</div></div>
+        <div class="metric"><div class="num">~100 MB</div><div class="label">Redis GEO (live)</div><div class="note">1M drivers × ~100 B vivos en RAM.<br/>+ locks ~50 MB; sesiones ~1 GB.</div></div>
+        <div class="metric"><div class="num">30 s</div><div class="label">TTL ubicación</div><div class="note">Marca driver stale.<br/>Heartbeat WS cada 15 s con jitter.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min/año · ~4 min/mes.<br/>~8 s/día permitidos por ciudad.</div></div>
       </div>
     </section>
 

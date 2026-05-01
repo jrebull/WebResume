@@ -134,8 +134,26 @@
     .bottleneck li, .improve li { margin: 5px 0; }
     .bottleneck b, .improve b { color: var(--text); }
 
+    .reco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .reco-type { padding: 20px 22px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.035); position: relative; }
+    .reco-type h3 { margin: 0 0 4px; font-size: 16px; color: var(--accent); letter-spacing: -.02em; font-weight: 800; }
+    .reco-type .reco-tag { margin: 0 0 12px; color: var(--muted); font-size: 12px; font-style: italic; }
+    .reco-type p { margin: 8px 0; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+    .reco-type p:last-child { margin-bottom: 0; }
+    .reco-type b { color: var(--accent); }
+    .reco-type code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 5px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; }
+    .reco-num { position: absolute; top: 14px; right: 16px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; color: var(--muted); font-weight: 800; letter-spacing: .1em; }
+
+    .recommendation { margin-top: 18px; padding: 24px 26px; border-radius: 18px; background: linear-gradient(145deg, rgba(167,139,250,.12), rgba(56,189,248,.06)); border: 1px solid rgba(167,139,250,.32); }
+    .recommendation h4 { margin: 0 0 10px; font-size: 13px; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .recommendation h4::before { content: "★"; color: var(--accent); }
+    .recommendation p { margin: 0 0 10px; color: var(--text); font-size: 14.5px; line-height: 1.7; }
+    .recommendation p:last-child { margin-bottom: 0; }
+    .recommendation b { color: var(--accent); }
+    .recommendation code { background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+
     @media (max-width: 980px) {
-      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs { grid-template-columns: 1fr; }
+      .hero, .quick-grid, .pitfalls, .arch-flow, .req-grid, .metrics, .schema-grid, .why, .tradeoffs, .reco-grid { grid-template-columns: 1fr; }
       table { min-width: 720px; } .table-box { overflow-x: auto; }
     }
   </style>
@@ -187,19 +205,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> Home feed personalizado, "you might also like" en página de producto, email weekly picks, search re-ranking, push notifications de items nuevos relevantes, "out-of-stock alternatives" en e-commerce, sidebar de "trending in your network", continue-watching en streaming.</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>Cuántos slots</b> a recomendar? 5 vs 100 cambia el budget de cómputo.<br/>
+        • ¿<b>Personalizado por user</b> o cohort-based / popularidad?<br/>
+        • ¿<b>Online (real-time)</b> o async (precomputed batch)?<br/>
+        • ¿<b>Cold start</b> matters: usuarios nuevos cómo arrancan?<br/>
+        • ¿<b>Métrica de éxito</b>: CTR, conversión, watch time, retención D7/D30?<br/>
+        • ¿<b>Diversidad</b> importa? Si solo optimizas relevancia, eco chamber.<br/>
+        • ¿<b>Explicabilidad</b> obligatoria? Cambia los modelos válidos (interpretables vs deep).<br/>
+        • ¿<b>Latencia</b>: budget online (sub-100ms) o se puede precomputar?<br/>
+        • ¿<b>Cuántos items y users</b>? 1K vs 1B cambia ANN, sharding, etc.</p>
+        <p><b>Frase clave:</b> "Asumo home feed online, ~10 slots, sub-100ms p99, 100M items y 100M users, métrica primaria CTR con guardrail de diversidad. Si me dices long-form watch time o conversion, ajusto el ranker."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Define el budget online del ranker y el tamaño del feature store.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Resoluciones año/día/seg. Define el budget online del ranker y el tamaño del feature store.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">100M</div><div class="label">DAU</div><div class="note">Plataforma de consumo masivo.</div></div>
-        <div class="metric"><div class="num">~10</div><div class="label">Reco requests / user / día</div><div class="note">~1B QPS-day → ~12K/s avg.</div></div>
-        <div class="metric"><div class="num">~500</div><div class="label">Candidates → 10–50 ranked</div><div class="note">Two-stage retrieval.</div></div>
-        <div class="metric"><div class="num">~1 KB</div><div class="label">Feature vector / item</div><div class="note">~100 GB / 100M items.</div></div>
-        <div class="metric"><div class="num">10–50 ms</div><div class="label">Budget feature lookup</div><div class="note">Redis / Bigtable.</div></div>
-        <div class="metric"><div class="num">100 ms p99</div><div class="label">Latency total</div><div class="note">Recall + rank + serve.</div></div>
-        <div class="metric"><div class="num">~10K events/s</div><div class="label">Pipeline de feedback</div><div class="note">Update incremental.</div></div>
-        <div class="metric"><div class="num">99.95%</div><div class="label">SLO reco</div><div class="note">~4.4 h / año.</div></div>
+        <div class="metric"><div class="num">100M</div><div class="label">DAU</div><div class="note">~3B MAU · plataforma de consumo masivo.<br/>~30B sesiones/año.</div></div>
+        <div class="metric"><div class="num">~10</div><div class="label">Reco requests / user / día</div><div class="note">~1B requests/día · ~365B/año.<br/>~12K/s avg · ~120K/s pico.</div></div>
+        <div class="metric"><div class="num">~500</div><div class="label">Candidates → 10–50 ranked</div><div class="note">~500B candidates rankeados/día.<br/>~6M ranks/s en peak.</div></div>
+        <div class="metric"><div class="num">~1 KB</div><div class="label">Feature vector / item</div><div class="note">~100 GB / 100M items.<br/>+ ~100 GB user features (1 KB × 100M).</div></div>
+        <div class="metric"><div class="num">10–50 ms</div><div class="label">Budget feature lookup</div><div class="note">Bulk MGET de ~500 items.<br/>Redis / Bigtable / DynamoDB.</div></div>
+        <div class="metric"><div class="num">100 ms p99</div><div class="label">Latency total</div><div class="note">Recall ~30 + lookup ~30 + rank ~30 + filter ~10.<br/>Hard budget no negociable.</div></div>
+        <div class="metric"><div class="num">~10K events/s</div><div class="label">Pipeline feedback</div><div class="note">~860M eventos/día · ~314B/año.<br/>Impr + click + conv ratio típico 100:5:1.</div></div>
+        <div class="metric"><div class="num">99.95%</div><div class="label">SLO reco</div><div class="note">~4.4 h/año · ~21 min/mes.<br/>~43 s/día permitidos.</div></div>
       </div>
     </section>
 
@@ -339,6 +373,128 @@ flowchart LR
           <div class="tbl-row"><span>ts</span><span class="tbl-type">TIMESTAMPTZ</span></div>
           <div class="tbl-idx">Tópico Kafka con dedup por <code>event_id</code><br/>Sink: feature store + warehouse</div>
         </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Tipos de sistemas de recomendación</h2><p>Lo que se pregunta en entrevistas: qué algoritmos existen, cuándo usar cada uno, y cuál proponer hoy.</p></div>
+      <div class="reco-grid">
+
+        <div class="reco-type"><span class="reco-num">01</span>
+          <h3>Content-based filtering</h3>
+          <p class="reco-tag">Item features → recomienda items similares al historial del user.</p>
+          <p><b>Cómo:</b> TF-IDF / embeddings sobre descripción, tags, atributos. User profile = vector promedio de items que le gustaron. Score = cosine similarity.</p>
+          <p><b>Cuándo:</b> catálogo con metadata rica (artículos, productos), users nuevos sin historial colaborativo, cold-start friendly.</p>
+          <p><b>Pros:</b> explicable ("porque te gustó X con tag Y"), no necesita historial de otros, items nuevos entran rápido.</p>
+          <p><b>Contras:</b> filter bubble — solo te recomienda más de lo mismo. Depende de calidad de features.</p>
+          <p><b>Ejemplo:</b> news apps por keyword, "más como este" en producto.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">02</span>
+          <h3>Collaborative filtering · user-based</h3>
+          <p class="reco-tag">User-User similarity → te gusta lo que les gustó a usuarios similares.</p>
+          <p><b>Cómo:</b> matriz user × item con interacciones; cosine sim entre filas. Recomienda items que vieron tus k vecinos.</p>
+          <p><b>Cuándo:</b> catálogos pequeños/medianos, prototipos rápidos. <em>No para producción a escala.</em></p>
+          <p><b>Pros:</b> descubre items lejos del historial, no necesita features de items.</p>
+          <p><b>Contras:</b> no escala (k-NN sobre 100M users es brutal), cold start fuerte, sparsity.</p>
+          <p><b>Ejemplo:</b> Amazon temprano, GroupLens, MovieLens académico.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">03</span>
+          <h3>Collaborative filtering · item-based</h3>
+          <p class="reco-tag">Item-Item similarity → items similares a los que ya usaste.</p>
+          <p><b>Cómo:</b> cosine sim entre columnas (items co-vistos por mismos users). Score user×item = sum de similarities con items del historial.</p>
+          <p><b>Cuándo:</b> muchos users, items relativamente estables. Workhorse clásico.</p>
+          <p><b>Pros:</b> precomputable offline, escala mejor que user-based, explicable.</p>
+          <p><b>Contras:</b> cold start de items nuevos, no captura tendencias temporales.</p>
+          <p><b>Ejemplo:</b> Amazon "Customers who bought X also bought Y" (Linden et al. 2003).</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">04</span>
+          <h3>Matrix Factorization (SVD / ALS)</h3>
+          <p class="reco-tag">Latent factors → comprime user-item en embeddings densos.</p>
+          <p><b>Cómo:</b> descompone matriz user-item rala en <code>U × Vᵀ</code> con dimensiones latentes (~50–200). Score = <code>U_user · V_item</code>.</p>
+          <p><b>Cuándo:</b> ratings explícitos o implícitos, base de muchos sistemas modernos.</p>
+          <p><b>Pros:</b> descubre patrones latentes, ALS distribuido escala (Spark MLlib), pre-cálculo de embeddings.</p>
+          <p><b>Contras:</b> cold start de users e items, factores poco interpretables.</p>
+          <p><b>Ejemplo:</b> ganador del Netflix Prize, Spotify CF temprano.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">05</span>
+          <h3>Two-Tower / Dual Encoder</h3>
+          <p class="reco-tag">User tower + Item tower → embeddings que se matchean por dot product.</p>
+          <p><b>Cómo:</b> dos NNs separados producen embeddings de user e item. Entrenar para que producto interno alto = relevancia. Indexar items con ANN (HNSW/FAISS/ScaNN).</p>
+          <p><b>Cuándo:</b> retrieval de catálogos masivos con sub-10 ms latency. <em>Estándar de oro hoy en producción.</em></p>
+          <p><b>Pros:</b> escala a billones de items, captura semántica, train/serve consistency.</p>
+          <p><b>Contras:</b> complejidad de infra, hay que regenerar embeddings de items nuevos.</p>
+          <p><b>Ejemplo:</b> YouTube candidate generation, Pinterest, Etsy, Amazon.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">06</span>
+          <h3>Deep Ranking (DLRM / Wide &amp; Deep / DCN)</h3>
+          <p class="reco-tag">Modelos densos para rankear pocos candidatos con muchas features.</p>
+          <p><b>Cómo:</b> arquitecturas como DLRM (Meta), Wide &amp; Deep (Google), DCN. Combinan features categóricas (embeddings) y dense (cross networks). Output: P(click), P(watch &gt; 30 s), etc.</p>
+          <p><b>Cuándo:</b> ranking stage en two-stage system, presupuesto computacional moderado.</p>
+          <p><b>Pros:</b> SOTA accuracy, captura cross-features no obvias, multi-objetivo.</p>
+          <p><b>Contras:</b> feature engineering caro, training pesado, latencia significativa por candidato.</p>
+          <p><b>Ejemplo:</b> Facebook Newsfeed, Google Ads, YouTube ranker.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">07</span>
+          <h3>Sequence-based (BERT4Rec / SASRec / GRU4Rec)</h3>
+          <p class="reco-tag">Modela la secuencia de items vistos como un lenguaje.</p>
+          <p><b>Cómo:</b> trata historia del user como secuencia. Predice next-item con self-attention (BERT4Rec / SASRec) o RNN (GRU4Rec). Mask de items para entrenar.</p>
+          <p><b>Cuándo:</b> orden importa (música, video, e-commerce con sesiones), historiales largos.</p>
+          <p><b>Pros:</b> captura patrones temporales y sesiones, SOTA en next-item.</p>
+          <p><b>Contras:</b> caro de entrenar (transformers), latencia mayor, necesita historia suficiente.</p>
+          <p><b>Ejemplo:</b> Spotify Discover Weekly mix, Netflix continue-watching, Amazon session-based.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">08</span>
+          <h3>Graph Neural Networks (PinSage / GraphSAGE)</h3>
+          <p class="reco-tag">Modela usuarios + items + interacciones como un grafo.</p>
+          <p><b>Cómo:</b> aprende embeddings propagando info por aristas (followers, likes, co-views). Score por proximidad en el grafo.</p>
+          <p><b>Cuándo:</b> dominio inherentemente de grafo (social, e-commerce con co-purchases, content sharing).</p>
+          <p><b>Pros:</b> rico en estructura, items nuevos entran rápido vía vecinos, captura relaciones indirectas.</p>
+          <p><b>Contras:</b> infra compleja, training pesado, debugging difícil.</p>
+          <p><b>Ejemplo:</b> Pinterest PinSage, Uber Eats, LinkedIn People You May Know.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">09</span>
+          <h3>Contextual Bandits / RL</h3>
+          <p class="reco-tag">Decide explorar nuevos items vs explotar lo que sabes.</p>
+          <p><b>Cómo:</b> cada slot es una decisión con reward. LinUCB, Thompson sampling. Slate optimization para múltiples slots correlacionados. RL con reward delayed (watch time, retention).</p>
+          <p><b>Cuándo:</b> cold start estructural, exploración necesaria, métricas largo plazo.</p>
+          <p><b>Pros:</b> maneja exploración formalmente, adapta rápido a items nuevos, marcos teóricos sólidos.</p>
+          <p><b>Contras:</b> convergencia lenta sin priors, evaluación compleja, off-policy difícil.</p>
+          <p><b>Ejemplo:</b> Yahoo News (LinUCB), Microsoft Decision Service, Uber promociones.</p>
+        </div>
+
+        <div class="reco-type"><span class="reco-num">10</span>
+          <h3>Hybrid (combinación)</h3>
+          <p class="reco-tag">Mezcla content + CF + signals contextuales.</p>
+          <p><b>Cómo:</b> ensemble lineal sobre scores de modelos distintos, o cascada (content para cold start, CF cuando hay historia, deep ranker al final).</p>
+          <p><b>Cuándo:</b> producción real. <em>Casi nadie usa un solo modelo.</em></p>
+          <p><b>Pros:</b> maneja cold start, combina fortalezas, robusto a fallas parciales.</p>
+          <p><b>Contras:</b> complejidad operativa, debugging del ensemble, tuning de pesos.</p>
+          <p><b>Ejemplo:</b> Netflix, Spotify, Amazon, YouTube — todos en producción son híbridos.</p>
+        </div>
+
+      </div>
+
+      <div class="recommendation">
+        <h4>Qué proponer en una entrevista hoy</h4>
+        <p>Para sistemas modernos a escala (YouTube, TikTok, Spotify, e-commerce), propongo un <b>pipeline híbrido de dos etapas con bandits</b>:</p>
+        <p><b>1. Retrieval (recall, ~500 candidatos).</b> Combino tres fuentes en paralelo:<br/>
+        • <b>Two-tower neural</b> con ANN (HNSW/FAISS) para ~200 items semánticamente similares al user.<br/>
+        • <b>Item-based CF</b> precomputado para ~150 vecinos colaborativos.<br/>
+        • <b>Popularidad por cohort/región</b> para ~100 items que tienden ahora (cold start safety net).<br/>
+        Después dedup → ~500 candidatos en &lt; 30 ms.</p>
+        <p><b>2. Ranking (precision, ~10–50).</b> <b>DLRM</b> o <b>Wide &amp; Deep</b> que toma features del user e item del feature store, predice probabilidad de la métrica primaria (CTR, watch time, conversión). Multi-objetivo si hay varios KPIs.</p>
+        <p><b>3. Re-ranking final.</b> <b>Diversity filter</b> (no stack del mismo creator/topic), business rules (boost campañas, filter policy/locale), <code>recent_seen</code> dedup.</p>
+        <p><b>4. Cold start &amp; exploration.</b> <b>Contextual bandit</b> con epsilon-greedy ~5–10% del tráfico para items nuevos. Fallback a popularity para users sin historial.</p>
+        <p><b>5. Sequence model opcional.</b> Si la entrevista es Spotify / Netflix continue-watching, agrego <b>SASRec / BERT4Rec</b> en candidate generation para capturar patrones temporales del user.</p>
+        <p><b>Por qué esta combinación:</b> two-tower escala a billones de items con sub-10 ms; DLRM da SOTA en ranking; bandits resuelven cold start formalmente; popularidad y re-ranking son guardrails baratos. Es exactamente lo que YouTube, TikTok y Pinterest tienen en producción hoy.</p>
       </div>
     </section>
 

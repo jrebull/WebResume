@@ -187,19 +187,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> OLTP banking (transferencias con strong consistency), OLAP analytics (lecturas masivas, agregaciones), time-series (logs, métricas, IoT), multi-tenant SaaS (aislamiento + escala), embedded en app (SQLite-style), distributed (Spanner / CockroachDB para multi-region), graph analytics (Neo4j-like), document store (Mongo-like).</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>OLTP, OLAP o ambos</b>? Cambia storage engine (B+Tree vs columnar).<br/>
+        • ¿<b>Single-node o distributed</b>? Distributed implica consensus (Raft/Paxos).<br/>
+        • ¿<b>SQL completo</b> o subset / NoSQL?<br/>
+        • ¿<b>Strongest isolation</b> requerido (serializable, snapshot, RR, RC)?<br/>
+        • ¿<b>Replicación sync vs async</b>? Trade durabilidad/latencia.<br/>
+        • ¿<b>On-prem o cloud-managed</b>? Cambia tooling de ops.<br/>
+        • ¿<b>Multi-region</b> con consistencia o eventually consistent OK?<br/>
+        • ¿<b>Schemaless</b> o schema enforced (DDL)?<br/>
+        • ¿<b>Workload</b> read-heavy, write-heavy, balanced?</p>
+        <p><b>Frase clave:</b> "Voy a diseñar OLTP single-node con SQL, isolation snapshot, replicación async para read replicas. Si me pides multi-region, agrego Raft con sharding y la conversación cambia bastante."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Lo que separa un B-Tree de un LSM y define el tamaño del buffer pool.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Resoluciones año/día/seg. Lo que separa un B-Tree de un LSM y define el tamaño del buffer pool.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">10K QPS</div><div class="label">Por instancia</div><div class="note">Mix read/write típico.</div></div>
-        <div class="metric"><div class="num">~1–10 TB</div><div class="label">Storage por nodo</div><div class="note">Antes de sharding.</div></div>
-        <div class="metric"><div class="num">~25–50%</div><div class="label">RAM como buffer pool</div><div class="note">Hot pages residentes.</div></div>
-        <div class="metric"><div class="num">~30 ms</div><div class="label">fsync típico SSD</div><div class="note">Lo que pagas por durabilidad.</div></div>
-        <div class="metric"><div class="num">~1 KB</div><div class="label">Tamaño de WAL record</div><div class="note">Append-only secuencial.</div></div>
-        <div class="metric"><div class="num">3</div><div class="label">Réplicas mínimas</div><div class="note">Quorum para failover.</div></div>
-        <div class="metric"><div class="num">&lt; 1 s</div><div class="label">Replication lag</div><div class="note">Async; sync penaliza p99.</div></div>
-        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min / año.</div></div>
+        <div class="metric"><div class="num">10K QPS</div><div class="label">Por instancia</div><div class="note">~860M queries/día · ~315B/año.<br/>Mix read/write típico 80/20.</div></div>
+        <div class="metric"><div class="num">~1–10 TB</div><div class="label">Storage por nodo</div><div class="note">Antes de sharding.<br/>~3× con réplicas + ~50% para WAL/temp.</div></div>
+        <div class="metric"><div class="num">~25–50%</div><div class="label">RAM como buffer pool</div><div class="note">Ej: 64 GB en nodo de 128 GB.<br/>Hit ratio target &gt; 99% en hot working set.</div></div>
+        <div class="metric"><div class="num">~30 ms</div><div class="label">fsync típico SSD</div><div class="note">~33 commits/s sin group commit.<br/>~3K commits/s con group commit (batch 100).</div></div>
+        <div class="metric"><div class="num">~1 KB</div><div class="label">Tamaño de WAL record</div><div class="note">~10 MB/s a ~10 K writes/s.<br/>~860 GB WAL/día (rotated + archived).</div></div>
+        <div class="metric"><div class="num">3</div><div class="label">Réplicas mínimas</div><div class="note">Quorum mayoritario para failover.<br/>Tolera 1 falla con consenso.</div></div>
+        <div class="metric"><div class="num">&lt; 1 s</div><div class="label">Replication lag</div><div class="note">Async típico ~100 ms.<br/>Sync penaliza p99 commit con +RTT × n.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min/año · ~4 min/mes.<br/>Failover automático &lt; 30 s.</div></div>
       </div>
     </section>
 

@@ -187,19 +187,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> VOD largo (películas, documentales, vlogs), Shorts (videos verticales &lt; 60 s), live streaming (gaming, eventos, deportes), premiere programado, contenido restringido por edad o región, monetización con ads (pre-roll, mid-roll, post-roll), creator dashboard con analytics, family-safe vs maduro.</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>Solo VOD o también live</b>? Live cambia todo: low-latency HLS, ingest, chat, etc.<br/>
+        • ¿<b>DRM</b> obligatorio (Widevine / FairPlay) o solo signed URLs?<br/>
+        • ¿<b>Comments y likes</b> están en este alcance?<br/>
+        • ¿<b>Subtítulos automáticos</b> generados (ASR)?<br/>
+        • ¿<b>Geo-blocking</b> por país (licencias)?<br/>
+        • ¿<b>Monetización</b>: ads, paywall, ambos?<br/>
+        • ¿<b>Privacidad</b>: público / unlisted / privado / paywall?<br/>
+        • ¿<b>Edad / política de contenido</b>: review humana o solo automática?<br/>
+        • ¿<b>Recommendations</b> en este alcance o se asume otro sistema?</p>
+        <p><b>Frase clave:</b> "Asumo VOD público con monetización via ads, sin live ni DRM. Si me pides live, agrego ingest server con low-latency HLS y un servicio de chat al final."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Lo que justifica object storage + CDN en lugar de servir desde el app server.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Resoluciones año/día/min/seg. Lo que justifica object storage + CDN y no servir desde el app server.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">2B</div><div class="label">MAU</div><div class="note">Plataforma global.</div></div>
-        <div class="metric"><div class="num">500 h/min</div><div class="label">Subidas</div><div class="note">~30 PB nuevos / mes.</div></div>
-        <div class="metric"><div class="num">~1B h/día</div><div class="label">Watch time</div><div class="note">Bandwidth dominado por CDN.</div></div>
-        <div class="metric"><div class="num">~300K QPS</div><div class="label">Watch events</div><div class="note">Pipeline analítico.</div></div>
-        <div class="metric"><div class="num">~1 EB</div><div class="label">Storage total</div><div class="note">Activos + archives + thumbs.</div></div>
-        <div class="metric"><div class="num">~5</div><div class="label">Renditions / video</div><div class="note">240p–4K + audio-only.</div></div>
-        <div class="metric"><div class="num">95%+</div><div class="label">Cache hit CDN</div><div class="note">Métrica clave del costo.</div></div>
-        <div class="metric"><div class="num">99.95%</div><div class="label">SLO playback</div><div class="note">~4.4 h / año.</div></div>
+        <div class="metric"><div class="num">2B</div><div class="label">MAU</div><div class="note">Plataforma global.<br/>~500M DAU · ~6K logins/s avg.</div></div>
+        <div class="metric"><div class="num">500 h/min</div><div class="label">Subidas</div><div class="note">~30K h/h · ~720K h/día.<br/>~262M h/año · ~30 PB/mes nuevos.</div></div>
+        <div class="metric"><div class="num">~1B h/día</div><div class="label">Watch time</div><div class="note">~365B h/año · ~42M h/h.<br/>Bandwidth dominado por CDN.</div></div>
+        <div class="metric"><div class="num">~300K QPS</div><div class="label">Watch events</div><div class="note">~26B/día · ~9.5T/año.<br/>Picos tarde-noche por timezone.</div></div>
+        <div class="metric"><div class="num">~1 EB</div><div class="label">Storage total</div><div class="note">+~30 PB/mes nuevos.<br/>Activos calientes + archives + thumbs.</div></div>
+        <div class="metric"><div class="num">~5</div><div class="label">Renditions / video</div><div class="note">240p · 480p · 720p · 1080p · 4K.<br/>+ audio-only para podcasts.</div></div>
+        <div class="metric"><div class="num">95%+</div><div class="label">Cache hit CDN</div><div class="note">Métrica clave del costo.<br/>~5% miss = ~50 PB/mes a origen.</div></div>
+        <div class="metric"><div class="num">99.95%</div><div class="label">SLO playback</div><div class="note">~4.4 h/año · ~21 min/mes.<br/>~43 s/día permitidos.</div></div>
       </div>
     </section>
 

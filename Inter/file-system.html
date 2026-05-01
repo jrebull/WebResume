@@ -187,19 +187,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> Backup automático de fotos del móvil, sync de carpeta de trabajo entre laptop y desktop, compartir folder con team via link, version history para restaurar archivo borrado, trash con retention de 30 días, edición colaborativa de Office docs (Word/Excel), shared drives empresariales con quotas, descarga selectiva (online-only files).</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>Compartir</b> solo a usuarios o también por link público con / sin auth?<br/>
+        • ¿<b>Versioning</b> ilimitado o limit (last N o por tiempo)?<br/>
+        • ¿<b>Trash retention</b>: hard delete después de X días?<br/>
+        • ¿<b>Collab en línea</b> (como Drive Docs) en alcance o aparte?<br/>
+        • ¿<b>Quotas</b> por user / team / org?<br/>
+        • ¿<b>Encryption client-side</b> (zero-knowledge) o server-side?<br/>
+        • ¿<b>Tipo de archivos</b>: cualquier blob o solo office docs?<br/>
+        • ¿<b>Selective sync</b> en cliente (online-only files)?<br/>
+        • ¿<b>Compliance</b> (HIPAA, GDPR, SOC2) en alcance?</p>
+        <p><b>Frase clave:</b> "Asumo cualquier blob, sync delta, versioning con retention 30 días, share por link y por user, encryption server-side, sin collab en línea. Eso me deja un sistema parecido a Dropbox core."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Lo que justifica chunks dedup + metadata DB independiente.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Resoluciones año/día/seg. Lo que justifica chunks dedup + metadata DB independiente.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">1B</div><div class="label">MAU</div><div class="note">~50 GB / user promedio.</div></div>
-        <div class="metric"><div class="num">~50 EB</div><div class="label">Storage total</div><div class="note">Antes de dedup y compresión.</div></div>
-        <div class="metric"><div class="num">~30%</div><div class="label">Ahorro por dedup</div><div class="note">Hash por chunk de 4–8 MB.</div></div>
-        <div class="metric"><div class="num">~1B</div><div class="label">Uploads / día</div><div class="note">~12K/s avg.</div></div>
-        <div class="metric"><div class="num">~10B</div><div class="label">Sync events / día</div><div class="note">~120K/s avg.</div></div>
-        <div class="metric"><div class="num">~50–500 KB</div><div class="label">Metadata por archivo</div><div class="note">Path, ACL, versions.</div></div>
-        <div class="metric"><div class="num">5 días</div><div class="label">TTL chunks huérfanos</div><div class="note">GC asíncrono.</div></div>
-        <div class="metric"><div class="num">99.95%</div><div class="label">SLO disponibilidad</div><div class="note">~4.4 h / año.</div></div>
+        <div class="metric"><div class="num">1B</div><div class="label">MAU</div><div class="note">~300M DAU.<br/>~50 GB / user promedio · ~30M new users/año.</div></div>
+        <div class="metric"><div class="num">~50 EB</div><div class="label">Storage total</div><div class="note">Antes de dedup y compresión.<br/>+~5 EB nuevos/año (10% growth).</div></div>
+        <div class="metric"><div class="num">~30%</div><div class="label">Ahorro por dedup</div><div class="note">Hash SHA256 por chunk de 4–8 MB.<br/>Mayor en docs corporativos repetidos.</div></div>
+        <div class="metric"><div class="num">~1B</div><div class="label">Uploads / día</div><div class="note">~365B/año · ~12K/s avg.<br/>~50K/s pico tarde.</div></div>
+        <div class="metric"><div class="num">~10B</div><div class="label">Sync events / día</div><div class="note">~3.6T/año · ~120K/s avg.<br/>10× picos durante work hours US/EU.</div></div>
+        <div class="metric"><div class="num">~50–500 KB</div><div class="label">Metadata / archivo</div><div class="note">Path, ACL, versions, chunks.<br/>~1 PB metadata DB total.</div></div>
+        <div class="metric"><div class="num">5 días</div><div class="label">TTL chunks huérfanos</div><div class="note">GC asíncrono nocturno.<br/>~5% del storage en orfandad transitoria.</div></div>
+        <div class="metric"><div class="num">99.95%</div><div class="label">SLO disponibilidad</div><div class="note">~4.4 h/año · ~21 min/mes.<br/>~43 s/día permitidos.</div></div>
       </div>
     </section>
 

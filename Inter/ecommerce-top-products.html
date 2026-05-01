@@ -188,19 +188,33 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> Editorial home con "más vendidos", sidebar de "lo más popular ahora", banners en Black Friday / Cyber Monday, dashboard de ops para inventario y supply chain, alertas de stock-out por velocidad de venta, sección "trending" en categoría de buscador.</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿El top es <b>global o por categoría/región/idioma</b>? Esto cambia el cardinality del sorted set.<br/>
+        • ¿Cuántas <b>ventanas de tiempo</b>? 1h/24h vs 7d/30d cambia almacenamiento y precisión.<br/>
+        • ¿<b>Filtrar productos out-of-stock</b> antes o después del ranking?<br/>
+        • ¿<b>Cancelaciones cuentan</b> negativamente o se ignoran?<br/>
+        • ¿Hay <b>boost editorial</b> (productos pinned por marketing)?<br/>
+        • ¿<b>Top global</b> o personalizado por user/cohort?<br/>
+        • ¿Cuál es la <b>métrica de éxito</b>: CTR del top, conversión a venta o GMV?</p>
+        <p><b>Frase clave:</b> "Antes de diseñar quiero saber si el top tiene que ser estrictamente fresco (real-time hard), eventually consistent (segundos), o batch (cada minuto). Eso cambia toda la arquitectura."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Back-of-the-envelope que justifica las decisiones de almacenamiento y caching.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Back-of-the-envelope con resoluciones año/día/segundo. Útil para defender almacenamiento, caching y partition keys.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">10M</div><div class="label">DAU</div><div class="note">Usuarios activos por día.</div></div>
-        <div class="metric"><div class="num">1M</div><div class="label">Órdenes/día</div><div class="note">~12/s avg, ~150/s peak.</div></div>
-        <div class="metric"><div class="num">1K QPS</div><div class="label">Lectura del top</div><div class="note">10K en flash sale.</div></div>
-        <div class="metric"><div class="num">~730 GB</div><div class="label">Storage / año</div><div class="note">Órdenes ≈ 2 KB × 1M/día.</div></div>
-        <div class="metric"><div class="num">~24 MB</div><div class="label">Redis (sorted sets)</div><div class="note">3 ventanas × 1M productos.</div></div>
-        <div class="metric"><div class="num">60/s</div><div class="label">Eventos al stream</div><div class="note">Peak con 5 items/orden.</div></div>
-        <div class="metric"><div class="num">5–30 s</div><div class="label">Edge cache TTL</div><div class="note">Trade frescura vs tráfico.</div></div>
-        <div class="metric"><div class="num">99.9%</div><div class="label">SLO disponibilidad</div><div class="note">~8.7 h / año.</div></div>
+        <div class="metric"><div class="num">10M</div><div class="label">DAU</div><div class="note">~300M/mes · ~3.6B sesiones/año.<br/>~120 sesiones/s avg.</div></div>
+        <div class="metric"><div class="num">1M</div><div class="label">Órdenes/día</div><div class="note">~365M/año · ~30M/mes.<br/>~12/s avg · ~150/s peak (Black Friday).</div></div>
+        <div class="metric"><div class="num">1K QPS</div><div class="label">Lectura del top</div><div class="note">~3.6M/h · ~86M/día.<br/>10K QPS en flash sale.</div></div>
+        <div class="metric"><div class="num">~730 GB</div><div class="label">Storage órdenes/año</div><div class="note">2 KB × 1M = 2 GB/día.<br/>~60 GB/mes; +metadata catálogo.</div></div>
+        <div class="metric"><div class="num">~24 MB</div><div class="label">Redis sorted sets</div><div class="note">3 ventanas × ~1M productos.<br/>Cache redirect: ~10 GB top calientes.</div></div>
+        <div class="metric"><div class="num">60/s</div><div class="label">Eventos al stream</div><div class="note">~5M/día · ~1.8B/año.<br/>5 items/orden × 12 órdenes/s avg.</div></div>
+        <div class="metric"><div class="num">5–30 s</div><div class="label">Edge cache TTL</div><div class="note">Reduce origen ~95%.<br/>~50K req/s al edge en peak.</div></div>
+        <div class="metric"><div class="num">99.9%</div><div class="label">SLO disponibilidad</div><div class="note">~8.7 h / año · ~43 min / mes.<br/>~1.4 min / día permitidos.</div></div>
       </div>
     </section>
 

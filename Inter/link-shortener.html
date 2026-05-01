@@ -187,19 +187,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> Marketing campaign con UTM tracking, links en SMS / Twitter / WhatsApp, QR codes que apuntan a un destino dinámico (puedes cambiarlo después), A/B test de landing pages, vanity URLs personalizados (brand.co/promo), branded short domains de empresa, deep links a apps móviles.</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>Custom alias</b> permitidos para usuarios paid?<br/>
+        • ¿<b>Stats</b>: solo conteo o granular (geo, referrer, device, hora)?<br/>
+        • ¿<b>Bulk creation API</b> para clientes enterprise?<br/>
+        • ¿<b>Multi-region</b> failover o single region?<br/>
+        • ¿<b>Password protect</b> o auth para acceder al destino?<br/>
+        • ¿<b>Deep links</b> a apps móviles con fallback web?<br/>
+        • ¿<b>301 vs 302</b>? 301 lo cachea el browser, 302 das control.<br/>
+        • ¿<b>TTL / expiración</b> de links?<br/>
+        • ¿<b>Anti-malware</b> check obligatorio o best-effort?</p>
+        <p><b>Frase clave:</b> "Asumo links permanentes (sin TTL), 302 redirect, stats granulares async, sin custom aliases. Si me pides paid features (custom domains, password) lo extiendo al final."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>El número clave es el cache hit ratio del redirect.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Resoluciones año/día/seg. El número clave es el cache hit ratio del redirect.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">~100M</div><div class="label">Links / año</div><div class="note">~3/s avg de creación.</div></div>
-        <div class="metric"><div class="num">~100B</div><div class="label">Redirects / año</div><div class="note">~3K/s avg, ~30K en pico.</div></div>
-        <div class="metric"><div class="num">~7</div><div class="label">Caracteres base62</div><div class="note">62⁷ ≈ 3.5 trillón IDs.</div></div>
-        <div class="metric"><div class="num">~500 B</div><div class="label">Tamaño por link</div><div class="note">~50 GB / 100M links.</div></div>
-        <div class="metric"><div class="num">~99% hit</div><div class="label">Cache redirect</div><div class="note">Power-law en links virales.</div></div>
-        <div class="metric"><div class="num">~10 GB</div><div class="label">Cache caliente</div><div class="note">~20M links top.</div></div>
-        <div class="metric"><div class="num">100 GB/día</div><div class="label">Click events</div><div class="note">Pipeline analítico.</div></div>
-        <div class="metric"><div class="num">99.99%</div><div class="label">SLO redirect</div><div class="note">~52 min / año.</div></div>
+        <div class="metric"><div class="num">~100M</div><div class="label">Links / año</div><div class="note">~270K/día · ~3/s avg.<br/>~30/s pico durante campañas.</div></div>
+        <div class="metric"><div class="num">~100B</div><div class="label">Redirects / año</div><div class="note">~270M/día · ~3K/s avg.<br/>~30K/s pico (links virales).</div></div>
+        <div class="metric"><div class="num">~7</div><div class="label">Caracteres base62</div><div class="note">62⁷ ≈ 3.5 trillón IDs únicos.<br/>Usar 6 chars hasta 56B; expandir luego.</div></div>
+        <div class="metric"><div class="num">~500 B</div><div class="label">Tamaño por link</div><div class="note">~50 GB / 100M links.<br/>~500 GB total con metadata + stats.</div></div>
+        <div class="metric"><div class="num">~99% hit</div><div class="label">Cache redirect</div><div class="note">Power-law: top 1% recibe 80% del tráfico.<br/>~30K req/s al edge, ~300/s al origen.</div></div>
+        <div class="metric"><div class="num">~10 GB</div><div class="label">Cache caliente</div><div class="note">~20M links top en RAM.<br/>~10 ms p99 de lookup en Redis.</div></div>
+        <div class="metric"><div class="num">100 GB/día</div><div class="label">Click events</div><div class="note">~36 TB/año · ~3K events/s avg.<br/>Sink: BigQuery / ClickHouse.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO redirect</div><div class="note">~52 min/año · ~4 min/mes.<br/>~8 s/día permitidos.</div></div>
       </div>
     </section>
 

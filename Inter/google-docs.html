@@ -187,19 +187,35 @@
           </ul>
         </div>
       </div>
+
+      <div class="flow-explain">
+        <h4>Cómo aclarar requisitos en la entrevista</h4>
+        <p><b>Casos de uso típicos.</b> Reunión de equipo con 50 personas tomando notas, doc personal con 1 editor (la mayoría), code review en doc, encuesta interna estilo form, template legal con tracked changes, doc compartido por link público (read-only), copy collaborativa con stakeholders externos, edición offline durante vuelo y resync al aterrizar.</p>
+        <p><b>Preguntas que debes hacer:</b></p>
+        <p>• ¿<b>Solo texto</b> o también imágenes, tablas, sheets, slides? Cambia el modelo de datos drásticamente.<br/>
+        • ¿<b>Soporte offline</b> con resync automático?<br/>
+        • ¿<b>Audit log granular</b>: quién cambió qué y cuándo?<br/>
+        • ¿<b>Track changes / suggesting mode</b> con accept/reject?<br/>
+        • ¿<b>Comentarios threaded</b> con replies?<br/>
+        • ¿<b>Embeds</b>: drawings, charts, otros docs?<br/>
+        • ¿<b>Public link</b> con auth opcional o solo invitados?<br/>
+        • ¿<b>Cuántos editores concurrentes</b> deben funcionar bien? 5 vs 100 cambia diseño.<br/>
+        • ¿<b>Extensión / API</b>: third-party plugins?</p>
+        <p><b>Frase clave:</b> "Asumo solo texto, máximo ~100 editores concurrentes en hot doc, comentarios simples, sin embeds. Si me pides shapes, tablas o suggesting mode, lo extiendo al final."</p>
+      </div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Lo que justifica sticky session por documentId y snapshots periódicos.</p></div>
+      <div class="section-head"><h2>Estimaciones de capacidad</h2><p>Resoluciones año/día/seg. Lo que justifica sticky session por documentId y snapshots periódicos.</p></div>
       <div class="metrics">
-        <div class="metric"><div class="num">100M</div><div class="label">MAU</div><div class="note">Suite Google Workspace.</div></div>
-        <div class="metric"><div class="num">~10M</div><div class="label">Editores concurrentes</div><div class="note">En hora pico oficina.</div></div>
-        <div class="metric"><div class="num">~10K ops/s</div><div class="label">Doc caliente</div><div class="note">Reunión grande con 100 cursores.</div></div>
-        <div class="metric"><div class="num">~50–200 B</div><div class="label">Tamaño de op</div><div class="note">Insert/delete pequeño.</div></div>
-        <div class="metric"><div class="num">~5 min</div><div class="label">Snapshot interval</div><div class="note">Acelera carga inicial.</div></div>
-        <div class="metric"><div class="num">~10–50 MB</div><div class="label">Doc + history</div><div class="note">Para 1 año de edición activa.</div></div>
-        <div class="metric"><div class="num">100M+</div><div class="label">Permisos</div><div class="note">Modelo Zanzibar-style.</div></div>
-        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min / año.</div></div>
+        <div class="metric"><div class="num">100M</div><div class="label">MAU</div><div class="note">Suite Workspace.<br/>~30M DAU · ~100K logins/s avg.</div></div>
+        <div class="metric"><div class="num">~10M</div><div class="label">Editores concurrentes</div><div class="note">En hora pico oficina (US/EU work hours).<br/>~50K nuevas conexiones WS/min.</div></div>
+        <div class="metric"><div class="num">~10K ops/s</div><div class="label">Doc caliente</div><div class="note">Reunión grande con ~100 cursores.<br/>Promedio doc normal: ~1 op/s.</div></div>
+        <div class="metric"><div class="num">~50–200 B</div><div class="label">Tamaño de op</div><div class="note">~10K docs activos × 1 op/s = 1 MB/s.<br/>~80 GB/día · ~30 TB/año en op log.</div></div>
+        <div class="metric"><div class="num">~5 min</div><div class="label">Snapshot interval</div><div class="note">~12 snapshots/h × ~1M docs activos = 12M/h.<br/>Compactación nocturna del log.</div></div>
+        <div class="metric"><div class="num">~10–50 MB</div><div class="label">Doc + history</div><div class="note">Para ~1 año de edición activa.<br/>~50 PB total (Google Drive scale).</div></div>
+        <div class="metric"><div class="num">100M+</div><div class="label">Permisos (Zanzibar)</div><div class="note">~1B+ relaciones de acceso.<br/>~100K lookups/s en pico.</div></div>
+        <div class="metric"><div class="num">99.99%</div><div class="label">SLO disponibilidad</div><div class="note">~52 min/año · ~4 min/mes.<br/>~8 s/día permitidos.</div></div>
       </div>
     </section>
 
