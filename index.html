@@ -482,6 +482,96 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+    
+        /* ════ CINEMATIC HERO ════ */
+        .resume-wrapper { display: block; }
+
+        .body-grid { display: flex; }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            background: #0b0d10;
+            color: #e4e0d6;
+            position: relative;
+            overflow: hidden;
+            min-height: 480px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(700px 420px at 18% 82%, rgba(212,176,106,0.10), transparent 65%);
+            pointer-events: none; z-index: 1;
+        }
+
+        .hero-text {
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 70px 24px 70px 60px;
+            position: relative; z-index: 2;
+        }
+
+        .hero-kicker {
+            color: var(--accent-warm);
+            font-size: 0.78em; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 5px;
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .hero-kicker::before {
+            content: '';
+            width: 42px; height: 1px;
+            background: var(--accent-warm);
+        }
+
+        .hero-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3.4rem, 7.2vw, 6.2rem);
+            font-weight: 800;
+            line-height: 0.98;
+            letter-spacing: -1px;
+            color: #f4f1e9;
+            margin: 0 0 8px;
+        }
+
+        .hero .subtitle {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin: 26px 0 0;
+            color: #989da6;
+            font-size: 0.95em;
+            gap: 18px;
+        }
+
+        .hero .subtitle-item i { color: var(--accent-warm); }
+
+        .hero-photo { position: relative; min-height: 380px; }
+
+        .hero-img {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: 50% 18%;
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 30%);
+        }
+
+        .sidebar { padding-top: 34px; }
+
+        @media (max-width: 992px) {
+            .body-grid { flex-direction: column; }
+            .hero { grid-template-columns: 1fr; min-height: 0; }
+            .hero-text { padding: 44px 24px 8px; text-align: center; align-items: center; }
+            .hero .subtitle { justify-content: center; font-size: 0.82em; gap: 8px 14px; }
+            .hero-photo { min-height: 0; aspect-ratio: 1/1; max-width: 420px; margin: 0 auto; width: 100%; }
+            .hero-img {
+                position: relative; inset: auto;
+                -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+                mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -500,8 +590,21 @@
     <!-- ═══════════════ ENGLISH ═══════════════ -->
     <div id="resume-en">
         <div class="resume-wrapper">
+            <header class="hero">
+                <div class="hero-text">
+                    <div class="hero-kicker">Full Stack &amp; AI</div>
+                    <h1 class="hero-name">Javier<br>Rebull</h1>
+                    <div class="subtitle">
+                    <span class="subtitle-item"><i class="fas fa-code"></i> Full Stack Engineering</span>
+                    <span class="subtitle-item"><i class="fas fa-brain"></i> AI &amp; Machine Learning</span>
+                    <span class="subtitle-item"><i class="fas fa-layer-group"></i> Software Architecture</span>
+                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> FinTech</span>
+                </div>
+                </div>
+                <div class="hero-photo"><img src="Images/profile.jpg" alt="Javier Rebull" class="hero-img"></div>
+            </header>
+            <div class="body-grid">
             <aside class="sidebar">
-                <img src="Images/profile.jpg" alt="Javier Rebull Profile" class="profile-pic">
 
                 <h2><i class="fas fa-address-book"></i> Contact</h2>
                 <div class="contact-item"><i class="fas fa-map-marker-alt"></i> Abington, MA</div>
@@ -574,13 +677,6 @@
             </aside>
 
             <main class="main-content">
-                <h1>Javier Rebull <span class="data-badge">Full Stack &amp; AI</span></h1>
-                <div class="subtitle">
-                    <span class="subtitle-item"><i class="fas fa-code"></i> Full Stack Engineering</span>
-                    <span class="subtitle-item"><i class="fas fa-brain"></i> AI &amp; Machine Learning</span>
-                    <span class="subtitle-item"><i class="fas fa-layer-group"></i> Software Architecture</span>
-                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> FinTech</span>
-                </div>
 
                 <div class="section summary">
                     <h2><i class="fas fa-user-tie"></i> Summary</h2>
@@ -774,14 +870,28 @@
                     <a href="/ForecastWC2026" style="color:inherit; text-decoration:none;"><i class="fas fa-futbol"></i> rebull.org/ForecastWC2026</a>
                 </div>
             </main>
+            </div><!-- /body-grid -->
         </div>
     </div>
 
     <!-- ═══════════════ SPANISH ═══════════════ -->
     <div id="resume-es" style="display: none;">
         <div class="resume-wrapper">
+            <header class="hero">
+                <div class="hero-text">
+                    <div class="hero-kicker">Full Stack & IA</div>
+                    <h1 class="hero-name">Javier<br>Rebull</h1>
+                    <div class="subtitle">
+                    <span class="subtitle-item"><i class="fas fa-code"></i> Ingeniería Full Stack</span>
+                    <span class="subtitle-item"><i class="fas fa-brain"></i> IA &amp; Machine Learning</span>
+                    <span class="subtitle-item"><i class="fas fa-layer-group"></i> Arquitectura de Software</span>
+                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> FinTech</span>
+                </div>
+                </div>
+                <div class="hero-photo"><img src="Images/profile.jpg" alt="Javier Rebull" class="hero-img"></div>
+            </header>
+            <div class="body-grid">
             <aside class="sidebar">
-                <img src="Images/profile.jpg" alt="Foto de Perfil Javier Rebull" class="profile-pic">
 
                 <h2><i class="fas fa-address-book"></i> Contacto</h2>
                 <div class="contact-item"><i class="fas fa-map-marker-alt"></i> Abington, MA</div>
@@ -854,13 +964,6 @@
             </aside>
 
             <main class="main-content">
-                <h1>Javier Rebull <span class="data-badge">Full Stack & IA</span></h1>
-                <div class="subtitle">
-                    <span class="subtitle-item"><i class="fas fa-code"></i> Ingeniería Full Stack</span>
-                    <span class="subtitle-item"><i class="fas fa-brain"></i> IA &amp; Machine Learning</span>
-                    <span class="subtitle-item"><i class="fas fa-layer-group"></i> Arquitectura de Software</span>
-                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> FinTech</span>
-                </div>
 
                 <div class="section summary">
                     <h2><i class="fas fa-user-tie"></i> Resumen Profesional</h2>
@@ -1054,14 +1157,28 @@
                     <a href="/ForecastWC2026" style="color:inherit; text-decoration:none;"><i class="fas fa-futbol"></i> rebull.org/ForecastWC2026</a>
                 </div>
             </main>
+            </div><!-- /body-grid -->
         </div>
     </div>
 
     <!-- ═══════════════ CHINESE ═══════════════ -->
     <div id="resume-zh" style="display: none;">
         <div class="resume-wrapper">
+            <header class="hero">
+                <div class="hero-text">
+                    <div class="hero-kicker">全栈 & 人工智能</div>
+                    <h1 class="hero-name">Javier Rebull<br>郝伟</h1>
+                    <div class="subtitle">
+                    <span class="subtitle-item"><i class="fas fa-code"></i> 全栈工程</span>
+                    <span class="subtitle-item"><i class="fas fa-brain"></i> 人工智能与机器学习</span>
+                    <span class="subtitle-item"><i class="fas fa-layer-group"></i> 软件架构</span>
+                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> 金融科技</span>
+                </div>
+                </div>
+                <div class="hero-photo"><img src="Images/profile.jpg" alt="Javier Rebull" class="hero-img"></div>
+            </header>
+            <div class="body-grid">
             <aside class="sidebar">
-                <img src="Images/profile.jpg" alt="Javier Rebull 郝伟 头像" class="profile-pic">
 
                 <h2><i class="fas fa-address-book"></i> 联系方式</h2>
                 <div class="contact-item"><i class="fas fa-map-marker-alt"></i> 美国马萨诸塞州阿宾顿</div>
@@ -1134,13 +1251,6 @@
             </aside>
 
             <main class="main-content">
-                <h1>Javier Rebull 郝伟 <span class="data-badge">全栈 & 人工智能</span></h1>
-                <div class="subtitle">
-                    <span class="subtitle-item"><i class="fas fa-code"></i> 全栈工程</span>
-                    <span class="subtitle-item"><i class="fas fa-brain"></i> 人工智能与机器学习</span>
-                    <span class="subtitle-item"><i class="fas fa-layer-group"></i> 软件架构</span>
-                    <span class="subtitle-item"><i class="fas fa-chart-line"></i> 金融科技</span>
-                </div>
 
                 <div class="section summary">
                     <h2><i class="fas fa-user-tie"></i> 专业概要</h2>
@@ -1334,6 +1444,7 @@
                     <a href="/ForecastWC2026" style="color:inherit; text-decoration:none;"><i class="fas fa-futbol"></i> rebull.org/ForecastWC2026</a>
                 </div>
             </main>
+            </div><!-- /body-grid -->
         </div>
     </div>
 
