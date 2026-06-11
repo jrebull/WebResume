@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Javier Rebull · Galería</title>
+<meta name="description" content="Galería fotográfica de Javier Rebull — sesión 2026.">
+<meta name="theme-color" content="#0f1419">
+<link rel="icon" type="image/jpeg" href="../Images/profile.jpg">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Playfair+Display:wght@600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f1419;color:#e8e6e1;font-family:'DM Sans',sans-serif;min-height:100vh}
+header{text-align:center;padding:56px 20px 34px}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700}
+header p{color:#8b95a0;margin-top:8px;font-size:.92rem;font-weight:300}
+header a.back{display:inline-block;margin-top:16px;color:#64b5f6;text-decoration:none;font-size:.85rem;border:1px solid rgba(100,181,246,.35);border-radius:999px;padding:7px 18px;transition:.2s}
+header a.back:hover{background:rgba(100,181,246,.1)}
+.grid{columns:4 280px;column-gap:14px;max-width:1280px;margin:0 auto;padding:0 18px 60px}
+.ph{break-inside:avoid;margin-bottom:14px;border-radius:12px;overflow:hidden;cursor:zoom-in;background:#161b22}
+.ph img{width:100%;display:block;transition:transform .35s ease,opacity .35s ease}
+.ph:hover img{transform:scale(1.025)}
+.lb{position:fixed;inset:0;background:rgba(8,10,13,.96);display:none;align-items:center;justify-content:center;z-index:100}
+.lb.open{display:flex}
+.lb img{max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 20px 80px rgba(0,0,0,.7)}
+.lb button{position:fixed;background:none;border:none;color:#e8e6e1;font-size:2.2rem;cursor:pointer;padding:18px;opacity:.6;transition:opacity .15s;font-family:inherit}
+.lb button:hover{opacity:1}
+.lb .x{top:10px;right:16px}
+.lb .prev{left:8px;top:50%;transform:translateY(-50%)}
+.lb .next{right:8px;top:50%;transform:translateY(-50%)}
+.lb .count{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:#8b95a0;font-size:.8rem;letter-spacing:1px}
+footer{text-align:center;color:#5a626c;font-size:.75rem;padding:0 0 40px}
+</style></head><body>
+<header>
+  <h1>Javier Rebull · Galería</h1>
+  <p>Sesión fotográfica · 2026</p>
+  <a class="back" href="/">← Volver al resume</a>
+</header>
+<div class="grid">
+    <figure class='ph' onclick='openLb(0)'><img src='../Images/gallery/JavierRebull05808.jpg' alt='Javier Rebull — sesión 2026, foto 1' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(1)'><img src='../Images/gallery/JavierRebull058081.jpg' alt='Javier Rebull — sesión 2026, foto 2' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(2)'><img src='../Images/gallery/JavierRebull05812.jpg' alt='Javier Rebull — sesión 2026, foto 3' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(3)'><img src='../Images/gallery/JavierRebull058121.jpg' alt='Javier Rebull — sesión 2026, foto 4' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(4)'><img src='../Images/gallery/JavierRebull05812_evotobak.jpg' alt='Javier Rebull — sesión 2026, foto 5' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(5)'><img src='../Images/gallery/JavierRebull05838.jpg' alt='Javier Rebull — sesión 2026, foto 6' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(6)'><img src='../Images/gallery/JavierRebull058381.jpg' alt='Javier Rebull — sesión 2026, foto 7' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(7)'><img src='../Images/gallery/JavierRebull05846.jpg' alt='Javier Rebull — sesión 2026, foto 8' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(8)'><img src='../Images/gallery/JavierRebull058461.jpg' alt='Javier Rebull — sesión 2026, foto 9' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(9)'><img src='../Images/gallery/JavierRebull05854.jpg' alt='Javier Rebull — sesión 2026, foto 10' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(10)'><img src='../Images/gallery/JavierRebull058541.jpg' alt='Javier Rebull — sesión 2026, foto 11' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(11)'><img src='../Images/gallery/JavierRebull05858.jpg' alt='Javier Rebull — sesión 2026, foto 12' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(12)'><img src='../Images/gallery/JavierRebull058581.jpg' alt='Javier Rebull — sesión 2026, foto 13' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(13)'><img src='../Images/gallery/JavierRebull05890.jpg' alt='Javier Rebull — sesión 2026, foto 14' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(14)'><img src='../Images/gallery/JavierRebull058901.jpg' alt='Javier Rebull — sesión 2026, foto 15' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(15)'><img src='../Images/gallery/JavierRebull05907.jpg' alt='Javier Rebull — sesión 2026, foto 16' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(16)'><img src='../Images/gallery/JavierRebull059071.jpg' alt='Javier Rebull — sesión 2026, foto 17' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(17)'><img src='../Images/gallery/JavierRebull05919.jpg' alt='Javier Rebull — sesión 2026, foto 18' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(18)'><img src='../Images/gallery/JavierRebull059191.jpg' alt='Javier Rebull — sesión 2026, foto 19' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(19)'><img src='../Images/gallery/JavierRebull05934.jpg' alt='Javier Rebull — sesión 2026, foto 20' loading='lazy'></figure>
+    <figure class='ph' onclick='openLb(20)'><img src='../Images/gallery/JavierRebull059341.jpg' alt='Javier Rebull — sesión 2026, foto 21' loading='lazy'></figure>
+</div>
+<footer>rebull.com</footer>
+<div class="lb" id="lb" onclick="if(event.target===this)closeLb()">
+  <button class="x" onclick="closeLb()" aria-label="Cerrar">✕</button>
+  <button class="prev" onclick="nav(-1);event.stopPropagation()" aria-label="Anterior">‹</button>
+  <img id="lbimg" src="" alt="Javier Rebull">
+  <button class="next" onclick="nav(1);event.stopPropagation()" aria-label="Siguiente">›</button>
+  <div class="count" id="lbcount"></div>
+</div>
+<script>
+const PICS=['../Images/gallery/JavierRebull05808.jpg','../Images/gallery/JavierRebull058081.jpg','../Images/gallery/JavierRebull05812.jpg','../Images/gallery/JavierRebull058121.jpg','../Images/gallery/JavierRebull05812_evotobak.jpg','../Images/gallery/JavierRebull05838.jpg','../Images/gallery/JavierRebull058381.jpg','../Images/gallery/JavierRebull05846.jpg','../Images/gallery/JavierRebull058461.jpg','../Images/gallery/JavierRebull05854.jpg','../Images/gallery/JavierRebull058541.jpg','../Images/gallery/JavierRebull05858.jpg','../Images/gallery/JavierRebull058581.jpg','../Images/gallery/JavierRebull05890.jpg','../Images/gallery/JavierRebull058901.jpg','../Images/gallery/JavierRebull05907.jpg','../Images/gallery/JavierRebull059071.jpg','../Images/gallery/JavierRebull05919.jpg','../Images/gallery/JavierRebull059191.jpg','../Images/gallery/JavierRebull05934.jpg','../Images/gallery/JavierRebull059341.jpg'];
+let cur=0;
+function openLb(i){cur=i;render();document.getElementById('lb').classList.add('open');document.body.style.overflow='hidden'}
+function closeLb(){document.getElementById('lb').classList.remove('open');document.body.style.overflow=''}
+function nav(d){cur=(cur+d+PICS.length)%PICS.length;render()}
+function render(){document.getElementById('lbimg').src=PICS[cur];document.getElementById('lbcount').textContent=(cur+1)+' / '+PICS.length}
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('lb').classList.contains('open'))return;
+  if(e.key==='Escape')closeLb();
+  if(e.key==='ArrowLeft')nav(-1);
+  if(e.key==='ArrowRight')nav(1);
+});
+</script>
+</body></html>
