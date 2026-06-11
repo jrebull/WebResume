@@ -495,7 +495,7 @@
             color: #e4e0d6;
             position: relative;
             overflow: hidden;
-            min-height: 340px;
+            min-height: 225px;
         }
 
         .hero::before {
@@ -507,16 +507,16 @@
 
         .hero-text {
             display: flex; flex-direction: column; justify-content: center;
-            padding: 40px 24px 40px 56px;
+            padding: 26px 24px 26px 48px;
             position: relative; z-index: 2;
         }
 
         .hero-kicker {
             color: var(--accent-warm);
-            font-size: 0.78em; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 5px;
-            display: flex; align-items: center; gap: 14px;
-            margin-bottom: 12px;
+            font-size: 0.7em; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 4px;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 8px;
         }
 
         .hero-kicker::before {
@@ -527,7 +527,7 @@
 
         .hero-name {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(2.6rem, 4.8vw, 4.2rem);
+            font-size: clamp(2rem, 3.4vw, 2.9rem);
             font-weight: 800;
             line-height: 0.98;
             letter-spacing: -1px;
@@ -538,15 +538,15 @@
         .hero .subtitle {
             border-bottom: none;
             padding-bottom: 0;
-            margin: 18px 0 0;
+            margin: 12px 0 0;
             color: #989da6;
-            font-size: 0.95em;
+            font-size: 0.85em;
             gap: 18px;
         }
 
         .hero .subtitle-item i { color: var(--accent-warm); }
 
-        .hero-photo { position: relative; min-height: 300px; }
+        .hero-photo { position: relative; min-height: 200px; }
 
         .hero-img {
             position: absolute; inset: 0;
@@ -572,11 +572,66 @@
             }
         }
 
+    
+        /* ════ TOPBAR FIJO ════ */
+        #topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 9px 18px;
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+
+        #topbar.scrolled {
+            background: rgba(11,13,16,0.86);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom-color: rgba(255,255,255,0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .brand {
+            display: flex; align-items: center; gap: 11px;
+            text-decoration: none;
+            color: #f4f1e9;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700; font-size: 1.02rem;
+            opacity: 0; transform: translateY(-8px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+
+        #topbar.scrolled .brand { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        .brand img {
+            width: 34px; height: 34px; border-radius: 50%;
+            object-fit: cover; object-position: 50% 20%;
+            border: 2px solid rgba(212,176,106,0.65);
+        }
+
+        #topbar .controls {
+            position: static; top: auto; margin: 0;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .resume-wrapper { margin-top: 64px; }
+
+        @media (max-width: 600px) {
+            .brand span { display: none; }
+            #topbar { padding: 8px 10px; }
+            .resume-wrapper { margin-top: 60px; }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="controls">
+    <div id="topbar">
+        <a class="brand" href="#top" aria-label="Javier Rebull">
+            <img src="Images/profile.jpg" alt="Javier Rebull">
+            <span>Javier Rebull</span>
+        </a>
+        <div class="controls">
         <div class="lang-menu">
             <button id="lang-en" class="active" onclick="switchLanguage('en')">ENG</button>
             <button id="lang-es" onclick="switchLanguage('es')">SPA</button>
@@ -585,7 +640,8 @@
         <button class="mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
             <i class="fa-solid fa-circle-half-stroke"></i> Mode
         </button>
-    </div>
+        </div>
+    </div><!-- /topbar -->
 
     <!-- ═══════════════ ENGLISH ═══════════════ -->
     <div id="resume-en">
@@ -1468,6 +1524,12 @@
 
             localStorage.setItem('lang', lang);
         }
+
+        // Topbar: identidad visible al hacer scroll
+        const _tb = document.getElementById('topbar');
+        window.addEventListener('scroll', () => {
+            _tb.classList.toggle('scrolled', window.scrollY > 180);
+        }, { passive: true });
 
         // Init
         (function() {
