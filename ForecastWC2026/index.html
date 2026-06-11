@@ -1,0 +1,525 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mundial 2026 · Pronóstico</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap');
+:root{--bg:#f8f8f6;--card:#ffffff;--line:#e8e8e3;--line2:#d6d6cf;--text:#171a1f;--mut:#646c77;--dim:#9aa1ab;
+--green:#0e7a4e;--green-soft:rgba(14,122,78,.08);--gold:#a8861d}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;color:var(--text);background:var(--bg);min-height:100vh}
+nav{position:sticky;top:0;z-index:50;display:flex;justify-content:center;gap:4px;padding:11px 16px;
+ background:rgba(248,248,246,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);border-top:3px solid var(--green)}
+nav a{color:var(--mut);text-decoration:none;font-size:.85rem;font-weight:600;padding:6px 15px;border-radius:999px;transition:.15s}
+nav a:hover{color:var(--green);background:var(--green-soft)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+/* ---------- HERO ---------- */
+.hero{text-align:center;padding:52px 20px 6px}
+.hero .kicker{color:var(--green);font-weight:700;letter-spacing:2.5px;font-size:.72rem;text-transform:uppercase}
+.hero h1{font-size:clamp(1.9rem,4.2vw,2.9rem);font-weight:900;line-height:1.08;margin:10px 0 8px}
+.hero .sub{color:var(--mut);font-size:.95rem;font-weight:400}
+.champstrip{display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;margin:26px auto 0;max-width:780px;
+ background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 26px;box-shadow:0 1px 3px rgba(23,26,31,.05)}
+.champstrip .cup{font-size:1.7rem}
+.champstrip .who{text-align:left}
+.champstrip .who .lab{font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--gold)}
+.champstrip .who .nm{font-size:1.25rem;font-weight:900;line-height:1.2}
+.champstrip .who .sc{font-size:.78rem;color:var(--mut)}
+.champstrip .sep{width:1px;align-self:stretch;background:var(--line)}
+.podium{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.podium span{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.76rem;font-weight:600;color:var(--text)}
+.podium span small{color:var(--dim);font-weight:400}
+.statsline{margin:18px auto 0;color:var(--dim);font-size:.8rem;letter-spacing:.4px}
+.statsline b{color:var(--mut);font-weight:700}
+/* ---------- SECTION ---------- */
+section{padding:52px 0 4px}
+.sechead{text-align:center;margin-bottom:26px}
+.sechead h2{font-size:1.65rem;font-weight:900}
+.sechead h2 em{font-style:normal;color:var(--green)}
+.sechead p{color:var(--mut);margin-top:5px;font-weight:300;font-size:.9rem}
+/* ---------- RANKING ---------- */
+.rankgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 38px;max-width:1020px;margin:0 auto}
+@media(max-width:860px){.rankgrid{grid-template-columns:1fr}}
+.rrow{display:grid;grid-template-columns:24px 156px 1fr 46px;align-items:center;gap:8px;padding:4px 8px;border-radius:8px;transition:background .15s}
+.rrow:hover{background:#f0f0ec}
+.rrow .rk{color:var(--dim);font-size:.68rem;font-weight:700;text-align:right}
+.rrow .nm{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rrow .bar{height:10px;border-radius:5px;background:#ececе7;background:#ecece7;overflow:hidden}
+.rrow .bar i{display:block;height:100%;border-radius:5px;background:#c2c8d0;min-width:3px}
+.rrow .pc{font-size:.72rem;font-weight:700;color:var(--mut);text-align:right}
+.rrow.top1 .bar i{background:var(--green)}
+.rrow.top1 .nm,.rrow.top1 .pc{color:var(--green);font-weight:800}
+.rrow.top3 .bar i{background:#7e8a98}
+.rrow.top3 .pc{color:var(--text)}
+/* ---------- CHARTS ---------- */
+.charts2{display:flex;gap:16px;flex-wrap:wrap;max-width:1020px;margin:32px auto 0;align-items:stretch}
+.ccard{flex:1;min-width:320px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 1px 3px rgba(23,26,31,.04)}
+.ccard h3{font-size:.98rem;font-weight:800}
+.ccard .cs{color:var(--dim);font-size:.76rem;margin:2px 0 18px}
+.donutbox{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.donut{width:164px;height:164px;border-radius:50%;position:relative;flex:none}
+.donut::after{content:'';position:absolute;inset:32px;border-radius:50%;background:var(--card)}
+.donut b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;font-size:1.05rem;color:var(--green)}
+.donut b small{color:var(--dim);font-size:.58rem;font-weight:600;letter-spacing:1px}
+.dleg{flex:1;min-width:180px}
+.dleg div{display:flex;align-items:center;gap:8px;font-size:.78rem;padding:4px 0;color:var(--mut)}
+.dleg .sw{width:11px;height:11px;border-radius:3px;flex:none;border:1px solid rgba(0,0,0,.06)}
+.dleg b{margin-left:auto;color:var(--text)}
+.gbars{display:flex;align-items:flex-end;gap:8px;height:160px;padding-top:6px}
+.gbar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.gbar i{display:block;width:100%;border-radius:5px 5px 0 0;background:#dfe2e6;transition:background .2s}
+.gbar:hover i{background:var(--green)}
+.gbar b{font-size:.7rem;color:var(--text);margin-bottom:4px}
+.gbar span{font-size:.64rem;color:var(--dim);margin-top:6px;font-weight:700}
+/* ---------- GROUPS ---------- */
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(282px,1fr));gap:14px}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(23,26,31,.04);
+ transition:transform .18s ease,box-shadow .18s ease}
+.gcard:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(23,26,31,.08)}
+.ghead{display:flex;align-items:baseline;justify-content:space-between;padding:12px 16px 8px;border-bottom:1px solid var(--line)}
+.ghead b{font-size:.92rem;font-weight:900;letter-spacing:1px}
+.ghead i{font-style:normal;font-size:.64rem;color:var(--dim);letter-spacing:.5px}
+.trow{display:grid;grid-template-columns:20px 1fr 64px 34px;align-items:center;gap:6px;padding:7px 14px 5px}
+.trow + .trow{border-top:1px solid #f1f1ed}
+.trow .pos{color:var(--dim);font-size:.7rem;font-weight:700;text-align:center}
+.trow .nm{font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trow .tag{font-size:.58rem;font-weight:600;letter-spacing:.4px;text-align:right;color:var(--dim);white-space:nowrap}
+.tag::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:1px;background:#d3d6db}
+.tag.g::before{background:var(--green)}
+.tag.y::before{background:#d9b13b}
+.trow .pts{font-weight:800;font-size:.95rem;text-align:right}
+.trow .pts small{font-weight:400;color:var(--dim);font-size:.6rem;display:block;line-height:1.1}
+.pbar{grid-column:2/5;height:3px;border-radius:2px;background:#f0f0ec;overflow:hidden;margin-top:2px}
+.pbar i{display:block;height:100%;border-radius:2px;background:rgba(14,122,78,.35)}
+details{border-top:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:9px 16px;color:var(--dim);font-size:.72rem;font-weight:700;letter-spacing:.8px;transition:.15s;user-select:none}
+summary:hover{color:var(--green)}
+summary::after{content:'▾';float:right;transition:transform .2s}
+details[open] summary::after{transform:rotate(180deg)}
+.mrow{display:grid;grid-template-columns:1fr 50px 1fr;align-items:center;padding:5px 14px;font-size:.76rem;border-top:1px dashed #ededе8;border-top:1px dashed #edede8}
+.mrow .h{text-align:right;color:var(--mut)}.mrow .a{text-align:left;color:var(--mut)}
+.mrow .s{text-align:center;font-weight:800;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:1px 0;margin:0 7px}
+.mrow .d{grid-column:1/4;text-align:center;color:var(--dim);font-size:.6rem;padding-top:1px}
+/* ---------- THIRDS ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:960px;margin:0 auto}
+.chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-size:.85rem;font-weight:600;box-shadow:0 1px 2px rgba(23,26,31,.04)}
+.chip .rk{color:var(--dim);font-size:.7rem;font-weight:800;width:16px;text-align:center}
+.chip .st{font-size:.62rem;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:999px}
+.chip.ok .st{color:var(--green);background:var(--green-soft)}
+.chip.ko{opacity:.5}
+.chip.ko .st{color:var(--dim);background:#f0f0ec}
+.chip small{color:var(--dim);font-weight:400}
+/* ---------- BRACKET ---------- */
+.bwrap{overflow-x:auto;padding:14px 4px 24px}
+.bracket{display:flex;min-width:1640px;margin:0 auto;align-items:stretch}
+.rnd{display:flex;flex-direction:column;flex:1;min-width:170px;padding:0 13px}
+.rnd .rt{height:28px;text-align:center;color:var(--dim);font-size:.62rem;font-weight:800;letter-spacing:1.6px}
+.rnd .body{flex:1;display:flex;flex-direction:column;justify-content:space-around}
+.pair{flex:1;display:flex;flex-direction:column;justify-content:space-around;position:relative}
+.slot{flex:1;display:flex;align-items:center;position:relative}
+.bm{width:100%;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:7px 9px;font-size:.75rem;
+ box-shadow:0 1px 2px rgba(23,26,31,.04);transition:border-color .15s;position:relative;z-index:2}
+.bm:hover{border-color:var(--green)}
+.bm .mt{display:flex;justify-content:space-between;color:var(--dim);font-size:.58rem;margin-bottom:4px}
+.bm .r{display:flex;justify-content:space-between;align-items:center;padding:2px 0;gap:6px}
+.bm .r .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bm .r .g{font-weight:800;min-width:14px;text-align:center}
+.bm .r.w .n{font-weight:800}
+.bm .r.w .g{color:var(--green)}
+.bm .r.l{color:var(--dim)}
+.bm .pen{margin-top:3px;color:var(--green);font-size:.58rem;font-weight:600}
+.L .pair::after{content:'';position:absolute;right:-13px;top:25%;height:50%;width:12px;border:2px solid var(--line2);border-left:none;border-radius:0 9px 9px 0}
+.L .slot.in::before{content:'';position:absolute;left:-13px;top:50%;width:13px;border-top:2px solid var(--line2)}
+.L .slot.out::after{content:'';position:absolute;right:-13px;top:50%;width:13px;border-top:2px solid var(--line2)}
+.R .pair::after{content:'';position:absolute;left:-13px;top:25%;height:50%;width:12px;border:2px solid var(--line2);border-right:none;border-radius:9px 0 0 9px}
+.R .slot.in::before{content:'';position:absolute;right:-13px;top:50%;width:13px;border-top:2px solid var(--line2)}
+.R .slot.out::after{content:'';position:absolute;left:-13px;top:50%;width:13px;border-top:2px solid var(--line2)}
+.center{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;min-width:212px;padding:28px 13px 0}
+.center .cup{font-size:2rem}
+.fm{width:100%;border:1px solid var(--line2);border-left:3px solid var(--gold);border-radius:12px;padding:10px 11px;font-size:.8rem;background:var(--card);box-shadow:0 2px 8px rgba(23,26,31,.06)}
+.fm .mt{display:flex;justify-content:space-between;color:var(--gold);font-size:.6rem;font-weight:800;letter-spacing:1px;margin-bottom:6px}
+.fm .r{display:flex;justify-content:space-between;padding:3px 0}
+.fm .r.w{font-weight:900}
+.fm .r.w span:last-child{color:var(--green)}
+.fm .r.l{color:var(--dim)}
+.tp{width:100%;border:1px solid var(--line);border-radius:11px;padding:8px 11px;font-size:.7rem;background:var(--card)}
+.tp .mt{color:var(--dim);font-size:.58rem;letter-spacing:1px;margin-bottom:4px;display:flex;justify-content:space-between;font-weight:700}
+.tp .r{display:flex;justify-content:space-between;padding:2px 0}
+.tp .r.w{font-weight:800}.tp .r.l{color:var(--dim)}
+.hint{text-align:center;color:var(--dim);font-size:.68rem;margin-top:-4px;letter-spacing:1px}
+/* ---------- FOOTER ---------- */
+footer{margin-top:58px;border-top:1px solid var(--line);padding:24px 0 42px;color:var(--dim);font-size:.78rem;line-height:1.8;text-align:center}
+footer b{color:var(--mut)}
+@media(max-width:720px){.hero{padding-top:38px}.champstrip{gap:14px;padding:12px 16px}.champstrip .sep{display:none}}
+</style></head><body>
+<nav><a href="#top">Inicio</a><a href="#ranking">Ranking</a><a href="#grupos">Grupos</a><a href="#terceros">Terceros</a><a href="#cuadro">Cuadro final</a></nav>
+<div class="wrap" id="top">
+<div class="hero">
+  <div class="kicker">Canadá · México · Estados Unidos — 11 jun → 19 jul 2026</div>
+  <h1>Copa Mundial 2026 · Pronóstico completo</h1>
+  <div class="sub">Pronósticos de Mi Modelo Inteligente · por Javier Rebull</div>
+  <div class="champstrip">
+    <span class="cup">🏆</span>
+    <div class="who">
+      <div class="lab">CAMPEÓN PRONOSTICADO</div>
+      <div class="nm">🇪🇸 España</div>
+      <div class="sc">Final · España 2–1 Inglaterra · MetLife, NY/NJ · 19 jul</div>
+    </div>
+    <div class="sep"></div>
+    <div class="podium"><span>🥈 Inglaterra <small>11.2%</small></span><span>🥉 Francia <small>13.0%</small></span><span>4º Argentina <small>10.4%</small></span></div>
+  </div>
+  <div class="statsline"><b>48</b> selecciones &nbsp;·&nbsp; <b>104</b> partidos &nbsp;·&nbsp; <b>16</b> sedes &nbsp;·&nbsp; <b>25,000</b> simulaciones</div>
+</div><section id="ranking"><div class="sechead">
+<h2>¿Quién será <em>campeón</em>?</h2>
+<p>Probabilidad de levantar la copa según el modelo · las 48 selecciones</p></div><div class="rankgrid"><div class='rrow top1'><span class='rk'>1</span>
+<span class='nm'>🇪🇸 España</span>
+<span class='bar'><i style='width:100.0%'></i></span>
+<span class='pc'>16.1%</span></div><div class='rrow top3'><span class='rk'>2</span>
+<span class='nm'>🇫🇷 Francia</span>
+<span class='bar'><i style='width:80.7%'></i></span>
+<span class='pc'>13%</span></div><div class='rrow top3'><span class='rk'>3</span>
+<span class='nm'>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span>
+<span class='bar'><i style='width:69.6%'></i></span>
+<span class='pc'>11.2%</span></div><div class='rrow top3'><span class='rk'>4</span>
+<span class='nm'>🇦🇷 Argentina</span>
+<span class='bar'><i style='width:64.6%'></i></span>
+<span class='pc'>10.4%</span></div><div class='rrow '><span class='rk'>5</span>
+<span class='nm'>🇵🇹 Portugal</span>
+<span class='bar'><i style='width:43.5%'></i></span>
+<span class='pc'>7%</span></div><div class='rrow '><span class='rk'>6</span>
+<span class='nm'>🇧🇷 Brasil</span>
+<span class='bar'><i style='width:41.0%'></i></span>
+<span class='pc'>6.6%</span></div><div class='rrow '><span class='rk'>7</span>
+<span class='nm'>🇩🇪 Alemania</span>
+<span class='bar'><i style='width:31.7%'></i></span>
+<span class='pc'>5.1%</span></div><div class='rrow '><span class='rk'>8</span>
+<span class='nm'>🇳🇱 Países Bajos</span>
+<span class='bar'><i style='width:22.4%'></i></span>
+<span class='pc'>3.6%</span></div><div class='rrow '><span class='rk'>9</span>
+<span class='nm'>🇧🇪 Bélgica</span>
+<span class='bar'><i style='width:14.9%'></i></span>
+<span class='pc'>2.4%</span></div><div class='rrow '><span class='rk'>10</span>
+<span class='nm'>🇺🇾 Uruguay</span>
+<span class='bar'><i style='width:13.7%'></i></span>
+<span class='pc'>2.2%</span></div><div class='rrow '><span class='rk'>11</span>
+<span class='nm'>🇨🇴 Colombia</span>
+<span class='bar'><i style='width:13.0%'></i></span>
+<span class='pc'>2.1%</span></div><div class='rrow '><span class='rk'>12</span>
+<span class='nm'>🇲🇦 Marruecos</span>
+<span class='bar'><i style='width:12.4%'></i></span>
+<span class='pc'>2%</span></div><div class='rrow '><span class='rk'>13</span>
+<span class='nm'>🇳🇴 Noruega</span>
+<span class='bar'><i style='width:11.8%'></i></span>
+<span class='pc'>1.9%</span></div><div class='rrow '><span class='rk'>14</span>
+<span class='nm'>🇭🇷 Croacia</span>
+<span class='bar'><i style='width:11.2%'></i></span>
+<span class='pc'>1.8%</span></div><div class='rrow '><span class='rk'>15</span>
+<span class='nm'>🇯🇵 Japón</span>
+<span class='bar'><i style='width:9.9%'></i></span>
+<span class='pc'>1.6%</span></div><div class='rrow '><span class='rk'>16</span>
+<span class='nm'>🇨🇭 Suiza</span>
+<span class='bar'><i style='width:9.3%'></i></span>
+<span class='pc'>1.5%</span></div><div class='rrow '><span class='rk'>17</span>
+<span class='nm'>🇪🇨 Ecuador</span>
+<span class='bar'><i style='width:6.8%'></i></span>
+<span class='pc'>1.1%</span></div><div class='rrow '><span class='rk'>18</span>
+<span class='nm'>🇹🇷 Turquía</span>
+<span class='bar'><i style='width:6.2%'></i></span>
+<span class='pc'>1%</span></div><div class='rrow '><span class='rk'>19</span>
+<span class='nm'>🇲🇽 México</span>
+<span class='bar'><i style='width:5.6%'></i></span>
+<span class='pc'>0.9%</span></div><div class='rrow '><span class='rk'>20</span>
+<span class='nm'>🇺🇸 Estados Unidos</span>
+<span class='bar'><i style='width:5.6%'></i></span>
+<span class='pc'>0.9%</span></div><div class='rrow '><span class='rk'>21</span>
+<span class='nm'>🇸🇳 Senegal</span>
+<span class='bar'><i style='width:5.0%'></i></span>
+<span class='pc'>0.8%</span></div><div class='rrow '><span class='rk'>22</span>
+<span class='nm'>🇦🇹 Austria</span>
+<span class='bar'><i style='width:4.3%'></i></span>
+<span class='pc'>0.7%</span></div><div class='rrow '><span class='rk'>23</span>
+<span class='nm'>🇨🇦 Canadá</span>
+<span class='bar'><i style='width:4.3%'></i></span>
+<span class='pc'>0.7%</span></div><div class='rrow '><span class='rk'>24</span>
+<span class='nm'>🇰🇷 Corea del Sur</span>
+<span class='bar'><i style='width:3.7%'></i></span>
+<span class='pc'>0.6%</span></div><div class='rrow '><span class='rk'>25</span>
+<span class='nm'>🇸🇪 Suecia</span>
+<span class='bar'><i style='width:3.1%'></i></span>
+<span class='pc'>0.5%</span></div><div class='rrow '><span class='rk'>26</span>
+<span class='nm'>🇪🇬 Egipto</span>
+<span class='bar'><i style='width:3.1%'></i></span>
+<span class='pc'>0.5%</span></div><div class='rrow '><span class='rk'>27</span>
+<span class='nm'>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</span>
+<span class='bar'><i style='width:2.5%'></i></span>
+<span class='pc'>0.4%</span></div><div class='rrow '><span class='rk'>28</span>
+<span class='nm'>🇨🇿 Chequia</span>
+<span class='bar'><i style='width:2.5%'></i></span>
+<span class='pc'>0.4%</span></div><div class='rrow '><span class='rk'>29</span>
+<span class='nm'>🇩🇿 Argelia</span>
+<span class='bar'><i style='width:1.9%'></i></span>
+<span class='pc'>0.3%</span></div><div class='rrow '><span class='rk'>30</span>
+<span class='nm'>🇮🇷 Irán</span>
+<span class='bar'><i style='width:1.9%'></i></span>
+<span class='pc'>0.3%</span></div><div class='rrow '><span class='rk'>31</span>
+<span class='nm'>🇵🇾 Paraguay</span>
+<span class='bar'><i style='width:1.9%'></i></span>
+<span class='pc'>0.3%</span></div><div class='rrow '><span class='rk'>32</span>
+<span class='nm'>🇹🇳 Túnez</span>
+<span class='bar'><i style='width:1.2%'></i></span>
+<span class='pc'>0.2%</span></div><div class='rrow '><span class='rk'>33</span>
+<span class='nm'>🇦🇺 Australia</span>
+<span class='bar'><i style='width:1.2%'></i></span>
+<span class='pc'>0.2%</span></div><div class='rrow '><span class='rk'>34</span>
+<span class='nm'>🇨🇮 Costa de Marfil</span>
+<span class='bar'><i style='width:1.2%'></i></span>
+<span class='pc'>0.2%</span></div><div class='rrow '><span class='rk'>35</span>
+<span class='nm'>🇬🇭 Ghana</span>
+<span class='bar'><i style='width:1.2%'></i></span>
+<span class='pc'>0.2%</span></div><div class='rrow '><span class='rk'>36</span>
+<span class='nm'>🇧🇦 Bosnia</span>
+<span class='bar'><i style='width:0.9%'></i></span>
+<span class='pc'>0.15%</span></div><div class='rrow '><span class='rk'>37</span>
+<span class='nm'>🇵🇦 Panamá</span>
+<span class='bar'><i style='width:0.6%'></i></span>
+<span class='pc'>0.1%</span></div><div class='rrow '><span class='rk'>38</span>
+<span class='nm'>🇶🇦 Catar</span>
+<span class='bar'><i style='width:0.6%'></i></span>
+<span class='pc'>0.1%</span></div><div class='rrow '><span class='rk'>39</span>
+<span class='nm'>🇸🇦 Arabia Saudita</span>
+<span class='bar'><i style='width:0.6%'></i></span>
+<span class='pc'>0.1%</span></div><div class='rrow '><span class='rk'>40</span>
+<span class='nm'>🇨🇻 Cabo Verde</span>
+<span class='bar'><i style='width:0.6%'></i></span>
+<span class='pc'>0.1%</span></div><div class='rrow '><span class='rk'>41</span>
+<span class='nm'>🇺🇿 Uzbekistán</span>
+<span class='bar'><i style='width:0.5%'></i></span>
+<span class='pc'>0.08%</span></div><div class='rrow '><span class='rk'>42</span>
+<span class='nm'>🇨🇩 RD Congo</span>
+<span class='bar'><i style='width:0.5%'></i></span>
+<span class='pc'>0.08%</span></div><div class='rrow '><span class='rk'>43</span>
+<span class='nm'>🇯🇴 Jordania</span>
+<span class='bar'><i style='width:0.4%'></i></span>
+<span class='pc'>0.07%</span></div><div class='rrow '><span class='rk'>44</span>
+<span class='nm'>🇮🇶 Irak</span>
+<span class='bar'><i style='width:0.4%'></i></span>
+<span class='pc'>0.07%</span></div><div class='rrow '><span class='rk'>45</span>
+<span class='nm'>🇳🇿 Nueva Zelanda</span>
+<span class='bar'><i style='width:0.4%'></i></span>
+<span class='pc'>0.06%</span></div><div class='rrow '><span class='rk'>46</span>
+<span class='nm'>🇿🇦 Sudáfrica</span>
+<span class='bar'><i style='width:0.4%'></i></span>
+<span class='pc'>0.06%</span></div><div class='rrow '><span class='rk'>47</span>
+<span class='nm'>🇨🇼 Curazao</span>
+<span class='bar'><i style='width:0.2%'></i></span>
+<span class='pc'>0.04%</span></div><div class='rrow '><span class='rk'>48</span>
+<span class='nm'>🇭🇹 Haití</span>
+<span class='bar'><i style='width:0.2%'></i></span>
+<span class='pc'>0.03%</span></div></div><div class='charts2'>
+<div class='ccard'><h3>Fuerza por confederación</h3><div class='cs'>Suma del % de título de sus selecciones</div>
+<div class='donutbox'><div class='donut' style='background:conic-gradient(#0e7a4e 0.0deg 241.0deg,#8b95a3 241.0deg 322.8deg,#b8bfc9 322.8deg 338.7deg,#d5d9df 338.7deg 350.3deg,#e9ebee 350.3deg 360.0deg)'><b>UEFA<small>DOMINA 66.8%</small></b></div>
+<div class='dleg'><div><span class='sw' style='background:#0e7a4e'></span>UEFA · Europa<b>66.8%</b></div><div><span class='sw' style='background:#8b95a3'></span>CONMEBOL · Sudamérica<b>22.7%</b></div><div><span class='sw' style='background:#b8bfc9'></span>CAF · África<b>4.4%</b></div><div><span class='sw' style='background:#d5d9df'></span>AFC/OFC · Asia y Oceanía<b>3.2%</b></div><div><span class='sw' style='background:#e9ebee'></span>CONCACAF · Norteamérica<b>2.7%</b></div></div></div></div>
+<div class='ccard'><h3>Goles pronosticados por grupo</h3><div class='cs'>Total de goles en los 6 partidos de cada grupo</div>
+<div class='gbars'><div class='gbar'><b>9</b><i style='height:64%'></i><span>A</span></div><div class='gbar'><b>12</b><i style='height:86%'></i><span>B</span></div><div class='gbar'><b>11</b><i style='height:79%'></i><span>C</span></div><div class='gbar'><b>10</b><i style='height:71%'></i><span>D</span></div><div class='gbar'><b>11</b><i style='height:79%'></i><span>E</span></div><div class='gbar'><b>10</b><i style='height:71%'></i><span>F</span></div><div class='gbar'><b>10</b><i style='height:71%'></i><span>G</span></div><div class='gbar'><b>12</b><i style='height:86%'></i><span>H</span></div><div class='gbar'><b>14</b><i style='height:100%'></i><span>I</span></div><div class='gbar'><b>14</b><i style='height:100%'></i><span>J</span></div><div class='gbar'><b>11</b><i style='height:79%'></i><span>K</span></div><div class='gbar'><b>11</b><i style='height:79%'></i><span>L</span></div></div></div>
+</div></section><section id="grupos"><div class="sechead">
+<h2>Fase de <em>grupos</em></h2>
+<p>Clasificación pronosticada · la barra muestra el % de avanzar a eliminatorias según el modelo</p></div><div class="groups"><div class='gcard'><div class='ghead'><b>GRUPO A</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇲🇽 México</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>4:1 (+3)</small></span>
+<span class='pbar'><i style='width:87.2%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇰🇷 Corea del Sur</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>5<small>3:2 (+1)</small></span>
+<span class='pbar'><i style='width:70.1%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇨🇿 Chequia</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>4<small>2:2 (0)</small></span>
+<span class='pbar'><i style='width:64.2%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇿🇦 Sudáfrica</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:4 (-4)</small></span>
+<span class='pbar'><i style='width:48.9%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>México 🇲🇽</span><span class='s'>2–0</span><span class='a'>🇿🇦 Sudáfrica</span><span class='d'>11 jun · Cd. de México</span></div><div class='mrow'><span class='h'>Corea del Sur 🇰🇷</span><span class='s'>1–1</span><span class='a'>🇨🇿 Chequia</span><span class='d'>11 jun · Guadalajara</span></div><div class='mrow'><span class='h'>Chequia 🇨🇿</span><span class='s'>1–0</span><span class='a'>🇿🇦 Sudáfrica</span><span class='d'>18 jun · Atlanta</span></div><div class='mrow'><span class='h'>México 🇲🇽</span><span class='s'>1–1</span><span class='a'>🇰🇷 Corea del Sur</span><span class='d'>18 jun · Guadalajara</span></div><div class='mrow'><span class='h'>Chequia 🇨🇿</span><span class='s'>0–1</span><span class='a'>🇲🇽 México</span><span class='d'>24 jun · Cd. de México</span></div><div class='mrow'><span class='h'>Sudáfrica 🇿🇦</span><span class='s'>0–1</span><span class='a'>🇰🇷 Corea del Sur</span><span class='d'>24 jun · Monterrey</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO B</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇨🇭 Suiza</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>5:1 (+4)</small></span>
+<span class='pbar'><i style='width:85.4%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇨🇦 Canadá</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>5:2 (+3)</small></span>
+<span class='pbar'><i style='width:79.8%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇧🇦 Bosnia</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>3<small>2:4 (-2)</small></span>
+<span class='pbar'><i style='width:62.6%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇶🇦 Catar</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:5 (-5)</small></span>
+<span class='pbar'><i style='width:43.5%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Canadá 🇨🇦</span><span class='s'>2–1</span><span class='a'>🇧🇦 Bosnia</span><span class='d'>12 jun · Toronto</span></div><div class='mrow'><span class='h'>Catar 🇶🇦</span><span class='s'>0–2</span><span class='a'>🇨🇭 Suiza</span><span class='d'>13 jun · San Francisco</span></div><div class='mrow'><span class='h'>Suiza 🇨🇭</span><span class='s'>2–0</span><span class='a'>🇧🇦 Bosnia</span><span class='d'>18 jun · Los Ángeles</span></div><div class='mrow'><span class='h'>Canadá 🇨🇦</span><span class='s'>2–0</span><span class='a'>🇶🇦 Catar</span><span class='d'>18 jun · Vancouver</span></div><div class='mrow'><span class='h'>Suiza 🇨🇭</span><span class='s'>1–1</span><span class='a'>🇨🇦 Canadá</span><span class='d'>24 jun · Vancouver</span></div><div class='mrow'><span class='h'>Bosnia 🇧🇦</span><span class='s'>1–0</span><span class='a'>🇶🇦 Catar</span><span class='d'>24 jun · Seattle</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO C</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇧🇷 Brasil</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>9<small>6:0 (+6)</small></span>
+<span class='pbar'><i style='width:96.9%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇲🇦 Marruecos</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>6<small>3:1 (+2)</small></span>
+<span class='pbar'><i style='width:88.7%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>3<small>2:3 (-1)</small></span>
+<span class='pbar'><i style='width:65.6%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇭🇹 Haití</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:7 (-7)</small></span>
+<span class='pbar'><i style='width:15.8%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Brasil 🇧🇷</span><span class='s'>1–0</span><span class='a'>🇲🇦 Marruecos</span><span class='d'>13 jun · Nueva York/NJ</span></div><div class='mrow'><span class='h'>Haití 🇭🇹</span><span class='s'>0–2</span><span class='a'>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</span><span class='d'>13 jun · Boston</span></div><div class='mrow'><span class='h'>Escocia 🏴󠁧󠁢󠁳󠁣󠁴󠁿</span><span class='s'>0–1</span><span class='a'>🇲🇦 Marruecos</span><span class='d'>19 jun · Boston</span></div><div class='mrow'><span class='h'>Brasil 🇧🇷</span><span class='s'>3–0</span><span class='a'>🇭🇹 Haití</span><span class='d'>19 jun · Filadelfia</span></div><div class='mrow'><span class='h'>Escocia 🏴󠁧󠁢󠁳󠁣󠁴󠁿</span><span class='s'>0–2</span><span class='a'>🇧🇷 Brasil</span><span class='d'>24 jun · Miami</span></div><div class='mrow'><span class='h'>Marruecos 🇲🇦</span><span class='s'>2–0</span><span class='a'>🇭🇹 Haití</span><span class='d'>24 jun · Atlanta</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO D</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇺🇸 Estados Unidos</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>4:2 (+2)</small></span>
+<span class='pbar'><i style='width:77.0%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇹🇷 Turquía</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>5<small>3:2 (+1)</small></span>
+<span class='pbar'><i style='width:73.0%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇵🇾 Paraguay</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>4<small>2:2 (0)</small></span>
+<span class='pbar'><i style='width:64.3%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇦🇺 Australia</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>1:4 (-3)</small></span>
+<span class='pbar'><i style='width:58.8%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Estados Unidos 🇺🇸</span><span class='s'>1–0</span><span class='a'>🇵🇾 Paraguay</span><span class='d'>12 jun · Los Ángeles</span></div><div class='mrow'><span class='h'>Australia 🇦🇺</span><span class='s'>0–1</span><span class='a'>🇹🇷 Turquía</span><span class='d'>13 jun · Vancouver</span></div><div class='mrow'><span class='h'>Estados Unidos 🇺🇸</span><span class='s'>2–1</span><span class='a'>🇦🇺 Australia</span><span class='d'>19 jun · Seattle</span></div><div class='mrow'><span class='h'>Turquía 🇹🇷</span><span class='s'>1–1</span><span class='a'>🇵🇾 Paraguay</span><span class='d'>19 jun · San Francisco</span></div><div class='mrow'><span class='h'>Turquía 🇹🇷</span><span class='s'>1–1</span><span class='a'>🇺🇸 Estados Unidos</span><span class='d'>25 jun · Los Ángeles</span></div><div class='mrow'><span class='h'>Paraguay 🇵🇾</span><span class='s'>1–0</span><span class='a'>🇦🇺 Australia</span><span class='d'>25 jun · San Francisco</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO E</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇩🇪 Alemania</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>9<small>6:0 (+6)</small></span>
+<span class='pbar'><i style='width:96.1%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇪🇨 Ecuador</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>6<small>3:1 (+2)</small></span>
+<span class='pbar'><i style='width:86.9%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇨🇮 Costa de Marfil</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>3<small>2:3 (-1)</small></span>
+<span class='pbar'><i style='width:64.2%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇨🇼 Curazao</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:7 (-7)</small></span>
+<span class='pbar'><i style='width:19.0%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Alemania 🇩🇪</span><span class='s'>3–0</span><span class='a'>🇨🇼 Curazao</span><span class='d'>14 jun · Houston</span></div><div class='mrow'><span class='h'>Costa de Marfil 🇨🇮</span><span class='s'>0–1</span><span class='a'>🇪🇨 Ecuador</span><span class='d'>14 jun · Filadelfia</span></div><div class='mrow'><span class='h'>Alemania 🇩🇪</span><span class='s'>2–0</span><span class='a'>🇨🇮 Costa de Marfil</span><span class='d'>20 jun · Toronto</span></div><div class='mrow'><span class='h'>Ecuador 🇪🇨</span><span class='s'>2–0</span><span class='a'>🇨🇼 Curazao</span><span class='d'>20 jun · Kansas City</span></div><div class='mrow'><span class='h'>Curazao 🇨🇼</span><span class='s'>0–2</span><span class='a'>🇨🇮 Costa de Marfil</span><span class='d'>25 jun · Filadelfia</span></div><div class='mrow'><span class='h'>Ecuador 🇪🇨</span><span class='s'>0–1</span><span class='a'>🇩🇪 Alemania</span><span class='d'>25 jun · Nueva York/NJ</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO F</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇳🇱 Países Bajos</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>5:1 (+4)</small></span>
+<span class='pbar'><i style='width:88.2%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇯🇵 Japón</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>4:1 (+3)</small></span>
+<span class='pbar'><i style='width:76.2%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇸🇪 Suecia</span><span class='tag r'>FUERA</span>
+<span class='pts'>3<small>1:3 (-2)</small></span>
+<span class='pbar'><i style='width:62.6%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇹🇳 Túnez</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:5 (-5)</small></span>
+<span class='pbar'><i style='width:43.4%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Países Bajos 🇳🇱</span><span class='s'>1–1</span><span class='a'>🇯🇵 Japón</span><span class='d'>14 jun · Dallas</span></div><div class='mrow'><span class='h'>Suecia 🇸🇪</span><span class='s'>1–0</span><span class='a'>🇹🇳 Túnez</span><span class='d'>14 jun · Monterrey</span></div><div class='mrow'><span class='h'>Países Bajos 🇳🇱</span><span class='s'>2–0</span><span class='a'>🇸🇪 Suecia</span><span class='d'>20 jun · Houston</span></div><div class='mrow'><span class='h'>Túnez 🇹🇳</span><span class='s'>0–2</span><span class='a'>🇯🇵 Japón</span><span class='d'>20 jun · Monterrey</span></div><div class='mrow'><span class='h'>Japón 🇯🇵</span><span class='s'>1–0</span><span class='a'>🇸🇪 Suecia</span><span class='d'>25 jun · Dallas</span></div><div class='mrow'><span class='h'>Túnez 🇹🇳</span><span class='s'>0–2</span><span class='a'>🇳🇱 Países Bajos</span><span class='d'>25 jun · Kansas City</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO G</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇧🇪 Bélgica</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>9<small>6:1 (+5)</small></span>
+<span class='pbar'><i style='width:89.6%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇪🇬 Egipto</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>6<small>3:2 (+1)</small></span>
+<span class='pbar'><i style='width:68.2%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇮🇷 Irán</span><span class='tag r'>FUERA</span>
+<span class='pts'>3<small>1:3 (-2)</small></span>
+<span class='pbar'><i style='width:64.3%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇳🇿 Nueva Zelanda</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:4 (-4)</small></span>
+<span class='pbar'><i style='width:47.8%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Bélgica 🇧🇪</span><span class='s'>2–1</span><span class='a'>🇪🇬 Egipto</span><span class='d'>15 jun · Seattle</span></div><div class='mrow'><span class='h'>Irán 🇮🇷</span><span class='s'>1–0</span><span class='a'>🇳🇿 Nueva Zelanda</span><span class='d'>15 jun · Los Ángeles</span></div><div class='mrow'><span class='h'>Bélgica 🇧🇪</span><span class='s'>2–0</span><span class='a'>🇮🇷 Irán</span><span class='d'>21 jun · Los Ángeles</span></div><div class='mrow'><span class='h'>Nueva Zelanda 🇳🇿</span><span class='s'>0–1</span><span class='a'>🇪🇬 Egipto</span><span class='d'>21 jun · Vancouver</span></div><div class='mrow'><span class='h'>Egipto 🇪🇬</span><span class='s'>1–0</span><span class='a'>🇮🇷 Irán</span><span class='d'>26 jun · Seattle</span></div><div class='mrow'><span class='h'>Nueva Zelanda 🇳🇿</span><span class='s'>0–2</span><span class='a'>🇧🇪 Bélgica</span><span class='d'>26 jun · Vancouver</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO H</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇪🇸 España</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>9<small>6:0 (+6)</small></span>
+<span class='pbar'><i style='width:98.5%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇺🇾 Uruguay</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>6<small>4:1 (+3)</small></span>
+<span class='pbar'><i style='width:84.3%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇸🇦 Arabia Saudita</span><span class='tag r'>FUERA</span>
+<span class='pts'>1<small>1:5 (-4)</small></span>
+<span class='pbar'><i style='width:39.9%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇨🇻 Cabo Verde</span><span class='tag r'>FUERA</span>
+<span class='pts'>1<small>1:6 (-5)</small></span>
+<span class='pbar'><i style='width:32.9%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>España 🇪🇸</span><span class='s'>3–0</span><span class='a'>🇨🇻 Cabo Verde</span><span class='d'>15 jun · Atlanta</span></div><div class='mrow'><span class='h'>Arabia Saudita 🇸🇦</span><span class='s'>0–2</span><span class='a'>🇺🇾 Uruguay</span><span class='d'>15 jun · Miami</span></div><div class='mrow'><span class='h'>España 🇪🇸</span><span class='s'>2–0</span><span class='a'>🇸🇦 Arabia Saudita</span><span class='d'>21 jun · Atlanta</span></div><div class='mrow'><span class='h'>Uruguay 🇺🇾</span><span class='s'>2–0</span><span class='a'>🇨🇻 Cabo Verde</span><span class='d'>21 jun · Miami</span></div><div class='mrow'><span class='h'>Cabo Verde 🇨🇻</span><span class='s'>1–1</span><span class='a'>🇸🇦 Arabia Saudita</span><span class='d'>26 jun · Houston</span></div><div class='mrow'><span class='h'>Uruguay 🇺🇾</span><span class='s'>0–1</span><span class='a'>🇪🇸 España</span><span class='d'>26 jun · Guadalajara</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO I</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇫🇷 Francia</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>9<small>6:1 (+5)</small></span>
+<span class='pbar'><i style='width:95.3%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇳🇴 Noruega</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>4<small>4:2 (+2)</small></span>
+<span class='pbar'><i style='width:82.3%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇸🇳 Senegal</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>4<small>4:3 (+1)</small></span>
+<span class='pbar'><i style='width:62.0%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇮🇶 Irak</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:8 (-8)</small></span>
+<span class='pbar'><i style='width:27.1%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Francia 🇫🇷</span><span class='s'>2–1</span><span class='a'>🇸🇳 Senegal</span><span class='d'>16 jun · Nueva York/NJ</span></div><div class='mrow'><span class='h'>Irak 🇮🇶</span><span class='s'>0–3</span><span class='a'>🇳🇴 Noruega</span><span class='d'>16 jun · Boston</span></div><div class='mrow'><span class='h'>Francia 🇫🇷</span><span class='s'>3–0</span><span class='a'>🇮🇶 Irak</span><span class='d'>22 jun · Filadelfia</span></div><div class='mrow'><span class='h'>Noruega 🇳🇴</span><span class='s'>1–1</span><span class='a'>🇸🇳 Senegal</span><span class='d'>22 jun · Nueva York/NJ</span></div><div class='mrow'><span class='h'>Noruega 🇳🇴</span><span class='s'>0–1</span><span class='a'>🇫🇷 Francia</span><span class='d'>26 jun · Boston</span></div><div class='mrow'><span class='h'>Senegal 🇸🇳</span><span class='s'>2–0</span><span class='a'>🇮🇶 Irak</span><span class='d'>26 jun · Toronto</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO J</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇦🇷 Argentina</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>9<small>7:1 (+6)</small></span>
+<span class='pbar'><i style='width:96.7%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇦🇹 Austria</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>4<small>4:4 (0)</small></span>
+<span class='pbar'><i style='width:67.4%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇩🇿 Argelia</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>4<small>2:3 (-1)</small></span>
+<span class='pbar'><i style='width:57.1%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇯🇴 Jordania</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>1:6 (-5)</small></span>
+<span class='pbar'><i style='width:40.9%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Argentina 🇦🇷</span><span class='s'>2–0</span><span class='a'>🇩🇿 Argelia</span><span class='d'>16 jun · Kansas City</span></div><div class='mrow'><span class='h'>Austria 🇦🇹</span><span class='s'>2–1</span><span class='a'>🇯🇴 Jordania</span><span class='d'>17 jun · San Francisco</span></div><div class='mrow'><span class='h'>Argentina 🇦🇷</span><span class='s'>2–1</span><span class='a'>🇦🇹 Austria</span><span class='d'>22 jun · Dallas</span></div><div class='mrow'><span class='h'>Jordania 🇯🇴</span><span class='s'>0–1</span><span class='a'>🇩🇿 Argelia</span><span class='d'>22 jun · San Francisco</span></div><div class='mrow'><span class='h'>Argelia 🇩🇿</span><span class='s'>1–1</span><span class='a'>🇦🇹 Austria</span><span class='d'>27 jun · Kansas City</span></div><div class='mrow'><span class='h'>Jordania 🇯🇴</span><span class='s'>0–3</span><span class='a'>🇦🇷 Argentina</span><span class='d'>27 jun · Dallas</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO K</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🇵🇹 Portugal</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>5:1 (+4)</small></span>
+<span class='pbar'><i style='width:94.9%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇨🇴 Colombia</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>7<small>4:1 (+3)</small></span>
+<span class='pbar'><i style='width:84.9%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇺🇿 Uzbekistán</span><span class='tag r'>FUERA</span>
+<span class='pts'>1<small>1:4 (-3)</small></span>
+<span class='pbar'><i style='width:22.1%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇨🇩 RD Congo</span><span class='tag r'>FUERA</span>
+<span class='pts'>1<small>1:5 (-4)</small></span>
+<span class='pbar'><i style='width:22.1%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Portugal 🇵🇹</span><span class='s'>2–0</span><span class='a'>🇨🇩 RD Congo</span><span class='d'>17 jun · Boston</span></div><div class='mrow'><span class='h'>Uzbekistán 🇺🇿</span><span class='s'>0–1</span><span class='a'>🇨🇴 Colombia</span><span class='d'>17 jun · Houston</span></div><div class='mrow'><span class='h'>Portugal 🇵🇹</span><span class='s'>2–0</span><span class='a'>🇺🇿 Uzbekistán</span><span class='d'>23 jun · Houston</span></div><div class='mrow'><span class='h'>Colombia 🇨🇴</span><span class='s'>2–0</span><span class='a'>🇨🇩 RD Congo</span><span class='d'>23 jun · Boston</span></div><div class='mrow'><span class='h'>Colombia 🇨🇴</span><span class='s'>1–1</span><span class='a'>🇵🇹 Portugal</span><span class='d'>27 jun · Miami</span></div><div class='mrow'><span class='h'>RD Congo 🇨🇩</span><span class='s'>1–1</span><span class='a'>🇺🇿 Uzbekistán</span><span class='d'>27 jun · Toronto</span></div></details></div><div class='gcard'><div class='ghead'><b>GRUPO L</b><i>PTS · GOLES</i></div>
+<div class='trow'><span class='pos'>1</span>
+<span class='nm'>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>9<small>5:0 (+5)</small></span>
+<span class='pbar'><i style='width:67.5%'></i></span></div><div class='trow'><span class='pos'>2</span>
+<span class='nm'>🇭🇷 Croacia</span><span class='tag g'>CLASIFICA</span>
+<span class='pts'>6<small>4:2 (+2)</small></span>
+<span class='pbar'><i style='width:76.9%'></i></span></div><div class='trow'><span class='pos'>3</span>
+<span class='nm'>🇬🇭 Ghana</span><span class='tag y'>MEJOR 3º</span>
+<span class='pts'>3<small>2:4 (-2)</small></span>
+<span class='pbar'><i style='width:49.5%'></i></span></div><div class='trow'><span class='pos'>4</span>
+<span class='nm'>🇵🇦 Panamá</span><span class='tag r'>FUERA</span>
+<span class='pts'>0<small>0:5 (-5)</small></span>
+<span class='pbar'><i style='width:40.0%'></i></span></div><details><summary>VER LOS 6 PARTIDOS</summary><div class='mrow'><span class='h'>Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class='s'>1–0</span><span class='a'>🇭🇷 Croacia</span><span class='d'>17 jun · Dallas</span></div><div class='mrow'><span class='h'>Ghana 🇬🇭</span><span class='s'>1–0</span><span class='a'>🇵🇦 Panamá</span><span class='d'>16 jun · Toronto</span></div><div class='mrow'><span class='h'>Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class='s'>2–0</span><span class='a'>🇬🇭 Ghana</span><span class='d'>23 jun · Atlanta</span></div><div class='mrow'><span class='h'>Panamá 🇵🇦</span><span class='s'>0–2</span><span class='a'>🇭🇷 Croacia</span><span class='d'>23 jun · Nueva York/NJ</span></div><div class='mrow'><span class='h'>Panamá 🇵🇦</span><span class='s'>0–2</span><span class='a'>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span><span class='d'>27 jun · Nueva York/NJ</span></div><div class='mrow'><span class='h'>Croacia 🇭🇷</span><span class='s'>2–1</span><span class='a'>🇬🇭 Ghana</span><span class='d'>27 jun · Atlanta</span></div></details></div></div></section><section id="terceros"><div class="sechead">
+<h2>Mejores <em>terceros</em></h2>
+<p>Los 8 mejores terceros avanzan · cruces asignados con la tabla oficial FIFA (combinación A·B·C·D·E·I·J·L)</p></div><div class="chips"><div class='chip ok'><span class='rk'>1</span>
+<span>🇸🇳 Senegal <small>· Grupo I · 4 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ok'><span class='rk'>2</span>
+<span>🇨🇿 Chequia <small>· Grupo A · 4 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ok'><span class='rk'>3</span>
+<span>🇵🇾 Paraguay <small>· Grupo D · 4 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ok'><span class='rk'>4</span>
+<span>🇩🇿 Argelia <small>· Grupo J · 4 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ok'><span class='rk'>5</span>
+<span>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia <small>· Grupo C · 3 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ok'><span class='rk'>6</span>
+<span>🇨🇮 Costa de Marfil <small>· Grupo E · 3 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ok'><span class='rk'>7</span>
+<span>🇧🇦 Bosnia <small>· Grupo B · 3 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ok'><span class='rk'>8</span>
+<span>🇬🇭 Ghana <small>· Grupo L · 3 pts</small></span>
+<span class='st'>AVANZA</span></div><div class='chip ko'><span class='rk'>9</span>
+<span>🇸🇪 Suecia <small>· Grupo F · 3 pts</small></span>
+<span class='st'>FUERA</span></div><div class='chip ko'><span class='rk'>10</span>
+<span>🇮🇷 Irán <small>· Grupo G · 3 pts</small></span>
+<span class='st'>FUERA</span></div><div class='chip ko'><span class='rk'>11</span>
+<span>🇺🇿 Uzbekistán <small>· Grupo K · 1 pts</small></span>
+<span class='st'>FUERA</span></div><div class='chip ko'><span class='rk'>12</span>
+<span>🇸🇦 Arabia Saudita <small>· Grupo H · 1 pts</small></span>
+<span class='st'>FUERA</span></div></div></section></div><section id="cuadro"><div class="sechead">
+<h2>Cuadro <em>final</em></h2>
+<p>De dieciseisavos a la final del 19 de julio · marcador del ganador en verde</p></div>
+<div class="hint">← DESLIZA PARA VER EL CUADRO COMPLETO →</div>
+<div class="bwrap"><div class="bracket"><div class='rnd L'><div class='rt'>DIECISEISAVOS</div><div class='body'><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P74</span><span>29 jun · Boston</span></div><div class='r w'><span class='n'>🇩🇪 Alemania</span><span class='g'>2</span></div><div class='r l'><span class='n'>🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</span><span class='g'>0</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P77</span><span>30 jun · Nueva York/NJ</span></div><div class='r w'><span class='n'>🇫🇷 Francia</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇵🇾 Paraguay</span><span class='g'>0</span></div></div></div></div><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P73</span><span>28 jun · Los Ángeles</span></div><div class='r l'><span class='n'>🇰🇷 Corea del Sur</span><span class='g'>1</span></div><div class='r w'><span class='n'>🇨🇦 Canadá</span><span class='g'>2</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P75</span><span>29 jun · Monterrey</span></div><div class='r w'><span class='n'>🇳🇱 Países Bajos</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇲🇦 Marruecos</span><span class='g'>1</span></div></div></div></div><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P83</span><span>2 jul · Toronto</span></div><div class='r w'><span class='n'>🇨🇴 Colombia</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇭🇷 Croacia</span><span class='g'>1</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P84</span><span>2 jul · Los Ángeles</span></div><div class='r w'><span class='n'>🇪🇸 España</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇦🇹 Austria</span><span class='g'>0</span></div></div></div></div><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P81</span><span>1 jul · San Francisco</span></div><div class='r w'><span class='n'>🇺🇸 Estados Unidos</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇧🇦 Bosnia</span><span class='g'>0</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P82</span><span>1 jul · Seattle</span></div><div class='r w'><span class='n'>🇧🇪 Bélgica</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇨🇿 Chequia</span><span class='g'>1</span></div></div></div></div></div></div><div class='rnd L'><div class='rt'>OCTAVOS</div><div class='body'><div class='pair'><div class='slot in'><div class='bm'><div class='mt'><span>P89</span><span>4 jul · Filadelfia</span></div><div class='r l'><span class='n'>🇩🇪 Alemania</span><span class='g'>1</span></div><div class='r w'><span class='n'>🇫🇷 Francia</span><span class='g'>2</span></div></div></div><div class='slot in'><div class='bm'><div class='mt'><span>P90</span><span>4 jul · Houston</span></div><div class='r l'><span class='n'>🇨🇦 Canadá</span><span class='g'>0</span></div><div class='r w'><span class='n'>🇳🇱 Países Bajos</span><span class='g'>2</span></div></div></div></div><div class='pair'><div class='slot in'><div class='bm'><div class='mt'><span>P93</span><span>6 jul · Dallas</span></div><div class='r l'><span class='n'>🇨🇴 Colombia</span><span class='g'>0</span></div><div class='r w'><span class='n'>🇪🇸 España</span><span class='g'>2</span></div></div></div><div class='slot in'><div class='bm'><div class='mt'><span>P94</span><span>6 jul · Seattle</span></div><div class='r l'><span class='n'>🇺🇸 Estados Unidos</span><span class='g'>1</span></div><div class='r w'><span class='n'>🇧🇪 Bélgica</span><span class='g'>2</span></div></div></div></div></div></div><div class='rnd L'><div class='rt'>CUARTOS</div><div class='body'><div class='pair'><div class='slot in'><div class='bm'><div class='mt'><span>P97</span><span>9 jul · Boston</span></div><div class='r w'><span class='n'>🇫🇷 Francia</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇳🇱 Países Bajos</span><span class='g'>1</span></div></div></div><div class='slot in'><div class='bm'><div class='mt'><span>P98</span><span>10 jul · Los Ángeles</span></div><div class='r w'><span class='n'>🇪🇸 España</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇧🇪 Bélgica</span><span class='g'>0</span></div></div></div></div></div></div><div class='rnd L'><div class='rt'>SEMIFINAL</div><div class='body'><div class='slot in out'><div class='bm'><div class='mt'><span>P101</span><span>14 jul · Dallas</span></div><div class='r l'><span class='n'>🇫🇷 Francia</span><span class='g'>1</span></div><div class='r w'><span class='n'>🇪🇸 España</span><span class='g'>2</span></div></div></div></div></div><div class='center'>
+<div class='cup'>🏆</div>
+<div class='fm'><div class='mt'><span>FINAL</span><span>19 jul · MetLife, NY/NJ</span></div>
+<div class='r w'><span>🇪🇸 España</span><span>2</span></div>
+<div class='r l'><span>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span><span>1</span></div></div>
+<div class='tp'><div class='mt'><span>3ER PUESTO</span><span>18 jul · Miami</span></div>
+<div class='r w'><span>🇫🇷 Francia</span><span>2</span></div>
+<div class='r l'><span>🇦🇷 Argentina</span><span>1</span></div></div>
+</div><div class='rnd R'><div class='rt'>SEMIFINAL</div><div class='body'><div class='slot in out'><div class='bm'><div class='mt'><span>P102</span><span>15 jul · Atlanta</span></div><div class='r w'><span class='n'>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span><span class='g'>1</span></div><div class='r l'><span class='n'>🇦🇷 Argentina</span><span class='g'>1</span></div><div class='pen'>Penales 4-2</div></div></div></div></div><div class='rnd R'><div class='rt'>CUARTOS</div><div class='body'><div class='pair'><div class='slot in'><div class='bm'><div class='mt'><span>P99</span><span>11 jul · Miami</span></div><div class='r l'><span class='n'>🇧🇷 Brasil</span><span class='g'>1</span></div><div class='r w'><span class='n'>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span><span class='g'>2</span></div></div></div><div class='slot in'><div class='bm'><div class='mt'><span>P100</span><span>11 jul · Kansas City</span></div><div class='r w'><span class='n'>🇦🇷 Argentina</span><span class='g'>1</span></div><div class='r l'><span class='n'>🇵🇹 Portugal</span><span class='g'>0</span></div></div></div></div></div></div><div class='rnd R'><div class='rt'>OCTAVOS</div><div class='body'><div class='pair'><div class='slot in'><div class='bm'><div class='mt'><span>P91</span><span>5 jul · Nueva York/NJ</span></div><div class='r w'><span class='n'>🇧🇷 Brasil</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇳🇴 Noruega</span><span class='g'>1</span></div></div></div><div class='slot in'><div class='bm'><div class='mt'><span>P92</span><span>5 jul · Cd. de México</span></div><div class='r l'><span class='n'>🇲🇽 México</span><span class='g'>1</span></div><div class='r w'><span class='n'>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span><span class='g'>2</span></div></div></div></div><div class='pair'><div class='slot in'><div class='bm'><div class='mt'><span>P95</span><span>7 jul · Atlanta</span></div><div class='r w'><span class='n'>🇦🇷 Argentina</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇹🇷 Turquía</span><span class='g'>0</span></div></div></div><div class='slot in'><div class='bm'><div class='mt'><span>P96</span><span>7 jul · Vancouver</span></div><div class='r l'><span class='n'>🇨🇭 Suiza</span><span class='g'>1</span></div><div class='r w'><span class='n'>🇵🇹 Portugal</span><span class='g'>2</span></div></div></div></div></div></div><div class='rnd R'><div class='rt'>DIECISEISAVOS</div><div class='body'><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P76</span><span>29 jun · Houston</span></div><div class='r w'><span class='n'>🇧🇷 Brasil</span><span class='g'>1</span></div><div class='r l'><span class='n'>🇯🇵 Japón</span><span class='g'>0</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P78</span><span>30 jun · Dallas</span></div><div class='r l'><span class='n'>🇪🇨 Ecuador</span><span class='g'>1</span></div><div class='r w'><span class='n'>🇳🇴 Noruega</span><span class='g'>2</span></div></div></div></div><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P79</span><span>30 jun · Cd. de México</span></div><div class='r w'><span class='n'>🇲🇽 México</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇨🇮 Costa de Marfil</span><span class='g'>1</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P80</span><span>1 jul · Atlanta</span></div><div class='r w'><span class='n'>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇸🇳 Senegal</span><span class='g'>0</span></div></div></div></div><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P86</span><span>3 jul · Miami</span></div><div class='r w'><span class='n'>🇦🇷 Argentina</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇺🇾 Uruguay</span><span class='g'>1</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P88</span><span>3 jul · Dallas</span></div><div class='r w'><span class='n'>🇹🇷 Turquía</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇪🇬 Egipto</span><span class='g'>1</span></div></div></div></div><div class='pair'><div class='slot'><div class='bm'><div class='mt'><span>P85</span><span>2 jul · Vancouver</span></div><div class='r w'><span class='n'>🇨🇭 Suiza</span><span class='g'>1</span></div><div class='r l'><span class='n'>🇩🇿 Argelia</span><span class='g'>0</span></div></div></div><div class='slot'><div class='bm'><div class='mt'><span>P87</span><span>3 jul · Kansas City</span></div><div class='r w'><span class='n'>🇵🇹 Portugal</span><span class='g'>2</span></div><div class='r l'><span class='n'>🇬🇭 Ghana</span><span class='g'>0</span></div></div></div></div></div></div></div></div></section><div class="wrap"><footer>
+<b>Pronósticos de Mi Modelo Inteligente · Javier Rebull.</b> Los marcadores de la fase de grupos están generados por el modelo
+a partir de 25,000 simulaciones del torneo, calibrando cada resultado con la fuerza relativa de las selecciones (datos al 3 de junio de 2026).
+Las eliminatorias se resuelven a favor del equipo con mayor probabilidad de avance según el mismo modelo.
+Los terceros clasificados y sus cruces siguen el reglamento oficial FIFA 2026.<br>
+Generado el 11 de junio de 2026
+</footer></div></body></html>
