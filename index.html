@@ -769,6 +769,114 @@
             .hero-cta { justify-content: center; }
         }
 
+    
+        /* ════ TOPBAR REFINADO ════ */
+        #topbar {
+            padding: 10px 22px;
+        }
+
+        .brand img {
+            width: 44px; height: 44px;
+            border: 2px solid rgba(212,176,106,0.75);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+        }
+
+        .brand { gap: 13px; }
+
+        .brand-id {
+            display: flex; flex-direction: column; line-height: 1.25;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem; font-weight: 700;
+            color: #f4f1e9;
+        }
+
+        .brand-id small {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.56rem; font-weight: 700;
+            letter-spacing: 2.6px; text-transform: uppercase;
+            color: #d4b06a;
+        }
+
+        /* controles: texto puro, sin caja */
+        #topbar .controls {
+            position: static; margin: 0;
+            background: transparent;
+            border: none; border-radius: 0;
+            box-shadow: none; backdrop-filter: none;
+            padding: 0; gap: 18px;
+            display: flex; align-items: center;
+        }
+
+        .lang-menu { gap: 2px; align-items: center; }
+
+        .lang-menu button {
+            background: transparent !important;
+            border: none;
+            color: rgba(228,224,214,0.5);
+            padding: 5px 9px; border-radius: 0;
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .lang-menu button:hover {
+            color: #f4f1e9;
+            background: transparent;
+            transform: none; box-shadow: none;
+        }
+
+        .lang-menu button.active {
+            background: transparent !important;
+            color: #d4b06a;
+            border-bottom-color: #d4b06a;
+        }
+
+        .mode-toggle {
+            width: 32px; height: 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: transparent;
+            border: 1px solid rgba(228,224,214,0.25);
+            border-radius: 50%;
+            color: rgba(228,224,214,0.65);
+            padding: 0; font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .mode-toggle:hover {
+            color: #d4b06a;
+            border-color: rgba(212,176,106,0.6);
+            background: transparent;
+            transform: none; box-shadow: none;
+        }
+
+        .mode-toggle i { margin: 0; color: inherit; }
+
+        /* el topbar siempre vive sobre oscuro: arriba flota sobre el hero, al bajar se vuelve vidrio */
+        #topbar { background: transparent; }
+
+        #topbar.scrolled {
+            background: rgba(11,13,16,0.88);
+        }
+
+        body.dark-mode #topbar.scrolled { background: rgba(8,9,11,0.88); }
+
+        @media (max-width: 600px) {
+            .brand img { width: 36px; height: 36px; }
+            .brand-id { font-size: 0.92rem; }
+            .brand-id small { display: none; }
+            #topbar .controls { gap: 10px; }
+            .lang-menu button { padding: 4px 6px; font-size: 0.66rem; }
+        }
+
+    
+        /* controles adaptativos: tinta sobre claro (arriba), marfil sobre vidrio (scrolled) */
+        #topbar:not(.scrolled) .lang-menu button { color: var(--text-muted); }
+        #topbar:not(.scrolled) .lang-menu button:hover { color: var(--heading); }
+        #topbar:not(.scrolled) .lang-menu button.active { color: var(--accent); border-bottom-color: var(--accent); }
+        #topbar:not(.scrolled) .mode-toggle { color: var(--text-muted); border-color: var(--border); }
+        #topbar:not(.scrolled) .mode-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
     </style>
 </head>
 <body>
@@ -777,7 +885,7 @@
     <div id="topbar">
         <a class="brand" href="#top" aria-label="Javier Rebull">
             <img src="Images/profile.jpg" alt="Javier Rebull">
-            <span>Javier Rebull</span>
+            <span class="brand-id">Javier Rebull<small>Full Stack &amp; AI</small></span>
         </a>
         <div class="controls">
         <div class="lang-menu">
@@ -785,8 +893,8 @@
             <button id="lang-es" onclick="switchLanguage('es')">SPA</button>
             <button id="lang-zh" onclick="switchLanguage('zh')">中文</button>
         </div>
-        <button class="mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
-            <i class="fa-solid fa-circle-half-stroke"></i> Mode
+        <button class="mode-toggle" onclick="toggleDarkMode()" title="Light / Dark" aria-label="Toggle dark mode">
+            <i class="fa-solid fa-circle-half-stroke"></i>
         </button>
         </div>
     </div><!-- /topbar -->
@@ -816,7 +924,7 @@
             <div class="statsband">
                 <div><b>15<em>+</em></b><span>Years of experience</span></div>
                 <div><b>14</b><span>Certifications</span></div>
-                <div><b>3</b><span>Spoken languages</span></div>
+                <div><b>4</b><span>Spoken languages</span></div>
             </div>
             <div class="body-grid">
             <aside class="sidebar">
@@ -1114,7 +1222,7 @@
             <div class="statsband">
                 <div><b>15<em>+</em></b><span>Años de experiencia</span></div>
                 <div><b>14</b><span>Certificaciones</span></div>
-                <div><b>3</b><span>Idiomas</span></div>
+                <div><b>4</b><span>Idiomas</span></div>
             </div>
             <div class="body-grid">
             <aside class="sidebar">
@@ -1412,7 +1520,7 @@
             <div class="statsband">
                 <div><b>15<em>+</em></b><span>年工作经验</span></div>
                 <div><b>14</b><span>专业认证</span></div>
-                <div><b>3</b><span>语言能力</span></div>
+                <div><b>4</b><span>语言能力</span></div>
             </div>
             <div class="body-grid">
             <aside class="sidebar">
