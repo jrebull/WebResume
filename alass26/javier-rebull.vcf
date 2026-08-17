@@ -8,6 +8,7 @@ TEL;TYPE=CELL,VOICE:+18572429661
 EMAIL;TYPE=INTERNET,PREF:rebull@outlook.com
 URL:https://rebull.org/
 URL;TYPE=WORK:https://epiforecast.mx/
+X-SOCIALPROFILE;TYPE=orcid:https://orcid.org/0009-0008-2089-5274
 X-SOCIALPROFILE;TYPE=linkedin:https://linkedin.com/in/rebull
 X-SOCIALPROFILE;TYPE=github:https://github.com/jrebull
 NOTE:CALASS 2026 - Universite de Montreal, 27-29 August 2026. EpiForecast-MX: weekly epidemiological forecasting across Mexico's 32 federal entities, built with IMSS. https://rebull.org/alass26/
