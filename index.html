@@ -100,7 +100,7 @@
             --sidebar-text: #e4e0d6;
             --sidebar-accent: #d4b06a;
             --text: #2e3033;
-            --text-muted: #75787e;
+            --text-muted: #686b71;
             --heading: #16181b;
             --accent: #97772f;
             --accent-soft: #f1ead8;
@@ -112,6 +112,8 @@
             --card-hover: rgba(151,119,47,0.04);
             --gradient-start: #97772f;
             --gradient-end: #d4b06a;
+            /* bronce con contraste AA sobre el fondo del tema */
+            --accent-strong: #806326;
         }
 
         body.dark-mode {
@@ -133,6 +135,7 @@
             --card-hover: rgba(212,176,106,0.05);
             --gradient-start: #d4b06a;
             --gradient-end: #97772f;
+            --accent-strong: #d4b06a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -773,7 +776,7 @@
             color: #84878d; white-space: nowrap;
         }
 
-        .ticker-track span.tk-sep { color: rgba(212,176,106,0.55); font-size: 0.55rem; letter-spacing: 0; }
+        .ticker-track span.tk-sep { color: rgba(212,176,106,0.8); font-size: 0.55rem; letter-spacing: 0; }
 
         @keyframes tick { to { transform: translateX(-50%); } }
 
@@ -949,14 +952,14 @@
         /* controles adaptativos: tinta sobre claro (arriba), marfil sobre vidrio (scrolled) */
         #topbar:not(.scrolled) .lang-menu button { color: var(--text-muted); }
         #topbar:not(.scrolled) .lang-menu button:hover { color: var(--heading); }
-        #topbar:not(.scrolled) .lang-menu button.active { color: var(--accent); border-bottom-color: var(--accent); }
+        #topbar:not(.scrolled) .lang-menu button.active { color: var(--accent-strong); border-bottom-color: var(--accent-strong); }
         #topbar:not(.scrolled) .mode-toggle { color: var(--text-muted); border-color: var(--border); }
         #topbar:not(.scrolled) .mode-toggle:hover { color: var(--accent); border-color: var(--accent); }
 
         /* ════ ACCESIBILIDAD ════ */
         .skip-link {
             position: absolute; left: -9999px; top: 0; z-index: 400;
-            background: var(--accent); color: #14110a;
+            background: var(--accent); color: #000;
             padding: 11px 20px; border-radius: 0 0 10px 0;
             font-size: 0.78rem; font-weight: 700;
             letter-spacing: 1.2px; text-transform: uppercase;

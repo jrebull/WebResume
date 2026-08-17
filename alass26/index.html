@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Javier Rebull">
 <meta property="og:locale" content="es_MX">
 <meta property="og:title" content="Javier Rebull · CALASS 2026 — EpiForecast-MX">
-<meta property="og:description" content="Pronóstico epidemiológico semanal a 52 semanas para las 32 entidades de México, con selección de modelo auditable por serie. Université de Montréal, 27–29 de agosto de 2026.">
+<meta property="og:description" content="Pronóstico epidemiológico semanal a 52 semanas para las 32 entidades de México: depresión, Parkinson, Alzheimer y dengue, con selección de modelo auditable por serie. Université de Montréal, 27–29 de agosto de 2026.">
 <meta property="og:image" content="https://rebull.org/Images/profile.jpg">
 <meta property="og:url" content="https://rebull.org/alass26/">
 <meta name="twitter:card" content="summary_large_image">
@@ -165,24 +165,24 @@
   }
   .step p{font-size:.9rem;color:var(--muted)}
 
-  /* ── dengue ── */
-  .callout{
-    background:linear-gradient(135deg,rgba(212,176,106,.1),transparent 62%);
-    border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+  /* ── padecimientos ── */
+  .conds{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-top:18px}
+  .cond{
+    background:var(--card);border:1px solid var(--line-soft);
+    border-top:3px solid var(--bronze-deep);border-radius:12px;padding:18px 20px;
   }
-  .callout h3{font-family:'Playfair Display',serif;font-size:1.28rem;font-weight:700;color:var(--cream);margin-bottom:9px}
-  .callout p{font-size:.93rem}
-  table.bt{width:100%;border-collapse:collapse;margin-top:16px;font-size:.86rem}
-  table.bt caption{
-    caption-side:top;text-align:left;color:var(--muted);
-    font-size:.62rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;padding-bottom:9px;
+  .icd{
+    display:inline-block;margin-bottom:9px;padding:3px 10px;border-radius:999px;
+    background:rgba(212,176,106,.12);border:1px solid rgba(212,176,106,.3);
+    color:var(--bronze);font-size:.62rem;font-weight:700;letter-spacing:1.8px;
   }
-  table.bt th,table.bt td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line-soft)}
-  table.bt th{color:var(--muted);font-size:.62rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
-  table.bt td:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--cream)}
-  table.bt tr.best td{color:var(--bronze);font-weight:700}
-  table.bt tr.best td:first-child::after{content:' ✦';color:var(--bronze)}
-  .tablewrap{overflow-x:auto}
+  .cond h3{font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:700;color:var(--cream);margin-bottom:6px}
+  .cond p{font-size:.88rem;color:var(--muted)}
+  .cond-note{
+    margin-top:16px;padding:14px 18px;border-left:3px solid var(--bronze-deep);
+    background:rgba(212,176,106,.05);border-radius:0 10px 10px 0;font-size:.88rem;
+  }
+  .cond-note strong{color:var(--cream)}
 
   /* ── enlaces ── */
   .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
@@ -224,7 +224,7 @@
     .portrait{width:76px;height:76px}
     section{padding:34px 0}
     .figures b{font-size:1.6rem}
-    .callout{padding:18px 17px}
+    .cond{padding:15px 16px}
   }
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
@@ -235,7 +235,7 @@
     .langs{display:none}
     body{background:#fff;color:#111}
     h1{background:none;-webkit-text-fill-color:#111;color:#111}
-    .step,.callout,.link,.figures div{background:none;border-color:#ccc}
+    .step,.cond,.cond-note,.link,.figures div{background:none;border-color:#ccc}
     a{color:#111}
   }
 </style>
@@ -278,9 +278,9 @@
       <div><b>32</b><span data-i18n="fig1">Entidades federativas</span></div>
       <div><b>52</b><span data-i18n="fig2">Semanas de horizonte</span></div>
       <div><b>4</b><span data-i18n="fig3">Padecimientos</span></div>
-      <div><b>333</b><span data-i18n="fig4">Modelos en producción</span></div>
+      <div><b>333</b><span data-i18n="fig4">Modelos neurológicos</span></div>
     </div>
-    <p style="margin-top:16px;font-size:.88rem;color:var(--muted)" data-i18n="figNote">Padecimientos: depresión (CIE-10 F32), enfermedad de Parkinson (G20), enfermedad de Alzheimer (G30) y dengue (A97).</p>
+    <p style="margin-top:16px;font-size:.88rem;color:var(--muted)" data-i18n="figNote">Padecimientos: depresión (CIE-10 F32), enfermedad de Parkinson (G20), enfermedad de Alzheimer (G30) y dengue (A97). La cohorte neurológica suma 333 modelos en producción; el dengue corre por su propio flujo de conteos, con 99 series adicionales.</p>
   </section>
 
   <section>
@@ -306,22 +306,31 @@
   </section>
 
   <section>
-    <h2 data-i18n="h2Dengue">Caso dengue</h2>
-    <div class="callout">
-      <h3 data-i18n="dTitle">Una enfermedad que rompe los supuestos</h3>
-      <p data-i18n="dBody">El dengue se incorporó como cuarto padecimiento precisamente porque su dinámica es distinta: estacionalidad climática, ciclos epidémicos de cuatro a cinco años y series casi nulas fuera de temporada. Los motores basados en árboles no extrapolan esa dinámica a 52 semanas, así que la producción recae en un <strong>GLM binomial negativo</strong> con estacionalidad de Fourier, rezagos y un regresor de <strong>El Niño (ONI)</strong>, que sí carga la señal epidémica interanual.</p>
-      <div class="tablewrap">
-        <table class="bt">
-          <caption data-i18n="dCaption">Retroprueba dejando fuera una epidemia · SMAPE, menor es mejor</caption>
-          <thead><tr><th data-i18n="dCol1">Motor</th><th data-i18n="dCol2">SMAPE</th></tr></thead>
-          <tbody>
-            <tr class="best"><td data-i18n="dR1">GLM binomial negativo + ONI</td><td>52</td></tr>
-            <tr><td data-i18n="dR2">Prophet + ENSO</td><td>76</td></tr>
-            <tr><td data-i18n="dR3">Prophet</td><td>102</td></tr>
-          </tbody>
-        </table>
+    <h2 data-i18n="h2Cond">Los cuatro padecimientos</h2>
+    <p data-i18n="condIntro">Cada uno le exige algo distinto al modelo. Ninguno se resuelve con el mismo supuesto, y por eso la selección se hace serie por serie.</p>
+    <div class="conds">
+      <div class="cond">
+        <span class="icd">CIE-10 F32</span>
+        <h3 data-i18n="c1t">Depresión</h3>
+        <p data-i18n="c1b">Línea base alta, patrón estacional marcado y la ruptura que dejó la COVID en la serie.</p>
+      </div>
+      <div class="cond">
+        <span class="icd">CIE-10 G20</span>
+        <h3 data-i18n="c2t">Enfermedad de Parkinson</h3>
+        <p data-i18n="c2b">Incidencia baja y series estatales volátiles: las de conteo casi nulo se difieren a un agregado regional.</p>
+      </div>
+      <div class="cond">
+        <span class="icd">CIE-10 G30</span>
+        <h3 data-i18n="c3t">Enfermedad de Alzheimer</h3>
+        <p data-i18n="c3b">Tendencia ligada al envejecimiento poblacional, sobre un registro con subnotificación conocida.</p>
+      </div>
+      <div class="cond">
+        <span class="icd">CIE-10 A97</span>
+        <h3 data-i18n="c4t">Dengue</h3>
+        <p data-i18n="c4b">Transmisión vectorial, ciclo epidémico de cuatro a cinco años y series casi nulas fuera de temporada.</p>
       </div>
     </div>
+    <p class="cond-note" data-i18n="condNote">El motor ganador cambia con el padecimiento: en dengue, un <strong>GLM binomial negativo</strong> con regresor de El Niño baja el SMAPE de 102 a 52 en retroprueba, donde los híbridos basados en árboles no extrapolan el ciclo.</p>
   </section>
 
   <section>
@@ -397,8 +406,8 @@
       lead1:"<strong>EpiForecast-MX</strong> est une plateforme d'intelligence épidémiologique développée avec l'<strong>Institut mexicain de sécurité sociale (IMSS)</strong> qui prévoit l'incidence hebdomadaire des maladies dans les 32 entités fédérales du Mexique, sur un horizon de 52 semaines.",
       lead2:"Elle se nourrit uniquement des bulletins publics du Système national de surveillance épidémiologique (SINAVE). Plutôt que d'imposer un seul algorithme à tout le système de surveillance, elle entraîne une bibliothèque de modèles aux hypothèses délibérément différentes et retient, pour chaque série, celui que ses propres données appuient le mieux.",
       h2Figures:'En chiffres',
-      fig1:'Entités fédérales', fig2:'Semaines d’horizon', fig3:'Maladies', fig4:'Modèles en production',
-      figNote:"Maladies : dépression (CIM-10 F32), maladie de Parkinson (G20), maladie d'Alzheimer (G30) et dengue (A97).",
+      fig1:'Entités fédérales', fig2:'Semaines d’horizon', fig3:'Maladies', fig4:'Modèles neurologiques',
+      figNote:"Maladies : dépression (CIM-10 F32), maladie de Parkinson (G20), maladie d'Alzheimer (G30) et dengue (A97). La cohorte neurologique totalise 333 modèles en production ; la dengue suit son propre flux de comptages, avec 99 séries supplémentaires.",
       h2Method:'La méthode',
       s1t:'Des données publiques, extraites et auditées',
       s1b:"Les tableaux des bulletins SINAVE sont extraits des PDF et validés cellule par cellule contre le total imprimé, avant d'être fusionnés dans un jeu de données versionné.",
@@ -408,12 +417,17 @@
       s3b:"Une règle transparente retient un modèle par série selon son exactitude validée, réaffecte les séries à faible incidence à un modèle régional et consigne chaque décision dans un journal justifié.",
       s4t:'Révisable, et non un champion figé',
       s4b:"L'exactitude validée n'a pas à se maintenir lorsque le signal se déplace. La sélection est recalculée à mesure que de nouveaux bulletins arrivent, de sorte que le système reste auditable et responsable en exploitation.",
-      h2Dengue:'Le cas de la dengue',
-      dTitle:'Une maladie qui brise les hypothèses',
-      dBody:"La dengue a été intégrée comme quatrième maladie précisément parce que sa dynamique diffère : saisonnalité climatique, cycles épidémiques de quatre à cinq ans et séries quasi nulles hors saison. Les moteurs à base d'arbres n'extrapolent pas cette dynamique à 52 semaines ; la production repose donc sur un <strong>GLM binomial négatif</strong> avec saisonnalité de Fourier, décalages et un régresseur <strong>El Niño (ONI)</strong>, qui porte le signal épidémique interannuel.",
-      dCaption:'Rétro-test en excluant une épidémie · SMAPE, plus bas est meilleur',
-      dCol1:'Moteur', dCol2:'SMAPE',
-      dR1:'GLM binomial négatif + ONI', dR2:'Prophet + ENSO', dR3:'Prophet',
+      h2Cond:'Les quatre maladies',
+      condIntro:"Chacune exige autre chose du modèle. Aucune ne se résout avec la même hypothèse, et c'est pourquoi la sélection se fait série par série.",
+      c1t:'Dépression',
+      c1b:'Base élevée, saisonnalité marquée et la rupture laissée par la COVID dans la série.',
+      c2t:'Maladie de Parkinson',
+      c2b:'Faible incidence et séries régionales volatiles : celles dont le compte est quasi nul sont reportées sur un agrégat régional.',
+      c3t:"Maladie d'Alzheimer",
+      c3b:'Tendance liée au vieillissement de la population, sur un registre à sous-déclaration connue.',
+      c4t:'Dengue',
+      c4b:'Transmission vectorielle, cycle épidémique de quatre à cinq ans et séries quasi nulles hors saison.',
+      condNote:"Le moteur retenu change selon la maladie : pour la dengue, un <strong>GLM binomial négatif</strong> doté d'un régresseur El Niño ramène le SMAPE de 102 à 52 en rétro-test, là où les hybrides à base d'arbres n'extrapolent pas le cycle.",
       h2Links:'Pour aller plus loin',
       l1t:'epiforecast.mx', l1b:'La plateforme en direct, avec les prévisions publiées',
       l2t:'Article sur Medium', l2b:'Le flux complet du cas dengue, de bout en bout',
@@ -433,8 +447,8 @@
       lead1:'<strong>EpiForecast-MX</strong> is an epidemiological intelligence platform built with the <strong>Mexican Social Security Institute (IMSS)</strong> that forecasts weekly disease incidence across Mexico’s 32 federal entities on a 52-week horizon.',
       lead2:'It is fed entirely by the public bulletins of the National Epidemiological Surveillance System (SINAVE). Rather than imposing one algorithm across an entire surveillance system, it trains a library of models with deliberately different assumptions and keeps, for each series, the one its own evidence supports best.',
       h2Figures:'In numbers',
-      fig1:'Federal entities', fig2:'Week horizon', fig3:'Conditions', fig4:'Models in production',
-      figNote:'Conditions: depression (ICD-10 F32), Parkinson’s disease (G20), Alzheimer’s disease (G30) and dengue (A97).',
+      fig1:'Federal entities', fig2:'Week horizon', fig3:'Conditions', fig4:'Neurological models',
+      figNote:'Conditions: depression (ICD-10 F32), Parkinson’s disease (G20), Alzheimer’s disease (G30) and dengue (A97). The neurological cohort totals 333 production models; dengue runs its own count-based pipeline, with 99 further series.',
       h2Method:'The method',
       s1t:'Public data, extracted and audited',
       s1b:'The tables in the SINAVE bulletins are parsed out of the PDFs and validated cell by cell against the printed total before being merged into a versioned dataset.',
@@ -444,12 +458,17 @@
       s3b:'A transparent rule keeps one model per series based on its validated accuracy, reassigns low-incidence series to a regional model and records every decision in a justified selection log.',
       s4t:'Revisable, not a frozen champion',
       s4b:'Validated accuracy need not persist as the live signal shifts. The selection is recomputed as new bulletins arrive, so the system stays auditable and accountable in deployment.',
-      h2Dengue:'The dengue case',
-      dTitle:'A disease that breaks the assumptions',
-      dBody:'Dengue was added as a fourth condition precisely because its dynamics differ: climate-driven seasonality, four-to-five-year epidemic cycles and near-zero off-season series. Tree-based engines do not extrapolate that dynamic across 52 weeks, so production rests on a <strong>Negative-Binomial GLM</strong> with Fourier seasonality, lags and an <strong>El Niño (ONI)</strong> regressor, which does carry the inter-annual epidemic signal.',
-      dCaption:'Leave-one-epidemic-out backtest · SMAPE, lower is better',
-      dCol1:'Engine', dCol2:'SMAPE',
-      dR1:'Negative-Binomial GLM + ONI', dR2:'Prophet + ENSO', dR3:'Prophet',
+      h2Cond:'The four conditions',
+      condIntro:'Each one asks something different of the model. None is solved by the same assumption, which is why the selection is made series by series.',
+      c1t:'Depression',
+      c1b:'A high baseline, marked seasonality and the break COVID left in the series.',
+      c2t:'Parkinson’s disease',
+      c2b:'Low incidence and volatile per-state series: those with near-zero counts defer to a regional aggregate.',
+      c3t:'Alzheimer’s disease',
+      c3b:'A trend tied to population ageing, over a registry with known under-reporting.',
+      c4t:'Dengue',
+      c4b:'Vector-borne transmission, a four-to-five-year epidemic cycle and near-zero off-season series.',
+      condNote:'The winning engine changes with the condition: for dengue, a <strong>Negative-Binomial GLM</strong> with an El Niño regressor brings SMAPE from 102 down to 52 in backtest, where tree-based hybrids fail to extrapolate the cycle.',
       h2Links:'Go deeper',
       l1t:'epiforecast.mx', l1b:'The live platform, with the published forecasts',
       l2t:'Article on Medium', l2b:'The full dengue workflow, end to end',
