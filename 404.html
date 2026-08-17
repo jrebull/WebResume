@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Javier Rebull</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e1013">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230e1013'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='31' font-weight='700' fill='%23d4b06a' text-anchor='middle'%3EJR%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Playfair+Display:wght@700;800&display=swap">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:6px;
+    background:#0e1013;color:#e4e0d6;
+    font-family:'DM Sans',system-ui,sans-serif;
+    text-align:center;padding:32px 20px;
+  }
+  .code{
+    font-family:'Playfair Display',serif;
+    font-size:clamp(4.5rem,16vw,9rem);font-weight:800;line-height:1;
+    background:linear-gradient(125deg,#f7f3e9 25%,#ecd9a8 70%,#c9a35c 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .kicker{
+    color:#d4b06a;font-size:.68rem;font-weight:700;
+    letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;
+  }
+  p{color:#84878d;font-size:.95rem;max-width:34ch;margin:10px 0 26px}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+  a{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:11px 24px;border-radius:999px;
+    font-size:.75rem;font-weight:700;letter-spacing:1.2px;
+    text-transform:uppercase;text-decoration:none;
+    transition:transform .2s,background .2s,box-shadow .2s;
+  }
+  .gold{background:linear-gradient(135deg,#e3c27e,#b08c46);color:#171204;box-shadow:0 6px 22px rgba(212,176,106,.25)}
+  .gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,176,106,.4)}
+  .ghost{border:1px solid rgba(212,176,106,.45);color:#ead9b4}
+  .ghost:hover{background:rgba(212,176,106,.12);transform:translateY(-2px)}
+  a:focus-visible{outline:2px solid #d4b06a;outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){a{transition:none}}
+</style>
+</head>
+<body>
+  <div class="kicker">Error 404</div>
+  <div class="code">404</div>
+  <p>This page does not exist. / Esta página no existe. / 此页面不存在。</p>
+  <div class="actions">
+    <a class="gold" href="/">Home · Inicio · 首页</a>
+    <a class="ghost" href="/Galeria/">Gallery</a>
+    <a class="ghost" href="/Javier_Rebull_Resume.pdf" download>Résumé PDF</a>
+  </div>
+</body>
+</html>

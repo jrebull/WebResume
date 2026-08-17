@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /BKs/
+Disallow: /old%20index.html
+
+Sitemap: https://rebull.org/sitemap.xml

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://rebull.org/</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://rebull.org/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://rebull.org/?lang=es"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://rebull.org/?lang=zh"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://rebull.org/"/>
+  </url>
+  <url>
+    <loc>https://rebull.org/Galeria/</loc>
+    <lastmod>2026-06-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://rebull.org/ForecastWC2026/</loc>
+    <lastmod>2026-06-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://rebull.org/Inter/</loc>
+    <lastmod>2026-06-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>
