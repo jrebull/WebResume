@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Rebull;Javier;;;
+FN:Javier Rebull
+TITLE:Senior Full Stack Engineer | AI & ML Specialist | Software Architect
+ADR;TYPE=HOME:;;;Abington;MA;;United States
+TEL;TYPE=CELL,VOICE:+18572429661
+EMAIL;TYPE=INTERNET,PREF:rebull@outlook.com
+URL:https://rebull.org/
+URL;TYPE=WORK:https://epiforecast.mx/
+X-SOCIALPROFILE;TYPE=linkedin:https://linkedin.com/in/rebull
+X-SOCIALPROFILE;TYPE=github:https://github.com/jrebull
+NOTE:CALASS 2026 - Universite de Montreal, 27-29 August 2026. EpiForecast-MX: weekly epidemiological forecasting across Mexico's 32 federal entities, built with IMSS. https://rebull.org/alass26/
+END:VCARD

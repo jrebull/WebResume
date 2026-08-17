@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /BKs/
 Disallow: /old%20index.html
+Disallow: /qr/
 
 Sitemap: https://rebull.org/sitemap.xml

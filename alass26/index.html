@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Javier Rebull · CALASS 2026</title>
+<meta name="description" content="Javier Rebull en CALASS 2026, Université de Montréal, 27–29 de agosto de 2026. EpiForecast-MX: pronóstico epidemiológico semanal para las 32 entidades de México, con el IMSS.">
+<meta name="author" content="Javier Rebull">
+<link rel="canonical" href="https://rebull.org/alass26/">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Javier Rebull">
+<meta property="og:locale" content="es_MX">
+<meta property="og:title" content="Javier Rebull · CALASS 2026 — EpiForecast-MX">
+<meta property="og:description" content="Pronóstico epidemiológico semanal a 52 semanas para las 32 entidades de México, con selección de modelo auditable por serie. Université de Montréal, 27–29 de agosto de 2026.">
+<meta property="og:image" content="https://rebull.org/Images/profile.jpg">
+<meta property="og:url" content="https://rebull.org/alass26/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Javier Rebull · CALASS 2026 — EpiForecast-MX">
+<meta name="twitter:description" content="Pronóstico epidemiológico semanal a 52 semanas para las 32 entidades de México, con selección de modelo auditable por serie.">
+<meta name="twitter:image" content="https://rebull.org/Images/profile.jpg">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230e1013'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='31' font-weight='700' fill='%23d4b06a' text-anchor='middle'%3EJR%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="../Images/profile.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700;800&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "CALASS 2026 — Congrès de l'ALASS",
+  "startDate": "2026-08-27",
+  "endDate": "2026-08-29",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "url": "https://alass.org/",
+  "location": {
+    "@type": "Place",
+    "name": "Université de Montréal",
+    "address": { "@type": "PostalAddress", "addressLocality": "Montréal", "addressRegion": "QC", "addressCountry": "CA" }
+  },
+  "organizer": { "@type": "Organization", "name": "Association Latine pour l'Analyse des Systèmes de Santé (ALASS)", "url": "https://alass.org/" },
+  "performer": {
+    "@type": "Person",
+    "name": "Javier Rebull",
+    "url": "https://rebull.org/",
+    "email": "mailto:rebull@outlook.com",
+    "sameAs": ["https://linkedin.com/in/rebull", "https://github.com/jrebull", "https://medium.com/@rebull"]
+  }
+}
+</script>
+<style>
+  :root{
+    --ink:#0b0d10; --ink-2:#11141a; --card:#14181f;
+    --line:rgba(212,176,106,.18); --line-soft:rgba(255,255,255,.08);
+    --bronze:#d4b06a; --bronze-deep:#b08c46; --cream:#f4f1e9;
+    --muted:#9aa0a9;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  ::selection{background:rgba(212,176,106,.35)}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);color:#d7d4cd;
+    font-family:'DM Sans',system-ui,-apple-system,sans-serif;
+    line-height:1.66;-webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:var(--bronze);text-decoration:none}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--bronze);outline-offset:3px;border-radius:6px}
+  .wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+  /* ── selector de idioma ── */
+  .langs{
+    position:fixed;top:12px;right:12px;z-index:60;display:flex;gap:2px;
+    background:rgba(11,13,16,.78);border:1px solid var(--line-soft);
+    border-radius:999px;padding:5px 7px;backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  .langs button{
+    font-family:inherit;background:none;border:none;color:rgba(228,224,214,.55);
+    font-size:.68rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+    padding:6px 10px;min-height:26px;border-radius:999px;cursor:pointer;transition:.2s;
+  }
+  .langs button:hover{color:var(--cream)}
+  .langs button[aria-pressed="true"]{background:var(--bronze);color:#14110a}
+
+  /* ── hero ── */
+  header.hero{
+    position:relative;overflow:hidden;
+    padding:78px 0 46px;
+    border-bottom:1px solid var(--line);
+  }
+  header.hero::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(760px 420px at 12% 0%,rgba(212,176,106,.13),transparent 62%);
+  }
+  .hero-inner{position:relative;z-index:1;display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+  .portrait{
+    width:104px;height:104px;flex-shrink:0;border-radius:50%;
+    object-fit:cover;object-position:50% 18%;
+    border:2px solid rgba(212,176,106,.6);box-shadow:0 8px 28px rgba(0,0,0,.5);
+  }
+  .hero-copy{flex:1;min-width:250px}
+  .chip{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:6px 15px 6px 12px;margin-bottom:14px;
+    border:1px solid rgba(212,176,106,.45);border-radius:999px;
+    background:rgba(212,176,106,.1);color:#ead9b4;
+    font-size:.6rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;
+  }
+  .dot{
+    width:7px;height:7px;border-radius:50%;background:#e3c27e;flex-shrink:0;
+    box-shadow:0 0 0 0 rgba(227,194,126,.75);animation:pulse 2.6s infinite;
+  }
+  @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(227,194,126,0)}100%{box-shadow:0 0 0 0 rgba(227,194,126,0)}}
+  h1{
+    font-family:'Playfair Display',serif;font-weight:800;
+    font-size:clamp(2.1rem,6.4vw,3rem);line-height:1.02;letter-spacing:-.6px;
+    background:linear-gradient(125deg,#f7f3e9 22%,#ecd9a8 68%,#c9a35c 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:9px;
+  }
+  .role{color:var(--muted);font-size:.93rem}
+  .venue{
+    margin-top:20px;padding-top:18px;border-top:1px solid var(--line-soft);
+    display:flex;flex-wrap:wrap;gap:7px 20px;
+    font-size:.72rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);
+  }
+  .venue b{color:var(--bronze);font-weight:700}
+
+  /* ── secciones ── */
+  section{padding:44px 0;border-bottom:1px solid var(--line-soft)}
+  h2{
+    font-size:.68rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+    color:var(--bronze);margin-bottom:18px;
+    display:flex;align-items:center;gap:14px;
+  }
+  h2::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  .lead{font-size:1.04rem;color:#e0ddd6}
+  .lead strong{color:var(--cream);font-weight:700}
+  p+p{margin-top:13px}
+
+  /* ── cifras ── */
+  .figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:14px;overflow:hidden}
+  .figures div{background:var(--ink-2);padding:20px 12px;text-align:center}
+  .figures b{
+    display:block;font-family:'Playfair Display',serif;
+    font-size:2rem;font-weight:700;line-height:1.1;color:var(--cream);
+  }
+  .figures span{font-size:.6rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted)}
+
+  /* ── método ── */
+  .steps{display:grid;gap:12px}
+  .step{
+    background:var(--card);border:1px solid var(--line-soft);
+    border-left:3px solid var(--bronze-deep);border-radius:12px;padding:17px 20px;
+  }
+  .step h3{
+    font-size:.95rem;font-weight:700;color:var(--cream);margin-bottom:5px;
+    display:flex;align-items:baseline;gap:11px;
+  }
+  .step h3 em{
+    font-style:normal;font-family:'Playfair Display',serif;
+    font-size:.82rem;color:var(--bronze);flex-shrink:0;
+  }
+  .step p{font-size:.9rem;color:var(--muted)}
+
+  /* ── dengue ── */
+  .callout{
+    background:linear-gradient(135deg,rgba(212,176,106,.1),transparent 62%);
+    border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+  }
+  .callout h3{font-family:'Playfair Display',serif;font-size:1.28rem;font-weight:700;color:var(--cream);margin-bottom:9px}
+  .callout p{font-size:.93rem}
+  table.bt{width:100%;border-collapse:collapse;margin-top:16px;font-size:.86rem}
+  table.bt caption{
+    caption-side:top;text-align:left;color:var(--muted);
+    font-size:.62rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;padding-bottom:9px;
+  }
+  table.bt th,table.bt td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line-soft)}
+  table.bt th{color:var(--muted);font-size:.62rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+  table.bt td:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--cream)}
+  table.bt tr.best td{color:var(--bronze);font-weight:700}
+  table.bt tr.best td:first-child::after{content:' ✦';color:var(--bronze)}
+  .tablewrap{overflow-x:auto}
+
+  /* ── enlaces ── */
+  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+  .link{
+    display:flex;align-items:center;gap:13px;
+    background:var(--card);border:1px solid var(--line-soft);border-radius:12px;
+    padding:15px 17px;transition:border-color .22s,transform .22s,background .22s;
+  }
+  .link:hover{border-color:rgba(212,176,106,.55);transform:translateY(-2px);background:#181d25}
+  .link svg{width:19px;height:19px;flex-shrink:0;fill:var(--bronze)}
+  .link span{display:block;color:var(--cream);font-size:.88rem;font-weight:600;line-height:1.35}
+  .link small{display:block;color:var(--muted);font-size:.72rem;font-weight:400;letter-spacing:.2px}
+
+  /* ── contacto ── */
+  .contact{display:flex;flex-wrap:wrap;gap:11px;margin-top:4px}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:12px 24px;border-radius:999px;min-height:44px;
+    font-size:.75rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+    transition:transform .2s,box-shadow .2s,background .2s;
+  }
+  .btn svg{width:15px;height:15px;fill:currentColor}
+  .btn-gold{background:linear-gradient(135deg,#e3c27e,#b08c46);color:#171204;box-shadow:0 6px 22px rgba(212,176,106,.24)}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,176,106,.4)}
+  .btn-ghost{border:1px solid rgba(212,176,106,.45);color:#ead9b4}
+  .btn-ghost:hover{background:rgba(212,176,106,.12);transform:translateY(-2px)}
+
+  footer{padding:32px 0 46px;text-align:center;color:var(--muted);font-size:.74rem}
+  footer a{color:var(--muted);font-weight:600}
+  footer a:hover{color:var(--bronze)}
+  .foot-links{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 20px;margin-bottom:14px;
+    font-size:.7rem;letter-spacing:1.2px;text-transform:uppercase}
+  .foot-links a{display:inline-flex;align-items:center;min-height:26px;padding:3px 0}
+  .updated{opacity:.6;letter-spacing:.6px}
+
+  @media (max-width:600px){
+    header.hero{padding:64px 0 36px}
+    .hero-inner{gap:18px}
+    .portrait{width:76px;height:76px}
+    section{padding:34px 0}
+    .figures b{font-size:1.6rem}
+    .callout{padding:18px 17px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .dot{animation:none}
+    .link:hover,.btn:hover{transform:none}
+  }
+  @media print{
+    .langs{display:none}
+    body{background:#fff;color:#111}
+    h1{background:none;-webkit-text-fill-color:#111;color:#111}
+    .step,.callout,.link,.figures div{background:none;border-color:#ccc}
+    a{color:#111}
+  }
+</style>
+</head>
+<body>
+
+<nav class="langs" role="group" aria-label="Idioma / Langue / Language">
+  <button type="button" data-lang="es" aria-pressed="true"  lang="es">ES</button>
+  <button type="button" data-lang="fr" aria-pressed="false" lang="fr">FR</button>
+  <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <img class="portrait" src="../Images/profile.jpg" alt="Javier Rebull" width="104" height="104">
+    <div class="hero-copy">
+      <span class="chip"><span class="dot" aria-hidden="true"></span><span data-i18n="chip">CALASS 2026 · Montréal</span></span>
+      <h1>Javier Rebull</h1>
+      <p class="role" data-i18n="role">Ingeniero full stack y especialista en IA · Maestría en Inteligencia Artificial y Analítica de Datos, UACJ</p>
+    </div>
+  </div>
+  <div class="wrap venue">
+    <span><b data-i18n="venueDates">27–29 de agosto de 2026</b></span>
+    <span data-i18n="venuePlace">Université de Montréal · Montreal, Canadá</span>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <section>
+    <h2 data-i18n="h2Work">La ponencia</h2>
+    <p class="lead" data-i18n="lead1"><strong>EpiForecast-MX</strong> es una plataforma de inteligencia epidemiológica desarrollada con el <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> que pronostica la incidencia semanal de enfermedades en las 32 entidades federativas de México, con un horizonte de 52 semanas.</p>
+    <p data-i18n="lead2">Se alimenta exclusivamente de los boletines públicos del Sistema Nacional de Vigilancia Epidemiológica (SINAVE). En lugar de imponer un solo algoritmo a todo el sistema de vigilancia, entrena una biblioteca de modelos con supuestos deliberadamente distintos y elige, para cada serie, el que su propia evidencia respalda mejor.</p>
+  </section>
+
+  <section>
+    <h2 data-i18n="h2Figures">En cifras</h2>
+    <div class="figures">
+      <div><b>32</b><span data-i18n="fig1">Entidades federativas</span></div>
+      <div><b>52</b><span data-i18n="fig2">Semanas de horizonte</span></div>
+      <div><b>4</b><span data-i18n="fig3">Padecimientos</span></div>
+      <div><b>333</b><span data-i18n="fig4">Modelos en producción</span></div>
+    </div>
+    <p style="margin-top:16px;font-size:.88rem;color:var(--muted)" data-i18n="figNote">Padecimientos: depresión (CIE-10 F32), enfermedad de Parkinson (G20), enfermedad de Alzheimer (G30) y dengue (A97).</p>
+  </section>
+
+  <section>
+    <h2 data-i18n="h2Method">El método</h2>
+    <div class="steps">
+      <div class="step">
+        <h3><em>01</em><span data-i18n="s1t">Datos públicos, extraídos y auditados</span></h3>
+        <p data-i18n="s1b">Las tablas de los boletines SINAVE se extraen en PDF y se validan celda por celda contra el total impreso, antes de fusionarse en un conjunto versionado.</p>
+      </div>
+      <div class="step">
+        <h3><em>02</em><span data-i18n="s2t">Una biblioteca, no un solo algoritmo</span></h3>
+        <p data-i18n="s2b">Cada serie se entrena con motores de supuestos inductivos distintos: descomposición aditiva estructural, red recurrente probabilística e híbridos basados en árboles. La diversidad del conjunto candidato es lo que cubre la heterogeneidad entre regiones, sexos y periodos.</p>
+      </div>
+      <div class="step">
+        <h3><em>03</em><span data-i18n="s3t">Selección por serie, auditable</span></h3>
+        <p data-i18n="s3b">Una regla transparente elige un modelo por serie según su exactitud validada, reasigna las series de baja incidencia a un modelo regional y registra cada decisión en una bitácora justificada.</p>
+      </div>
+      <div class="step">
+        <h3><em>04</em><span data-i18n="s4t">Revisable, no un campeón congelado</span></h3>
+        <p data-i18n="s4b">La exactitud validada no tiene por qué sostenerse cuando la señal cambia. La selección se recalcula conforme llegan nuevos boletines, de modo que el sistema sigue siendo auditable y responsable en operación.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="h2Dengue">Caso dengue</h2>
+    <div class="callout">
+      <h3 data-i18n="dTitle">Una enfermedad que rompe los supuestos</h3>
+      <p data-i18n="dBody">El dengue se incorporó como cuarto padecimiento precisamente porque su dinámica es distinta: estacionalidad climática, ciclos epidémicos de cuatro a cinco años y series casi nulas fuera de temporada. Los motores basados en árboles no extrapolan esa dinámica a 52 semanas, así que la producción recae en un <strong>GLM binomial negativo</strong> con estacionalidad de Fourier, rezagos y un regresor de <strong>El Niño (ONI)</strong>, que sí carga la señal epidémica interanual.</p>
+      <div class="tablewrap">
+        <table class="bt">
+          <caption data-i18n="dCaption">Retroprueba dejando fuera una epidemia · SMAPE, menor es mejor</caption>
+          <thead><tr><th data-i18n="dCol1">Motor</th><th data-i18n="dCol2">SMAPE</th></tr></thead>
+          <tbody>
+            <tr class="best"><td data-i18n="dR1">GLM binomial negativo + ONI</td><td>52</td></tr>
+            <tr><td data-i18n="dR2">Prophet + ENSO</td><td>76</td></tr>
+            <tr><td data-i18n="dR3">Prophet</td><td>102</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="h2Links">Para profundizar</h2>
+    <div class="links">
+      <a class="link" href="https://epiforecast.mx" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h2v18H3V3zm4 12h3v6H7v-6zm5-6h3v12h-3V9zm5-4h3v16h-3V5z"/></svg>
+        <span data-i18n="l1t">epiforecast.mx<small data-i18n="l1b">La plataforma en vivo, con los pronósticos publicados</small></span>
+      </a>
+      <a class="link" href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v2H4V4zm0 5h16v2H4V9zm0 5h11v2H4v-2zm0 5h11v2H4v-2z"/></svg>
+        <span data-i18n="l2t">Artículo en Medium<small data-i18n="l2b">El flujo completo del caso dengue, de principio a fin</small></span>
+      </a>
+      <a class="link" href="https://rebull.org/" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 9h-3a15 15 0 00-1.2-5.3A8 8 0 0118.9 11zM12 4.2c.8 1.2 1.5 3.1 1.7 6.8h-3.4c.2-3.7.9-5.6 1.7-6.8zM4.3 13h3c.1 2 .5 3.8 1.1 5.3A8 8 0 014.3 13zm3-2h-3a8 8 0 014.1-5.3A15 15 0 007.3 11zm4.7 8.8c-.8-1.2-1.5-3.1-1.7-6.8h3.4c-.2 3.7-.9 5.6-1.7 6.8zm2.7-.5c.6-1.5 1-3.3 1.1-5.3h3a8 8 0 01-4.1 5.3z"/></svg>
+        <span data-i18n="l3t">rebull.org<small data-i18n="l3b">Trayectoria profesional completa y currículum</small></span>
+      </a>
+      <a class="link" href="https://alass.org/" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1a5 5 0 00-5 5v5a5 5 0 0010 0V6a5 5 0 00-5-5zm7 10a7 7 0 01-6 6.9V21h3v2H8v-2h3v-3.1A7 7 0 015 11h2a5 5 0 0010 0h2z"/></svg>
+        <span data-i18n="l4t">alass.org<small data-i18n="l4b">Programa e información del congreso</small></span>
+      </a>
+    </div>
+  </section>
+
+  <section style="border-bottom:none">
+    <h2 data-i18n="h2Contact">Sigamos la conversación</h2>
+    <p style="margin-bottom:18px" data-i18n="contactBody">Si el enfoque te resulta útil para tu sistema de salud, o quieres discutir la selección de modelos por serie, escríbeme durante el congreso o después.</p>
+    <div class="contact">
+      <a class="btn btn-gold" href="mailto:rebull@outlook.com?subject=CALASS%202026">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        <span data-i18n="btnMail">Escríbeme</span>
+      </a>
+      <a class="btn btn-ghost" href="javier-rebull.vcf" download>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-8 2h16v2H4v-2z"/></svg>
+        <span data-i18n="btnVcf">Guardar contacto</span>
+      </a>
+      <a class="btn btn-ghost" href="https://linkedin.com/in/rebull" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 102.5 6 2.5 2.5 0 004.98 3.5zM3 8h4v12H3V8zm6 0h3.8v1.7h.05a4.2 4.2 0 013.75-2c4 0 4.75 2.6 4.75 6V20h-4v-5.6c0-1.35 0-3.1-1.9-3.1s-2.2 1.5-2.2 3v5.7H9V8z"/></svg>
+        <span>LinkedIn</span>
+      </a>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="https://rebull.org/">rebull.org</a>
+      <a href="https://epiforecast.mx" target="_blank" rel="noopener noreferrer">epiforecast.mx</a>
+      <a href="mailto:rebull@outlook.com">rebull@outlook.com</a>
+    </div>
+    <div class="updated">
+      <span data-i18n="updated">Actualizado el</span>
+      <time datetime="2026-08-17">17 · 08 · 2026</time>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  // El español vive en el HTML (funciona sin JS); FR y EN se sustituyen desde aquí.
+  var DICT = {
+    fr: {
+      chip:'CALASS 2026 · Montréal',
+      role:"Ingénieur full stack et spécialiste en IA · Master en intelligence artificielle et analytique de données, UACJ",
+      venueDates:'27–29 août 2026',
+      venuePlace:'Université de Montréal · Montréal, Canada',
+      h2Work:'La communication',
+      lead1:"<strong>EpiForecast-MX</strong> est une plateforme d'intelligence épidémiologique développée avec l'<strong>Institut mexicain de sécurité sociale (IMSS)</strong> qui prévoit l'incidence hebdomadaire des maladies dans les 32 entités fédérales du Mexique, sur un horizon de 52 semaines.",
+      lead2:"Elle se nourrit uniquement des bulletins publics du Système national de surveillance épidémiologique (SINAVE). Plutôt que d'imposer un seul algorithme à tout le système de surveillance, elle entraîne une bibliothèque de modèles aux hypothèses délibérément différentes et retient, pour chaque série, celui que ses propres données appuient le mieux.",
+      h2Figures:'En chiffres',
+      fig1:'Entités fédérales', fig2:'Semaines d’horizon', fig3:'Maladies', fig4:'Modèles en production',
+      figNote:"Maladies : dépression (CIM-10 F32), maladie de Parkinson (G20), maladie d'Alzheimer (G30) et dengue (A97).",
+      h2Method:'La méthode',
+      s1t:'Des données publiques, extraites et auditées',
+      s1b:"Les tableaux des bulletins SINAVE sont extraits des PDF et validés cellule par cellule contre le total imprimé, avant d'être fusionnés dans un jeu de données versionné.",
+      s2t:'Une bibliothèque, pas un seul algorithme',
+      s2b:"Chaque série est entraînée avec des moteurs aux hypothèses inductives distinctes : décomposition additive structurelle, réseau récurrent probabiliste et hybrides à base d'arbres. C'est la diversité du vivier de candidats qui couvre l'hétérogénéité entre régions, sexes et périodes.",
+      s3t:'Une sélection par série, auditable',
+      s3b:"Une règle transparente retient un modèle par série selon son exactitude validée, réaffecte les séries à faible incidence à un modèle régional et consigne chaque décision dans un journal justifié.",
+      s4t:'Révisable, et non un champion figé',
+      s4b:"L'exactitude validée n'a pas à se maintenir lorsque le signal se déplace. La sélection est recalculée à mesure que de nouveaux bulletins arrivent, de sorte que le système reste auditable et responsable en exploitation.",
+      h2Dengue:'Le cas de la dengue',
+      dTitle:'Une maladie qui brise les hypothèses',
+      dBody:"La dengue a été intégrée comme quatrième maladie précisément parce que sa dynamique diffère : saisonnalité climatique, cycles épidémiques de quatre à cinq ans et séries quasi nulles hors saison. Les moteurs à base d'arbres n'extrapolent pas cette dynamique à 52 semaines ; la production repose donc sur un <strong>GLM binomial négatif</strong> avec saisonnalité de Fourier, décalages et un régresseur <strong>El Niño (ONI)</strong>, qui porte le signal épidémique interannuel.",
+      dCaption:'Rétro-test en excluant une épidémie · SMAPE, plus bas est meilleur',
+      dCol1:'Moteur', dCol2:'SMAPE',
+      dR1:'GLM binomial négatif + ONI', dR2:'Prophet + ENSO', dR3:'Prophet',
+      h2Links:'Pour aller plus loin',
+      l1t:'epiforecast.mx', l1b:'La plateforme en direct, avec les prévisions publiées',
+      l2t:'Article sur Medium', l2b:'Le flux complet du cas dengue, de bout en bout',
+      l3t:'rebull.org', l3b:'Parcours professionnel complet et CV',
+      l4t:'alass.org', l4b:'Programme et informations du congrès',
+      h2Contact:'Poursuivons la conversation',
+      contactBody:"Si cette approche vous semble utile pour votre système de santé, ou si vous souhaitez discuter de la sélection de modèles par série, écrivez-moi pendant le congrès ou après.",
+      btnMail:'Écrivez-moi', btnVcf:'Enregistrer le contact',
+      updated:'Mis à jour le'
+    },
+    en: {
+      chip:'CALASS 2026 · Montréal',
+      role:'Full stack engineer and AI specialist · M.S. in Artificial Intelligence and Data Analytics, UACJ',
+      venueDates:'27–29 August 2026',
+      venuePlace:'Université de Montréal · Montréal, Canada',
+      h2Work:'The talk',
+      lead1:'<strong>EpiForecast-MX</strong> is an epidemiological intelligence platform built with the <strong>Mexican Social Security Institute (IMSS)</strong> that forecasts weekly disease incidence across Mexico’s 32 federal entities on a 52-week horizon.',
+      lead2:'It is fed entirely by the public bulletins of the National Epidemiological Surveillance System (SINAVE). Rather than imposing one algorithm across an entire surveillance system, it trains a library of models with deliberately different assumptions and keeps, for each series, the one its own evidence supports best.',
+      h2Figures:'In numbers',
+      fig1:'Federal entities', fig2:'Week horizon', fig3:'Conditions', fig4:'Models in production',
+      figNote:'Conditions: depression (ICD-10 F32), Parkinson’s disease (G20), Alzheimer’s disease (G30) and dengue (A97).',
+      h2Method:'The method',
+      s1t:'Public data, extracted and audited',
+      s1b:'The tables in the SINAVE bulletins are parsed out of the PDFs and validated cell by cell against the printed total before being merged into a versioned dataset.',
+      s2t:'A library, not a single algorithm',
+      s2b:'Every series is trained with engines carrying deliberately different inductive assumptions: a structural additive decomposition, a probabilistic recurrent network and tree-based hybrids. It is the diversity of the candidate pool that covers the heterogeneity across regions, sexes and periods.',
+      s3t:'Per-series selection, auditable',
+      s3b:'A transparent rule keeps one model per series based on its validated accuracy, reassigns low-incidence series to a regional model and records every decision in a justified selection log.',
+      s4t:'Revisable, not a frozen champion',
+      s4b:'Validated accuracy need not persist as the live signal shifts. The selection is recomputed as new bulletins arrive, so the system stays auditable and accountable in deployment.',
+      h2Dengue:'The dengue case',
+      dTitle:'A disease that breaks the assumptions',
+      dBody:'Dengue was added as a fourth condition precisely because its dynamics differ: climate-driven seasonality, four-to-five-year epidemic cycles and near-zero off-season series. Tree-based engines do not extrapolate that dynamic across 52 weeks, so production rests on a <strong>Negative-Binomial GLM</strong> with Fourier seasonality, lags and an <strong>El Niño (ONI)</strong> regressor, which does carry the inter-annual epidemic signal.',
+      dCaption:'Leave-one-epidemic-out backtest · SMAPE, lower is better',
+      dCol1:'Engine', dCol2:'SMAPE',
+      dR1:'Negative-Binomial GLM + ONI', dR2:'Prophet + ENSO', dR3:'Prophet',
+      h2Links:'Go deeper',
+      l1t:'epiforecast.mx', l1b:'The live platform, with the published forecasts',
+      l2t:'Article on Medium', l2b:'The full dengue workflow, end to end',
+      l3t:'rebull.org', l3b:'Full professional background and résumé',
+      l4t:'alass.org', l4b:'Congress programme and information',
+      h2Contact:'Let’s keep talking',
+      contactBody:'If the approach is useful for your health system, or you want to discuss per-series model selection, write to me during the congress or after.',
+      btnMail:'Write to me', btnVcf:'Save contact',
+      updated:'Last updated'
+    }
+  };
+
+  var META = {
+    es:{lang:'es',locale:'es_MX',title:'Javier Rebull · CALASS 2026'},
+    fr:{lang:'fr',locale:'fr_CA',title:'Javier Rebull · CALASS 2026'},
+    en:{lang:'en',locale:'en_US',title:'Javier Rebull · CALASS 2026'}
+  };
+
+  var nodes = [].slice.call(document.querySelectorAll('[data-i18n]'));
+  var ES = {};
+  nodes.forEach(function(n){ ES[n.getAttribute('data-i18n')] = n.innerHTML; });
+
+  function setLang(code){
+    if (!META[code]) { code = 'es'; }
+    var d = (code === 'es') ? ES : DICT[code];
+    nodes.forEach(function(n){
+      var k = n.getAttribute('data-i18n');
+      if (d[k] !== undefined) { n.innerHTML = d[k]; }
+      else if (ES[k] !== undefined) { n.innerHTML = ES[k]; }
+    });
+    document.documentElement.lang = META[code].lang;
+    document.title = META[code].title;
+    var og = document.querySelector('meta[property="og:locale"]');
+    if (og) { og.setAttribute('content', META[code].locale); }
+    [].forEach.call(document.querySelectorAll('.langs button'), function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-lang') === code ? 'true' : 'false');
+    });
+    try { localStorage.setItem('alass26.lang', code); } catch(e){}
+  }
+
+  [].forEach.call(document.querySelectorAll('.langs button'), function(b){
+    b.addEventListener('click', function(){
+      var code = b.getAttribute('data-lang');
+      setLang(code);
+      var url = location.pathname + (code === 'es' ? '' : '?lang=' + code);
+      try { history.replaceState(null, '', url); } catch(e){}
+    });
+  });
+
+  var urlLang = new URLSearchParams(location.search).get('lang');
+  var saved = null;
+  try { saved = localStorage.getItem('alass26.lang'); } catch(e){}
+  var nav = (navigator.language || '').slice(0,2);
+  var initial = META[urlLang] ? urlLang
+              : (META[saved] ? saved
+              : (META[nav] ? nav : 'es'));
+  if (initial !== 'es') { setLang(initial); }
+})();
+</script>
+</body>
+</html>
