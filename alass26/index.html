@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Javier Rebull · CALASS 2026</title>
-<meta name="description" content="Javier Rebull en CALASS 2026, Université de Montréal, 27–29 de agosto de 2026. EpiForecast-MX: pronóstico epidemiológico semanal para las 32 entidades de México, con el IMSS.">
+<meta name="description" content="Ponencia de Javier Rebull en CALASS 2026, Université de Montréal, 27–29 de agosto de 2026. EpiForecast-MX: pronóstico epidemiológico semanal para las 32 entidades de México, con el IMSS.">
 <meta name="author" content="Javier Rebull">
 <link rel="canonical" href="https://rebull.org/alass26/">
 <meta name="theme-color" content="#0b0d10">
@@ -40,6 +40,11 @@
     "address": { "@type": "PostalAddress", "addressLocality": "Montréal", "addressRegion": "QC", "addressCountry": "CA" }
   },
   "organizer": { "@type": "Organization", "name": "Association Latine pour l'Analyse des Systèmes de Santé (ALASS)", "url": "https://alass.org/" },
+  "workPerformed": {
+    "@type": "CreativeWork",
+    "name": "De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé",
+    "inLanguage": "fr"
+  },
   "performer": {
     "@type": "Person",
     "name": "Javier Rebull",
@@ -111,11 +116,7 @@
     background:rgba(212,176,106,.1);color:#ead9b4;
     font-size:.6rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;
   }
-  .dot{
-    width:7px;height:7px;border-radius:50%;background:#e3c27e;flex-shrink:0;
-    box-shadow:0 0 0 0 rgba(227,194,126,.75);animation:pulse 2.6s infinite;
-  }
-  @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(227,194,126,0)}100%{box-shadow:0 0 0 0 rgba(227,194,126,0)}}
+  .chip svg{width:12px;height:12px;fill:#e3c27e;flex-shrink:0}
   h1{
     font-family:'Playfair Display',serif;font-weight:800;
     font-size:clamp(2.1rem,6.4vw,3rem);line-height:1.02;letter-spacing:-.6px;
@@ -143,6 +144,30 @@
   .lead strong{color:var(--cream);font-weight:700}
   p+p{margin-top:13px}
 
+  /* ── ficha de la ponencia ── */
+  .record{
+    margin:0 0 26px;padding:20px 22px;
+    background:var(--card);border:1px solid var(--line-soft);
+    border-left:3px solid var(--bronze-deep);border-radius:12px;
+  }
+  .rec-kind{font-size:.62rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--bronze);margin-bottom:9px}
+  .record blockquote{
+    font-family:'Playfair Display',serif;font-style:italic;font-weight:600;
+    font-size:1.1rem;line-height:1.5;color:var(--cream);
+  }
+  .record figcaption{margin-top:10px;display:grid;gap:9px}
+  .rec-gloss{font-size:.88rem;color:var(--muted)}
+  .rec-gloss:empty{display:none}
+  .rec-authors{font-size:.82rem;color:#b9b4a9;line-height:1.55}
+  .rec-authors b{color:var(--cream);font-weight:700}
+  .rec-authors b,.rec-authors span{white-space:nowrap}
+  .rec-pdf{
+    display:inline-flex;align-items:center;gap:8px;justify-self:start;min-height:32px;
+    font-size:.72rem;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;
+  }
+  .rec-pdf svg{width:15px;height:15px;fill:currentColor;flex-shrink:0}
+  .rec-pdf:hover{color:#ecd9a8}
+
   /* ── cifras ── */
   .figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:14px;overflow:hidden}
   .figures div{background:var(--ink-2);padding:20px 12px;text-align:center}
@@ -169,7 +194,7 @@
   .step p{font-size:.9rem;color:var(--muted)}
 
   /* ── padecimientos ── */
-  .conds{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-top:18px}
+  .conds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:12px;margin-top:18px}
   .cond{
     background:var(--card);border:1px solid var(--line-soft);
     border-top:3px solid var(--bronze-deep);border-radius:12px;padding:18px 20px;
@@ -231,14 +256,14 @@
   }
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
-    .dot{animation:none}
     .link:hover,.btn:hover{transform:none}
   }
   @media print{
     .langs{display:none}
     body{background:#fff;color:#111}
     h1{background:none;-webkit-text-fill-color:#111;color:#111}
-    .step,.cond,.cond-note,.link,.figures div{background:none;border-color:#ccc}
+    .step,.cond,.cond-note,.link,.figures div,.record{background:none;border-color:#ccc}
+    .record blockquote,.rec-authors b{color:#111}
     a{color:#111}
   }
 </style>
@@ -255,7 +280,7 @@
   <div class="wrap hero-inner">
     <img class="portrait" src="../Images/profile.jpg" alt="Javier Rebull" width="104" height="104">
     <div class="hero-copy">
-      <span class="chip"><span class="dot" aria-hidden="true"></span><span data-i18n="chip">CALASS 2026 · Montréal</span></span>
+      <span class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4zm-1.6 15.2-4-4 1.4-1.4 2.6 2.6 5.8-5.8 1.4 1.4-7.2 7.2z"/></svg><span data-i18n="chip">Ponencia presentada · CALASS 2026</span></span>
       <h1>Javier Rebull</h1>
       <p class="role" data-i18n="role">M.Sc. en Inteligencia Artificial Aplicada, Tecnológico de Monterrey · Ingeniero de software e IA aplicada a la salud pública</p>
     </div>
@@ -271,6 +296,15 @@
 
   <section>
     <h2 data-i18n="h2Work">La ponencia</h2>
+    <figure class="record">
+      <p class="rec-kind" data-i18n="recKind">Comunicación oral · título oficial</p>
+      <blockquote lang="fr">« De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé »</blockquote>
+      <figcaption>
+        <span class="rec-gloss" data-i18n="recGloss">De la vigilancia epidemiológica a la inteligencia predictiva: el papel de la inteligencia artificial en la organización prospectiva de los sistemas públicos de salud.</span>
+        <span class="rec-authors"><b>Javier Augusto Rebull Saucedo</b>, <span>Juan Carlos Pérez-Nava</span>, <span>Luis Gerardo Sánchez-Salazar</span>, <span>Grettel Barceló-Alonso</span>, <span>Ruth Pérez-Hernández</span>, <span>Silvia Magali Cuadra-Hernández</span></span>
+        <a class="rec-pdf" href="../constancias/2026-08-calass-montreal-oral.pdf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8.5 12v1.6h9V12h-9zm0 3.2v1.6h9v-1.6h-9zm0 3.2V20h6v-1.6h-6z"/></svg><span data-i18n="recPdf">Constancia de participación (PDF)</span></a>
+      </figcaption>
+    </figure>
     <p class="lead" data-i18n="lead1"><strong>EpiForecast-MX</strong> es una plataforma de inteligencia epidemiológica desarrollada en el <strong>Tecnológico de Monterrey</strong> en colaboración con el <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> que pronostica la incidencia semanal de enfermedades en las 32 entidades federativas de México, con un horizonte de 52 semanas.</p>
     <p data-i18n="lead2">Se alimenta exclusivamente de los boletines públicos del Sistema Nacional de Vigilancia Epidemiológica (SINAVE). En lugar de imponer un solo algoritmo a todo el sistema de vigilancia, entrena una biblioteca de modelos con supuestos deliberadamente distintos y elige, para cada serie, el que su propia evidencia respalda mejor.</p>
   </section>
@@ -360,7 +394,7 @@
 
   <section style="border-bottom:none">
     <h2 data-i18n="h2Contact">Sigamos la conversación</h2>
-    <p style="margin-bottom:18px" data-i18n="contactBody">Si el enfoque te resulta útil para tu sistema de salud, o quieres discutir la selección de modelos por serie, escríbeme durante el congreso o después.</p>
+    <p style="margin-bottom:18px" data-i18n="contactBody">Si el enfoque te resulta útil para tu sistema de salud, o quieres discutir la selección de modelos por serie, escríbeme.</p>
     <div class="contact">
       <a class="btn btn-gold" href="mailto:rebull@outlook.com?subject=CALASS%202026">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
@@ -390,7 +424,7 @@
     </div>
     <div class="updated">
       <span data-i18n="updated">Actualizado el</span>
-      <time datetime="2026-08-18">18 · 08 · 2026</time>
+      <time datetime="2026-09-27">27 · 09 · 2026</time>
     </div>
   </div>
 </footer>
@@ -402,11 +436,14 @@
   // El español vive en el HTML (funciona sin JS); FR y EN se sustituyen desde aquí.
   var DICT = {
     fr: {
-      chip:'CALASS 2026 · Montréal',
+      chip:'Communication présentée · CALASS 2026',
       role:"M.Sc. en intelligence artificielle appliquée, Tecnológico de Monterrey · Ingénieur logiciel et IA appliquée à la santé publique",
       venueDates:'27–29 août 2026',
       venuePlace:'Université de Montréal · Montréal, Canada',
       h2Work:'La communication',
+      recKind:'Communication orale · titre officiel',
+      recGloss:'',
+      recPdf:'Attestation de participation (PDF)',
       lead1:"<strong>EpiForecast-MX</strong> est une plateforme d'intelligence épidémiologique développée au <strong>Tecnológico de Monterrey</strong> en collaboration avec l'<strong>Institut mexicain de sécurité sociale (IMSS)</strong> qui prévoit l'incidence hebdomadaire des maladies dans les 32 entités fédérales du Mexique, sur un horizon de 52 semaines.",
       lead2:"Elle se nourrit uniquement des bulletins publics du Système national de surveillance épidémiologique (SINAVE). Plutôt que d'imposer un seul algorithme à tout le système de surveillance, elle entraîne une bibliothèque de modèles aux hypothèses délibérément différentes et retient, pour chaque série, celui que ses propres données appuient le mieux.",
       h2Figures:'En chiffres',
@@ -438,16 +475,19 @@
       l3t:'rebull.org', l3b:'Parcours professionnel complet et CV',
       l4t:'alass.org', l4b:'Programme et informations du congrès',
       h2Contact:'Poursuivons la conversation',
-      contactBody:"Si cette approche vous semble utile pour votre système de santé, ou si vous souhaitez discuter de la sélection de modèles par série, écrivez-moi pendant le congrès ou après.",
+      contactBody:"Si cette approche vous semble utile pour votre système de santé, ou si vous souhaitez discuter de la sélection de modèles par série, écrivez-moi.",
       btnMail:'Écrivez-moi', btnVcf:'Enregistrer le contact',
       updated:'Mis à jour le'
     },
     en: {
-      chip:'CALASS 2026 · Montréal',
+      chip:'Talk delivered · CALASS 2026',
       role:'M.Sc. in Applied Artificial Intelligence, Tecnológico de Monterrey · Software engineer, AI applied to public health',
       venueDates:'27–29 August 2026',
       venuePlace:'Université de Montréal · Montréal, Canada',
       h2Work:'The talk',
+      recKind:'Oral communication · official title',
+      recGloss:'From epidemiological surveillance to predictive intelligence: the role of artificial intelligence in the prospective organisation of public health systems.',
+      recPdf:'Certificate of participation (PDF)',
       lead1:'<strong>EpiForecast-MX</strong> is an epidemiological intelligence platform built at the <strong>Tecnológico de Monterrey</strong> in collaboration with the <strong>Mexican Social Security Institute (IMSS)</strong> that forecasts weekly disease incidence across Mexico’s 32 federal entities on a 52-week horizon.',
       lead2:'It is fed entirely by the public bulletins of the National Epidemiological Surveillance System (SINAVE). Rather than imposing one algorithm across an entire surveillance system, it trains a library of models with deliberately different assumptions and keeps, for each series, the one its own evidence supports best.',
       h2Figures:'In numbers',
@@ -479,7 +519,7 @@
       l3t:'rebull.org', l3b:'Full professional background and résumé',
       l4t:'alass.org', l4b:'Congress programme and information',
       h2Contact:'Let’s keep talking',
-      contactBody:'If the approach is useful for your health system, or you want to discuss per-series model selection, write to me during the congress or after.',
+      contactBody:'If the approach is useful for your health system, or you want to discuss per-series model selection, write to me.',
       btnMail:'Write to me', btnVcf:'Save contact',
       updated:'Last updated'
     }

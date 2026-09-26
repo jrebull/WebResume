@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Javier Rebull — Senior Full Stack Engineer &amp; AI Specialist</title>
-    <meta name="description" content="Javier Rebull — Senior Full Stack Engineer, AI &amp; ML Specialist and Software Architect, M.Sc. in Applied Artificial Intelligence. 18 years shipping production systems in regulated financial services. Speaking at CALASS 2026, Université de Montréal.">
+    <meta name="description" content="Javier Rebull — Senior Full Stack Engineer, AI &amp; ML Specialist and Software Architect, M.Sc. in Applied Artificial Intelligence. 18 years shipping production systems in regulated financial services. Presented research at CALASS 2026 (Montréal) and the 2nd Public Health Conference (Skopje).">
     <meta name="author" content="Javier Rebull">
     <link rel="canonical" href="https://rebull.org/">
     <meta name="theme-color" content="#f3f1ea" media="(prefers-color-scheme: light)">
@@ -15,13 +15,13 @@
     <meta property="og:locale:alternate" content="es_MX">
     <meta property="og:locale:alternate" content="zh_CN">
     <meta property="og:title" content="Javier Rebull — Senior Full Stack Engineer &amp; AI Specialist">
-    <meta property="og:description" content="18 years shipping production systems in regulated financial services. AI &amp; ML, MLOps, software architecture. Speaking at CALASS 2026, Université de Montréal.">
+    <meta property="og:description" content="18 years shipping production systems in regulated financial services. AI &amp; ML, MLOps, software architecture. Presented research at CALASS 2026 (Montréal) and the 2nd Public Health Conference (Skopje).">
     <meta property="og:image" content="https://rebull.org/Images/profile.jpg">
     <meta property="og:image:alt" content="Portrait of Javier Rebull">
     <meta property="og:url" content="https://rebull.org/">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Javier Rebull — Senior Full Stack Engineer &amp; AI Specialist">
-    <meta name="twitter:description" content="18 years shipping production systems in regulated financial services. Speaking at CALASS 2026, Université de Montréal.">
+    <meta name="twitter:description" content="18 years shipping production systems in regulated financial services. Presented research at CALASS 2026 (Montréal) and the 2nd Public Health Conference (Skopje).">
     <meta name="twitter:image" content="https://rebull.org/Images/profile.jpg">
     <link rel="alternate" hreflang="en" href="https://rebull.org/">
     <link rel="alternate" hreflang="es" href="https://rebull.org/?lang=es">
@@ -101,6 +101,45 @@
             }
           },
           "performer": { "@id": "https://rebull.org/#person" }
+        },
+        {
+          "@type": "Event",
+          "name": "2nd Public Health Conference & 2nd HSG Europe Preconference",
+          "startDate": "2026-05-21",
+          "endDate": "2026-05-22",
+          "eventStatus": "https://schema.org/EventScheduled",
+          "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+          "url": "https://publichealthfutures.org/",
+          "location": {
+            "@type": "Place",
+            "name": "Faculty of Medicine, Skopje",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Skopje",
+              "addressCountry": "MK"
+            }
+          },
+          "performer": { "@id": "https://rebull.org/#person" }
+        },
+        {
+          "@type": "Event",
+          "name": "26th WPA World Congress of Psychiatry",
+          "startDate": "2026-09-23",
+          "endDate": "2026-09-26",
+          "eventStatus": "https://schema.org/EventScheduled",
+          "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+          "url": "https://wcp-congress.com/",
+          "location": {
+            "@type": "Place",
+            "name": "Stockholm",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Stockholm",
+              "addressCountry": "SE"
+            }
+          },
+          "organizer": { "@type": "Organization", "name": "World Psychiatric Association", "url": "https://www.wpanet.org/" },
+          "attendee": { "@id": "https://rebull.org/#person" }
         }
       ]
     }
@@ -1078,6 +1117,45 @@
         .feature-link i { transition: transform 0.22s; }
         .feature-card:hover .feature-link i { transform: translateX(5px); }
 
+        /* ponencias ya presentadas: título oficial, coautores y constancia */
+        .hero-flag i { color: #e3c27e; font-size: 1.15em; }
+        .feature-flag i { font-size: 1.1em; }
+        .main-content .feature-work {
+            margin: 2px 0 6px; padding-left: 14px;
+            border-left: 2px solid var(--accent-warm);
+            font-family: 'Playfair Display', serif;
+            font-style: italic; font-weight: 500;
+            font-size: 1.02em; line-height: 1.5;
+            color: var(--heading);
+        }
+        .main-content .feature-gloss {
+            padding-left: 16px; margin-bottom: 14px;
+            font-size: 0.84em; color: var(--text-muted);
+        }
+        .main-content .feature-authors {
+            margin-bottom: 14px;
+            font-size: 0.8em; color: var(--text-muted);
+        }
+        .feature-authors span, .nw { white-space: nowrap; }
+        .main-content .feature-work + .feature-authors { margin-top: 12px; }
+        .feature-actions {
+            display: flex; flex-wrap: wrap; gap: 6px 24px;
+        }
+        .main-content .feature-actions a, .main-content .section-more {
+            display: inline-flex; align-items: center; gap: 8px;
+            min-height: 28px;
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 1.4px; text-transform: uppercase;
+            color: var(--accent-strong);
+        }
+        .feature-actions a i { transition: transform 0.22s; }
+        .feature-actions a:hover .fa-arrow-right, .section-more:hover i { transform: translateX(4px); }
+        .talk-item .feature-meta { margin-bottom: 12px; }
+        .talk-item h3 { margin-bottom: 5px; }
+        .attend-item .feature-actions { margin-top: 10px; }
+        .main-content .section-more { margin-top: 16px; }
+        .section-more i { transition: transform 0.22s; }
+
         .pub-item {
             margin-top: 14px; padding: 16px 20px;
             border: 1px solid var(--border); border-radius: 12px;
@@ -1183,6 +1261,7 @@
 
             .section, .job, .education-entry, .project,
             .pub-item, .feature-card, .cert-item { break-inside: avoid; }
+            .section-more { display: none !important; }
 
             a { color: #111 !important; border-bottom: none !important; }
             .feature-card { background: none !important; }
@@ -1216,7 +1295,7 @@
         <div class="resume-wrapper">
             <header class="hero">
                 <div class="hero-text">
-                    <a class="hero-flag" href="#speaking-en"><span class="live-dot" aria-hidden="true"></span> Speaking · CALASS 2026 · Montréal</a>
+                    <a class="hero-flag" href="#speaking-en"><i class="fas fa-circle-check" aria-hidden="true"></i> Presented 2026 · Montréal &amp; Skopje</a>
                     <div class="hero-kicker">Full Stack &amp; AI</div>
                     <h1 class="hero-name">Javier<br>Rebull</h1>
                     <div class="subtitle">
@@ -1330,19 +1409,48 @@
                 <div class="section speaking" id="speaking-en">
                     <h2><i class="fas fa-microphone-lines"></i> Speaking &amp; Research</h2>
 
-                    <a class="feature-card" href="/alass26/">
-                        <div class="feature-flag"><span class="live-dot" aria-hidden="true"></span> Upcoming · 27–29 August 2026</div>
+                    <div class="feature-card">
+                        <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> Presented · Oral communication · 27–29 August 2026</div>
                         <h3>CALASS 2026 — Congrès de l'ALASS</h3>
                         <div class="feature-meta"><i class="fas fa-location-dot"></i> Université de Montréal · Montréal, Canada</div>
-                        <p>Presenting <strong>EpiForecast-MX</strong>, an epidemiological intelligence platform built with the <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> that forecasts weekly disease incidence across Mexico's 32 states on a 52-week horizon. Prophet, DeepAR, Ensemble and Stacking engines are selected per series and re-validated against every new national epidemiological bulletin.</p>
-                        <span class="feature-link">rebull.org/alass26 <i class="fas fa-arrow-right"></i></span>
-                    </a>
+                        <p class="feature-work" lang="fr">« De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé »</p>
+                        <p class="feature-gloss">From epidemiological surveillance to predictive intelligence: the role of artificial intelligence in the prospective organisation of public health systems.</p>
+                        <p>Presented <strong class="nw">EpiForecast-MX</strong>, an epidemiological intelligence platform built at <strong>Tecnológico de Monterrey</strong> with the <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> that forecasts weekly disease incidence across Mexico's 32 states on a 52-week horizon. Prophet, DeepAR, Ensemble and Stacking engines are selected per series and re-validated against every new national epidemiological bulletin.</p>
+                        <p class="feature-authors">With <span>J. C. Pérez-Nava</span>, <span>L. G. Sánchez-Salazar</span>, <span>G. Barceló-Alonso</span>, <span>R. Pérez-Hernández</span> and <span>S. M. Cuadra-Hernández</span></p>
+                        <div class="feature-actions">
+                            <a href="/alass26/">rebull.org/alass26 <i class="fas fa-arrow-right"></i></a>
+                            <a href="/constancias/2026-08-calass-montreal-oral.pdf"><i class="fas fa-file-pdf"></i> Certificate (PDF)</a>
+                        </div>
+                    </div>
+
+                    <div class="pub-item talk-item">
+                        <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> Presented · Poster · 21–22 May 2026</div>
+                        <h3>2nd Public Health Conference &amp; 2nd HSG Europe Preconference</h3>
+                        <div class="feature-meta"><i class="fas fa-location-dot"></i> Skopje, North Macedonia</div>
+                        <p class="feature-work" lang="en">“AI-Based Forecasting to Shift Epidemiological Surveillance toward Predictive Approaches: Depression, Alzheimer’s, and Parkinson’s as Use Cases <span class="nw">(Epi-Forecast)”</span></p>
+                        <p class="feature-authors">With <span>J. C. Pérez-Nava</span>, <span>L. G. Sánchez-Salazar</span>, <span>G. Barceló-Alonso</span>, <span>L. Díaz-Castro</span>, <span>S. M. Cuadra-Hernández</span> and <span>R. M. Pérez-Hernández</span></p>
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-05-skopje-public-health-poster.pdf"><i class="fas fa-file-pdf"></i> Certificate (PDF)</a>
+                            <a href="https://publichealthfutures.org/verify/cmo0fpwt9003exoihyqneqq7a" target="_blank" rel="noopener noreferrer"><i class="fas fa-shield-halved"></i> Verify online</a>
+                        </div>
+                    </div>
 
                     <div class="pub-item">
                         <h3><a href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">Forecasting Dengue in Mexico: An End-to-End Data Science Story</a></h3>
                         <div class="item-meta">Medium · Article</div>
                         From a messy government PDF to a 52-week forecast that holds together through an epidemic year — data extraction and cleansing, feature engineering, model selection and evaluation.
                     </div>
+
+                    <div class="pub-item attend-item">
+                        <h3>26th WPA World Congress of Psychiatry</h3>
+                        <div class="item-meta">Attended · 23–26 September 2026 · Stockholm, Sweden</div>
+                        Clinical context for the depression, Alzheimer’s and Parkinson’s series that <span class="nw">EpiForecast-MX</span> forecasts.
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> Certificate (PDF)</a>
+                        </div>
+                    </div>
+
+                    <a class="section-more" href="/constancias/">All certificates, with verification <i class="fas fa-arrow-right"></i></a>
                 </div>
 
                 <div class="section experience">
@@ -1553,10 +1661,11 @@
                 <footer class="site-foot">
                     <a href="/Javier_Rebull_Resume.pdf" download><i class="fas fa-file-pdf"></i>Résumé PDF</a>
                     <a href="/alass26/"><i class="fas fa-microphone-lines"></i>CALASS 2026</a>
+                    <a href="/constancias/"><i class="fas fa-award"></i>Certificates</a>
                     <a href="/Galeria/"><i class="fas fa-camera"></i>Gallery</a>
                     <a href="/ForecastWC2026"><i class="fas fa-futbol"></i>World Cup Forecast</a>
                     <a href="https://github.com/jrebull" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i>GitHub</a>
-                    <span class="updated">Last updated <time datetime="2026-08-18">18 Aug 2026</time></span>
+                    <span class="updated">Last updated <time datetime="2026-09-27">27 Sep 2026</time></span>
                 </footer>
             </main>
             </div><!-- /body-grid -->
@@ -1568,7 +1677,7 @@
         <div class="resume-wrapper">
             <header class="hero">
                 <div class="hero-text">
-                    <a class="hero-flag" href="#speaking-es"><span class="live-dot" aria-hidden="true"></span> Ponencia · CALASS 2026 · Montreal</a>
+                    <a class="hero-flag" href="#speaking-es"><i class="fas fa-circle-check" aria-hidden="true"></i> Presentaciones 2026 · Montreal y Skopje</a>
                     <div class="hero-kicker">Full Stack & IA</div>
                     <h1 class="hero-name">Javier<br>Rebull</h1>
                     <div class="subtitle">
@@ -1682,19 +1791,49 @@
                 <div class="section speaking" id="speaking-es">
                     <h2><i class="fas fa-microphone-lines"></i> Ponencias e Investigación</h2>
 
-                    <a class="feature-card" href="/alass26/">
-                        <div class="feature-flag"><span class="live-dot" aria-hidden="true"></span> Próximamente · 27–29 de agosto de 2026</div>
+                    <div class="feature-card">
+                        <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> Presentada · Comunicación oral · 27–29 de agosto de 2026</div>
                         <h3>CALASS 2026 — Congreso de la ALASS</h3>
                         <div class="feature-meta"><i class="fas fa-location-dot"></i> Université de Montréal · Montreal, Canadá</div>
-                        <p>Presentación de <strong>EpiForecast-MX</strong>, plataforma de inteligencia epidemiológica desarrollada con el <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> que pronostica la incidencia semanal de enfermedades en los 32 estados de México a 52 semanas. Los motores Prophet, DeepAR, Ensemble y Stacking se seleccionan por serie y se revalidan contra cada nuevo boletín epidemiológico nacional.</p>
-                        <span class="feature-link">rebull.org/alass26 <i class="fas fa-arrow-right"></i></span>
-                    </a>
+                        <p class="feature-work" lang="fr">« De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé »</p>
+                        <p class="feature-gloss">De la vigilancia epidemiológica a la inteligencia predictiva: el papel de la inteligencia artificial en la organización prospectiva de los sistemas públicos de salud.</p>
+                        <p>Presentó <strong class="nw">EpiForecast-MX</strong>, plataforma de inteligencia epidemiológica desarrollada en el <strong>Tecnológico de Monterrey</strong> con el <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> que pronostica la incidencia semanal de enfermedades en los 32 estados de México a 52 semanas. Los motores Prophet, DeepAR, Ensemble y Stacking se seleccionan por serie y se revalidan contra cada nuevo boletín epidemiológico nacional.</p>
+                        <p class="feature-authors">Con <span>J. C. Pérez-Nava</span>, <span>L. G. Sánchez-Salazar</span>, <span>G. Barceló-Alonso</span>, <span>R. Pérez-Hernández</span> y <span>S. M. Cuadra-Hernández</span></p>
+                        <div class="feature-actions">
+                            <a href="/alass26/">rebull.org/alass26 <i class="fas fa-arrow-right"></i></a>
+                            <a href="/constancias/2026-08-calass-montreal-oral.pdf"><i class="fas fa-file-pdf"></i> Constancia (PDF)</a>
+                        </div>
+                    </div>
+
+                    <div class="pub-item talk-item">
+                        <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> Presentado · Póster · 21–22 de mayo de 2026</div>
+                        <h3>2nd Public Health Conference &amp; 2nd HSG Europe Preconference</h3>
+                        <div class="feature-meta"><i class="fas fa-location-dot"></i> Skopje, Macedonia del Norte</div>
+                        <p class="feature-work" lang="en">“AI-Based Forecasting to Shift Epidemiological Surveillance toward Predictive Approaches: Depression, Alzheimer’s, and Parkinson’s as Use Cases <span class="nw">(Epi-Forecast)”</span></p>
+                        <p class="feature-gloss">Pronóstico basado en IA para llevar la vigilancia epidemiológica hacia enfoques predictivos: depresión, Alzheimer y Parkinson como casos de uso.</p>
+                        <p class="feature-authors">Con <span>J. C. Pérez-Nava</span>, <span>L. G. Sánchez-Salazar</span>, <span>G. Barceló-Alonso</span>, <span>L. Díaz-Castro</span>, <span>S. M. Cuadra-Hernández</span> y <span>R. M. Pérez-Hernández</span></p>
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-05-skopje-public-health-poster.pdf"><i class="fas fa-file-pdf"></i> Constancia (PDF)</a>
+                            <a href="https://publichealthfutures.org/verify/cmo0fpwt9003exoihyqneqq7a" target="_blank" rel="noopener noreferrer"><i class="fas fa-shield-halved"></i> Verificar en línea</a>
+                        </div>
+                    </div>
 
                     <div class="pub-item">
                         <h3><a href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">Forecasting Dengue in Mexico: An End-to-End Data Science Story</a></h3>
                         <div class="item-meta">Medium · Artículo</div>
                         De un PDF gubernamental desordenado a un pronóstico de 52 semanas que se sostiene durante un año epidémico — extracción y limpieza de datos, ingeniería de características, selección de modelos y evaluación.
                     </div>
+
+                    <div class="pub-item attend-item">
+                        <h3>26th WPA World Congress of Psychiatry</h3>
+                        <div class="item-meta">Asistencia · 23–26 de septiembre de 2026 · Estocolmo, Suecia</div>
+                        Contexto clínico para las series de depresión, Alzheimer y Parkinson que pronostica <span class="nw">EpiForecast-MX</span>.
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> Constancia (PDF)</a>
+                        </div>
+                    </div>
+
+                    <a class="section-more" href="/constancias/?lang=es">Todas las constancias, con su verificación <i class="fas fa-arrow-right"></i></a>
                 </div>
 
                 <div class="section experience">
@@ -1905,10 +2044,11 @@
                 <footer class="site-foot">
                     <a href="/Javier_Rebull_Resume.pdf" download><i class="fas fa-file-pdf"></i>Currículum PDF</a>
                     <a href="/alass26/"><i class="fas fa-microphone-lines"></i>CALASS 2026</a>
+                    <a href="/constancias/?lang=es"><i class="fas fa-award"></i>Constancias</a>
                     <a href="/Galeria/"><i class="fas fa-camera"></i>Galería</a>
                     <a href="/ForecastWC2026"><i class="fas fa-futbol"></i>Pronóstico Mundial</a>
                     <a href="https://github.com/jrebull" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i>GitHub</a>
-                    <span class="updated">Actualizado el <time datetime="2026-08-18">18 ago 2026</time></span>
+                    <span class="updated">Actualizado el <time datetime="2026-09-27">27 sep 2026</time></span>
                 </footer>
             </main>
             </div><!-- /body-grid -->
@@ -1920,7 +2060,7 @@
         <div class="resume-wrapper">
             <header class="hero">
                 <div class="hero-text">
-                    <a class="hero-flag" href="#speaking-zh"><span class="live-dot" aria-hidden="true"></span> 演讲 · CALASS 2026 · 蒙特利尔</a>
+                    <a class="hero-flag" href="#speaking-zh"><i class="fas fa-circle-check" aria-hidden="true"></i> 2026 学术报告 · 蒙特利尔 &amp; 斯科普里</a>
                     <div class="hero-kicker">全栈 & 人工智能</div>
                     <h1 class="hero-name">Javier Rebull<br>郝伟</h1>
                     <div class="subtitle">
@@ -2034,19 +2174,49 @@
                 <div class="section speaking" id="speaking-zh">
                     <h2><i class="fas fa-microphone-lines"></i> 演讲与研究</h2>
 
-                    <a class="feature-card" href="/alass26/">
-                        <div class="feature-flag"><span class="live-dot" aria-hidden="true"></span> 即将举行 · 2026年8月27–29日</div>
+                    <div class="feature-card">
+                        <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> 已完成 · 口头报告 · 2026年8月27–29日</div>
                         <h3>CALASS 2026 — 拉丁卫生系统分析协会大会</h3>
                         <div class="feature-meta"><i class="fas fa-location-dot"></i> 蒙特利尔大学 · 加拿大蒙特利尔</div>
-                        <p>介绍 <strong>EpiForecast-MX</strong>——与<strong>墨西哥社会保障局（IMSS）</strong>合作开发的流行病学智能平台，可对墨西哥 32 个州的疾病周发病率进行 52 周预测。Prophet、DeepAR、Ensemble 与 Stacking 四种引擎按序列择优选用，并依据每期国家流行病学公报重新验证。</p>
-                        <span class="feature-link">rebull.org/alass26 <i class="fas fa-arrow-right"></i></span>
-                    </a>
+                        <p class="feature-work" lang="fr">« De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé »</p>
+                        <p class="feature-gloss">从流行病学监测到预测性智能：人工智能在公共卫生体系前瞻性组织中的作用。</p>
+                        <p>报告介绍了 <strong class="nw">EpiForecast-MX</strong>——由<strong>蒙特雷科技大学</strong>与<strong>墨西哥社会保障局（IMSS）</strong>合作开发的流行病学智能平台，可对墨西哥 32 个州的疾病周发病率进行 52 周预测。Prophet、DeepAR、Ensemble 与 Stacking 四种引擎按序列择优选用，并依据每期国家流行病学公报重新验证。</p>
+                        <p class="feature-authors">合作者：<span>J. C. Pérez-Nava</span>、<span>L. G. Sánchez-Salazar</span>、<span>G. Barceló-Alonso</span>、<span>R. Pérez-Hernández</span>、<span>S. M. Cuadra-Hernández</span></p>
+                        <div class="feature-actions">
+                            <a href="/alass26/">rebull.org/alass26 <i class="fas fa-arrow-right"></i></a>
+                            <a href="/constancias/2026-08-calass-montreal-oral.pdf"><i class="fas fa-file-pdf"></i> 证书（PDF）</a>
+                        </div>
+                    </div>
+
+                    <div class="pub-item talk-item">
+                        <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> 已完成 · 海报展示 · 2026年5月21–22日</div>
+                        <h3>2nd Public Health Conference &amp; 2nd HSG Europe Preconference</h3>
+                        <div class="feature-meta"><i class="fas fa-location-dot"></i> 北马其顿斯科普里</div>
+                        <p class="feature-work" lang="en">“AI-Based Forecasting to Shift Epidemiological Surveillance toward Predictive Approaches: Depression, Alzheimer’s, and Parkinson’s as Use Cases <span class="nw">(Epi-Forecast)”</span></p>
+                        <p class="feature-gloss">基于人工智能的预测，推动流行病学监测转向预测性方法：以抑郁症、阿尔茨海默病和帕金森病为应用案例。</p>
+                        <p class="feature-authors">合作者：<span>J. C. Pérez-Nava</span>、<span>L. G. Sánchez-Salazar</span>、<span>G. Barceló-Alonso</span>、<span>L. Díaz-Castro</span>、<span>S. M. Cuadra-Hernández</span>、<span>R. M. Pérez-Hernández</span></p>
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-05-skopje-public-health-poster.pdf"><i class="fas fa-file-pdf"></i> 证书（PDF）</a>
+                            <a href="https://publichealthfutures.org/verify/cmo0fpwt9003exoihyqneqq7a" target="_blank" rel="noopener noreferrer"><i class="fas fa-shield-halved"></i> 在线核验</a>
+                        </div>
+                    </div>
 
                     <div class="pub-item">
                         <h3><a href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">在墨西哥预测登革热：一个端到端的数据科学故事</a></h3>
                         <div class="item-meta">Medium · 文章</div>
                         从一份杂乱的政府 PDF 到一个能够经受流行年份考验的 52 周预测——数据提取与清洗、特征工程、模型选择与评估。
                     </div>
+
+                    <div class="pub-item attend-item">
+                        <h3>26th WPA World Congress of Psychiatry</h3>
+                        <div class="item-meta">参会 · 2026年9月23–26日 · 瑞典斯德哥尔摩</div>
+                        为 <span class="nw">EpiForecast-MX</span> 所预测的抑郁症、阿尔茨海默病和帕金森病序列提供临床背景。
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> 证书（PDF）</a>
+                        </div>
+                    </div>
+
+                    <a class="section-more" href="/constancias/?lang=zh">查看全部证书及核验信息 <i class="fas fa-arrow-right"></i></a>
                 </div>
 
                 <div class="section experience">
@@ -2257,10 +2427,11 @@
                 <footer class="site-foot">
                     <a href="/Javier_Rebull_Resume.pdf" download><i class="fas fa-file-pdf"></i>简历 PDF</a>
                     <a href="/alass26/"><i class="fas fa-microphone-lines"></i>CALASS 2026</a>
+                    <a href="/constancias/?lang=zh"><i class="fas fa-award"></i>证书</a>
                     <a href="/Galeria/"><i class="fas fa-camera"></i>相册</a>
                     <a href="/ForecastWC2026"><i class="fas fa-futbol"></i>世界杯预测</a>
                     <a href="https://github.com/jrebull" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i>GitHub</a>
-                    <span class="updated">最后更新于 <time datetime="2026-08-18">2026年8月18日</time></span>
+                    <span class="updated">最后更新于 <time datetime="2026-09-27">2026年9月27日</time></span>
                 </footer>
             </main>
             </div><!-- /body-grid -->
@@ -2278,7 +2449,7 @@
                 htmlLang: 'en',
                 ogLocale: 'en_US',
                 title: 'Javier Rebull — Senior Full Stack Engineer & AI Specialist',
-                desc: 'Javier Rebull — Senior Full Stack Engineer, AI & ML Specialist and Software Architect. 18 years shipping production systems in regulated financial services. Speaking at CALASS 2026, Université de Montréal.',
+                desc: 'Javier Rebull — Senior Full Stack Engineer, AI & ML Specialist and Software Architect. 18 years shipping production systems in regulated financial services. Presented research at CALASS 2026 (Montréal) and the 2nd Public Health Conference (Skopje).',
                 skip: 'Skip to content',
                 langLabel: 'English'
             },
@@ -2286,7 +2457,7 @@
                 htmlLang: 'es',
                 ogLocale: 'es_MX',
                 title: 'Javier Rebull — Ingeniero Full Stack Senior y Especialista en IA',
-                desc: 'Javier Rebull — Ingeniero Full Stack Senior, especialista en IA y ML y arquitecto de software. 18 años entregando sistemas en producción en servicios financieros regulados. Ponente en CALASS 2026, Université de Montréal.',
+                desc: 'Javier Rebull — Ingeniero Full Stack Senior, especialista en IA y ML y arquitecto de software. 18 años entregando sistemas en producción en servicios financieros regulados. Presentó investigación en CALASS 2026 (Montreal) y en la 2nd Public Health Conference (Skopje).',
                 skip: 'Ir al contenido',
                 langLabel: 'Español'
             },
@@ -2294,7 +2465,7 @@
                 htmlLang: 'zh-Hans',
                 ogLocale: 'zh_CN',
                 title: 'Javier Rebull — 高级全栈工程师与人工智能专家',
-                desc: 'Javier Rebull — 高级全栈工程师、人工智能与机器学习专家、软件架构师。在受监管的金融服务领域拥有 18 年生产系统交付经验。将在 CALASS 2026（蒙特利尔大学）发表演讲。',
+                desc: 'Javier Rebull — 高级全栈工程师、人工智能与机器学习专家、软件架构师。在受监管的金融服务领域拥有 18 年生产系统交付经验。曾在 CALASS 2026（蒙特利尔）及第二届公共卫生大会（斯科普里）发表研究成果。',
                 skip: '跳转到内容',
                 langLabel: '中文'
             }

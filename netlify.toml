@@ -22,6 +22,13 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
+# ── Constancias: se abren desde los enlaces del sitio, pero no se ─
+#    indexan, porque los documentos nombran a los coautores ─────────
+[[headers]]
+  for = "/constancias/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+
 # ── El HTML siempre se revalida (deploys inmediatos) ──────────────
 [[headers]]
   for = "/*.html"
