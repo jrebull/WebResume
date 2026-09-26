@@ -12,34 +12,33 @@ La carpeta se publica en **[rebull.org/constancias/](https://rebull.org/constanc
 
 ## Índice
 
+De la más reciente a la más antigua, igual que en el sitio y en el CV.
+
 | # | Fechas | Evento | Sede | Modalidad | Archivo |
 |---|---|---|---|---|---|
-| 1 | 21–22 may 2026 | 2nd Public Health Conference & 2nd HSG Europe Preconference | Skopje, Macedonia del Norte | Póster | [`2026-05-skopje-public-health-poster.pdf`](2026-05-skopje-public-health-poster.pdf) |
+| 1 | 23–26 sep 2026 | 26th WPA World Congress of Psychiatry | Estocolmo, Suecia | Asistencia | [`2026-09-wpa-stockholm-attendance.pdf`](2026-09-wpa-stockholm-attendance.pdf) |
 | 2 | 27–29 ago 2026 | CALASS 2026, Congrès de l'ALASS | Université de Montréal, Canadá | Comunicación oral | [`2026-08-calass-montreal-oral.pdf`](2026-08-calass-montreal-oral.pdf) |
-| 3 | 23–26 sep 2026 | 26th WPA World Congress of Psychiatry | Estocolmo, Suecia | Asistencia | [`2026-09-wpa-stockholm-attendance.pdf`](2026-09-wpa-stockholm-attendance.pdf) |
+| 3 | 21–22 may 2026 | 2nd Public Health Conference & 2nd HSG Europe Preconference | Skopje, Macedonia del Norte | Póster | [`2026-05-skopje-public-health-poster.pdf`](2026-05-skopje-public-health-poster.pdf) |
 
 Nombre de archivo: `AAAA-MM-ciudad-evento-modalidad.pdf`. El prefijo de fecha ordena la carpeta cronológicamente y la URL queda limpia y estable.
 
-Las dos presentaciones son del mismo proyecto, **EpiForecast-MX**, la plataforma de pronóstico epidemiológico desarrollada en el Tecnológico de Monterrey con el Instituto Mexicano del Seguro Social (IMSS). La asistencia a la WPA es formación continua en el dominio de la cohorte neurológica y psiquiátrica del proyecto (depresión, Alzheimer, Parkinson).
+Las dos presentaciones son del mismo proyecto, **EpiForecast-MX**, la plataforma de pronóstico epidemiológico desarrollada en el Tecnológico de Monterrey con el Instituto Mexicano del Seguro Social (IMSS). La asistencia a la WPA da contexto clínico a la cohorte neurológica y psiquiátrica del proyecto (depresión, Alzheimer, Parkinson).
 
 ---
 
-## 1. Póster · Skopje · mayo de 2026
+## 1. Asistencia · 26th WPA World Congress of Psychiatry · Estocolmo · septiembre de 2026
 
 | Campo | Valor |
 |---|---|
-| Documento | *Certificate of Presentation* (inglés), 1 página A4 horizontal |
-| Evento | 2nd Public Health Conference & 2nd HSG Europe Preconference |
-| Fechas y sede | 21–22 de mayo de 2026, Skopje, Macedonia del Norte |
-| Lema del congreso | *Building Evidence Based Resilient Health Systems in a Changing Europe* |
-| Organizan | Center-School of Public Health y Faculty of Medicine, Ss. Cyril and Methodius University (UKIM); Ministry of Health; Institute for Public Health; Health Systems Global (HSG); SEEHN; TDR (según [publichealthfutures.org](https://publichealthfutures.org/)) |
-| Modalidad | Presentación de póster |
-| Título | *AI-Based Forecasting to Shift Epidemiological Surveillance toward Predictive Approaches: Depression, Alzheimer's, and Parkinson's as Use Cases (Epi-Forecast)* |
-| Autores, en el orden de la constancia | Javier Augusto Rebull-Saucedo, MS · Juan Carlos Pérez-Nava, MS · Luis Gerardo Sánchez-Salazar, MS · Grettel Barceló-Alonso, PhD (*Project Leader*) · Lina Díaz-Castro, PhD · Silvia Magali Cuadra-Hernández, PhD · Ruth Manuela Pérez-Hernández, PhD (*Project Leader*) |
-| Firma | Prof. Fimka Tozija, Chair, Organizing Committee |
-| Verificación | ID `cmo0fpwt9003exoihyqneqq7a`. El QR de la constancia lleva a <https://publichealthfutures.org/verify/cmo0fpwt9003exoihyqneqq7a>, que el 27 sep 2026 respondía **«Valid certificate»** a nombre de Javier Augusto Rebull Saucedo |
-| Archivo original | `Constancia Future Health.pdf` (Microsoft Word 2010, 18 sep 2026; autor en los metadatos: Ruth Manuela Perez Hernandez) |
-| SHA-256 | `87bc97537417a65e67622dfe1081f33cf4f6360e17c50789ffe82765b5573a45` |
+| Documento | *Certificate of Attendance* (inglés), 1 página A4 |
+| Evento | 26th WPA World Congress of Psychiatry (WCP 2026), World Psychiatric Association |
+| Fechas y sede | 23–26 de septiembre de 2026, Estocolmo, Suecia |
+| Modalidad | Asistencia. **No** hubo ponencia: en el sitio y en el CV se presenta como asistencia, nunca como presentación |
+| A nombre de | Javier Augusto Rebull Saucedo M.Sc. |
+| Firma | Professor Danuta Wasserman, President, World Psychiatric Association |
+| Verificación | Verification ID `e17e9dd1-8bed-41c1-afaa-3cc77a85586b`, sin página pública de consulta. Lo emite el organizador profesional del congreso, **Kenes Group** (Ginebra), a través de [wcp-congress.com](https://wcp-congress.com/). Revisado el 27 sep 2026: el PDF no trae QR, enlace ni metadatos; las rutas `/verify/`, `/certificate/` y `/verification/` de wcp-congress.com devuelven 404; ni la FAQ ni la página CME mencionan verificación (el certificado CME se obtiene con la encuesta en SurveyMonkey). Para verificarlo, un tercero tendría que escribir a la secretaría ([wcp-congress.com/contact-us](https://wcp-congress.com/contact-us/)) citando el folio |
+| Archivo original | `Certificate of Attendance WCP 2026.pdf` (WeasyPrint 69.0) |
+| SHA-256 | `77b160d6b0d706f7aa79e491efe6095baf419ce07f128d27da6d710c3c4ee2d6` |
 
 ## 2. Comunicación oral · CALASS 2026 · Montreal · agosto de 2026
 
@@ -58,19 +57,22 @@ Las dos presentaciones son del mismo proyecto, **EpiForecast-MX**, la plataforma
 | Archivo original | `Javier Augusto Rebull Saucedo.pdf` (Microsoft Word, 22 sep 2026; autor en los metadatos: Borgès Da Silva Roxane) |
 | SHA-256 | `e094a3c142461a4e6595ddfe0bb34b9ed026caaa00480403b37dfbe313cd9340` |
 
-## 3. Asistencia · 26th WPA World Congress of Psychiatry · Estocolmo · septiembre de 2026
+## 3. Póster · Skopje · mayo de 2026
 
 | Campo | Valor |
 |---|---|
-| Documento | *Certificate of Attendance* (inglés), 1 página A4 |
-| Evento | 26th WPA World Congress of Psychiatry (WCP 2026), World Psychiatric Association |
-| Fechas y sede | 23–26 de septiembre de 2026, Estocolmo, Suecia |
-| Modalidad | Asistencia. **No** hubo ponencia: en el sitio y en el CV se presenta como asistencia, nunca como presentación |
-| A nombre de | Javier Augusto Rebull Saucedo M.Sc. |
-| Firma | Professor Danuta Wasserman, President, World Psychiatric Association |
-| Verificación | Verification ID `e17e9dd1-8bed-41c1-afaa-3cc77a85586b`. No hay portal público de verificación: [wcp-congress.com](https://wcp-congress.com/) emite el certificado CME al contestar la encuesta posterior al congreso |
-| Archivo original | `Certificate of Attendance WCP 2026.pdf` (WeasyPrint 69.0) |
-| SHA-256 | `77b160d6b0d706f7aa79e491efe6095baf419ce07f128d27da6d710c3c4ee2d6` |
+| Documento | *Certificate of Presentation* (inglés), 1 página A4 horizontal |
+| Evento | 2nd Public Health Conference & 2nd HSG Europe Preconference |
+| Fechas y sede | 21–22 de mayo de 2026, Skopje, Macedonia del Norte |
+| Lema del congreso | *Building Evidence Based Resilient Health Systems in a Changing Europe* |
+| Organizan | Center-School of Public Health y Faculty of Medicine, Ss. Cyril and Methodius University (UKIM); Ministry of Health; Institute for Public Health; Health Systems Global (HSG); SEEHN; TDR (según [publichealthfutures.org](https://publichealthfutures.org/)) |
+| Modalidad | Presentación de póster |
+| Título | *AI-Based Forecasting to Shift Epidemiological Surveillance toward Predictive Approaches: Depression, Alzheimer's, and Parkinson's as Use Cases (Epi-Forecast)* |
+| Autores, en el orden de la constancia | Javier Augusto Rebull-Saucedo, MS · Juan Carlos Pérez-Nava, MS · Luis Gerardo Sánchez-Salazar, MS · Grettel Barceló-Alonso, PhD (*Project Leader*) · Lina Díaz-Castro, PhD · Silvia Magali Cuadra-Hernández, PhD · Ruth Manuela Pérez-Hernández, PhD (*Project Leader*) |
+| Firma | Prof. Fimka Tozija, Chair, Organizing Committee |
+| Verificación | ID `cmo0fpwt9003exoihyqneqq7a`. El QR de la constancia lleva a <https://publichealthfutures.org/verify/cmo0fpwt9003exoihyqneqq7a>, que el 27 sep 2026 respondía **«Valid certificate»** a nombre de Javier Augusto Rebull Saucedo |
+| Archivo original | `Constancia Future Health.pdf` (Microsoft Word 2010, 18 sep 2026; autor en los metadatos: Ruth Manuela Perez Hernandez) |
+| SHA-256 | `87bc97537417a65e67622dfe1081f33cf4f6360e17c50789ffe82765b5573a45` |
 
 ---
 
@@ -87,10 +89,10 @@ Cada presentación se cita **como la registra su constancia**, aunque las dos di
 
 | Lugar | Qué muestra |
 |---|---|
-| `index.html`, sección *Speaking & Research*, en los tres bloques de idioma (EN, ES, ZH) | CALASS como tarjeta destacada con título, coautores y constancia; Skopje como tarjeta con constancia y verificación; la WPA como línea de asistencia |
+| `index.html`, sección *Speaking & Research*, en los tres bloques de idioma (EN, ES, ZH) | De la más reciente a la más antigua: la WPA como asistencia, CALASS como tarjeta destacada con título, coautores y constancia, y Skopje con constancia y verificación |
 | `alass26/index.html` | Título oficial, coautores y enlace a la atestación, en ES, FR y EN |
-| `constancias/index.html` | Las tres constancias, con miniatura, verificación y huella |
-| CV LaTeX `Personal/Interviews/Latex/javier_rebull_cv_september2026.tex` | Sección *Conference Presentations* y la línea de asistencia |
+| `constancias/index.html` | Las tres constancias de la más reciente a la más antigua, con miniatura, verificación y huella |
+| CV LaTeX `Personal/Interviews/Latex/javier_rebull_cv_september2026.tex` | Sección *Conferences*, de la más reciente a la más antigua |
 | `citas.bib` | Las dos presentaciones en BibTeX, listas para ORCID (*Works → Add → BibTeX*) o para un CV académico |
 
 ## Cómo agregar una constancia nueva
@@ -100,5 +102,5 @@ Cada presentación se cita **como la registra su constancia**, aunque las dos di
 3. Generar la miniatura:
    `pdftoppm -jpeg -jpegopt quality=85,optimize=y -scale-to-x 400 -scale-to-y -1 -singlefile ARCHIVO.pdf previews/ARCHIVO`
 4. Si trae QR, decodificarlo y comprobar que la verificación responde antes de enlazarla.
-5. Agregar su ficha aquí y su tarjeta en `index.html` de esta carpeta (los tres idiomas).
+5. Agregar su ficha aquí y su tarjeta en `index.html` de esta carpeta (los tres idiomas), **en orden cronológico, de la más reciente a la más antigua**.
 6. Actualizar el sitio principal en **los tres bloques de idioma**, el CV LaTeX (versión nueva, no sobrescribir) y la fecha de «Last updated».

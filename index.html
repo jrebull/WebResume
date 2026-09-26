@@ -1138,6 +1138,9 @@
         }
         .feature-authors span, .nw { white-space: nowrap; }
         .main-content .feature-work + .feature-authors { margin-top: 12px; }
+        /* orden cronológico: la tarjeta destacada ya no siempre va primero */
+        .main-content .pub-item + .feature-card { margin-top: 14px; }
+        .main-content h2 + .pub-item { margin-top: 0; }
         .feature-actions {
             display: flex; flex-wrap: wrap; gap: 6px 24px;
         }
@@ -1409,6 +1412,15 @@
                 <div class="section speaking" id="speaking-en">
                     <h2><i class="fas fa-microphone-lines"></i> Speaking &amp; Research</h2>
 
+                    <div class="pub-item attend-item">
+                        <h3>26th WPA World Congress of Psychiatry</h3>
+                        <div class="item-meta">Attended · 23–26 September 2026 · Stockholm, Sweden</div>
+                        Clinical context for the depression, Alzheimer’s and Parkinson’s series that <span class="nw">EpiForecast-MX</span> forecasts.
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> Certificate (PDF)</a>
+                        </div>
+                    </div>
+
                     <div class="feature-card">
                         <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> Presented · Oral communication · 27–29 August 2026</div>
                         <h3>CALASS 2026 — Congrès de l'ALASS</h3>
@@ -1439,15 +1451,6 @@
                         <h3><a href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">Forecasting Dengue in Mexico: An End-to-End Data Science Story</a></h3>
                         <div class="item-meta">Medium · Article</div>
                         From a messy government PDF to a 52-week forecast that holds together through an epidemic year — data extraction and cleansing, feature engineering, model selection and evaluation.
-                    </div>
-
-                    <div class="pub-item attend-item">
-                        <h3>26th WPA World Congress of Psychiatry</h3>
-                        <div class="item-meta">Attended · 23–26 September 2026 · Stockholm, Sweden</div>
-                        Clinical context for the depression, Alzheimer’s and Parkinson’s series that <span class="nw">EpiForecast-MX</span> forecasts.
-                        <div class="feature-actions">
-                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> Certificate (PDF)</a>
-                        </div>
                     </div>
 
                     <a class="section-more" href="/constancias/">All certificates, with verification <i class="fas fa-arrow-right"></i></a>
@@ -1791,6 +1794,15 @@
                 <div class="section speaking" id="speaking-es">
                     <h2><i class="fas fa-microphone-lines"></i> Ponencias e Investigación</h2>
 
+                    <div class="pub-item attend-item">
+                        <h3>26th WPA World Congress of Psychiatry</h3>
+                        <div class="item-meta">Asistencia · 23–26 de septiembre de 2026 · Estocolmo, Suecia</div>
+                        Contexto clínico para las series de depresión, Alzheimer y Parkinson que pronostica <span class="nw">EpiForecast-MX</span>.
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> Constancia (PDF)</a>
+                        </div>
+                    </div>
+
                     <div class="feature-card">
                         <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> Presentada · Comunicación oral · 27–29 de agosto de 2026</div>
                         <h3>CALASS 2026 — Congreso de la ALASS</h3>
@@ -1822,15 +1834,6 @@
                         <h3><a href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">Forecasting Dengue in Mexico: An End-to-End Data Science Story</a></h3>
                         <div class="item-meta">Medium · Artículo</div>
                         De un PDF gubernamental desordenado a un pronóstico de 52 semanas que se sostiene durante un año epidémico — extracción y limpieza de datos, ingeniería de características, selección de modelos y evaluación.
-                    </div>
-
-                    <div class="pub-item attend-item">
-                        <h3>26th WPA World Congress of Psychiatry</h3>
-                        <div class="item-meta">Asistencia · 23–26 de septiembre de 2026 · Estocolmo, Suecia</div>
-                        Contexto clínico para las series de depresión, Alzheimer y Parkinson que pronostica <span class="nw">EpiForecast-MX</span>.
-                        <div class="feature-actions">
-                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> Constancia (PDF)</a>
-                        </div>
                     </div>
 
                     <a class="section-more" href="/constancias/?lang=es">Todas las constancias, con su verificación <i class="fas fa-arrow-right"></i></a>
@@ -2174,6 +2177,15 @@
                 <div class="section speaking" id="speaking-zh">
                     <h2><i class="fas fa-microphone-lines"></i> 演讲与研究</h2>
 
+                    <div class="pub-item attend-item">
+                        <h3>26th WPA World Congress of Psychiatry</h3>
+                        <div class="item-meta">参会 · 2026年9月23–26日 · 瑞典斯德哥尔摩</div>
+                        为 <span class="nw">EpiForecast-MX</span> 所预测的抑郁症、阿尔茨海默病和帕金森病序列提供临床背景。
+                        <div class="feature-actions">
+                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> 证书（PDF）</a>
+                        </div>
+                    </div>
+
                     <div class="feature-card">
                         <div class="feature-flag"><i class="fas fa-circle-check" aria-hidden="true"></i> 已完成 · 口头报告 · 2026年8月27–29日</div>
                         <h3>CALASS 2026 — 拉丁卫生系统分析协会大会</h3>
@@ -2205,15 +2217,6 @@
                         <h3><a href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">在墨西哥预测登革热：一个端到端的数据科学故事</a></h3>
                         <div class="item-meta">Medium · 文章</div>
                         从一份杂乱的政府 PDF 到一个能够经受流行年份考验的 52 周预测——数据提取与清洗、特征工程、模型选择与评估。
-                    </div>
-
-                    <div class="pub-item attend-item">
-                        <h3>26th WPA World Congress of Psychiatry</h3>
-                        <div class="item-meta">参会 · 2026年9月23–26日 · 瑞典斯德哥尔摩</div>
-                        为 <span class="nw">EpiForecast-MX</span> 所预测的抑郁症、阿尔茨海默病和帕金森病序列提供临床背景。
-                        <div class="feature-actions">
-                            <a href="/constancias/2026-09-wpa-stockholm-attendance.pdf"><i class="fas fa-file-pdf"></i> 证书（PDF）</a>
-                        </div>
                     </div>
 
                     <a class="section-more" href="/constancias/?lang=zh">查看全部证书及核验信息 <i class="fas fa-arrow-right"></i></a>

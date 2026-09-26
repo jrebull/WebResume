@@ -150,6 +150,8 @@
     font-size:.72rem;color:#b9b4a9;word-break:break-all;
   }
   .ok{color:#9ccc9c;font-weight:700}
+  .facts dd a{border-bottom:1px solid rgba(212,176,106,.4)}
+  .facts dd a:hover{color:#ecd9a8}
   .actions{display:flex;flex-wrap:wrap;gap:10px}
   .btn{
     display:inline-flex;align-items:center;gap:8px;
@@ -221,16 +223,37 @@
     <div class="tally">
       <span data-i18n="t1"><b>2</b> presentations</span>
       <span data-i18n="t2"><b>1</b> attendance</span>
-      <span data-i18n="t3">Canada · North Macedonia · Sweden</span>
+      <span data-i18n="t3">Sweden · Canada · North Macedonia</span>
     </div>
   </div>
 </header>
 
 <main class="wrap">
 
-  <section aria-labelledby="h-pres">
-    <h2 id="h-pres" data-i18n="h2Pres">Presentations</h2>
-    <p class="sec-note" data-i18n="presNote">Both report <strong class="nw">EpiForecast-MX</strong>, the epidemiological forecasting platform built at Tecnológico de Monterrey with the Mexican Social Security Institute (IMSS).</p>
+  <section aria-labelledby="h-2026">
+    <h2 id="h-2026">2026</h2>
+    <p class="sec-note" data-i18n="yearNote">Newest first. The two presentations report <strong class="nw">EpiForecast-MX</strong>, the epidemiological forecasting platform built at Tecnológico de Monterrey with the Mexican Social Security Institute (IMSS).</p>
+
+    <article class="rec" id="wpa-2026">
+      <a class="thumb" href="2026-09-wpa-stockholm-attendance.pdf" aria-label="Certificate of Attendance, 26th WPA World Congress of Psychiatry (PDF)">
+        <img src="previews/2026-09-wpa-stockholm-attendance.jpg" width="400" height="566" alt="" loading="lazy">
+      </a>
+      <div>
+        <span class="kind attend" data-i18n="kAttend">Attendance</span>
+        <h3>26th WPA World Congress of Psychiatry</h3>
+        <p class="when" data-i18n="wpaWhen">23–26 September 2026 · Stockholm, Sweden</p>
+        <p class="note" data-i18n="wpaNote">Clinical context for the depression, Alzheimer’s and Parkinson’s series that <span class="nw">EpiForecast-MX</span> forecasts.</p>
+        <dl class="facts">
+          <div><dt data-i18n="fDoc">Document</dt><dd>Certificate of Attendance</dd></div>
+          <div><dt data-i18n="fIssued">Issued by</dt><dd data-i18n="wpaIssuer">World Psychiatric Association. Signed by Professor Danuta Wasserman, President</dd></div>
+          <div><dt data-i18n="fVerify">Verification</dt><dd><span data-i18n="wpaVerify">Verification ID</span> <code>e17e9dd1-8bed-41c1-afaa-3cc77a85586b</code> · <span data-i18n="wpaVerify2">issued by the congress organiser, <a href="https://wcp-congress.com/contact-us/" target="_blank" rel="noopener noreferrer">Kenes Group</a>; no public lookup page</span></dd></div>
+          <div><dt>SHA-256</dt><dd><code>77b160d6b0d706f7aa79e491efe6095baf419ce07f128d27da6d710c3c4ee2d6</code></dd></div>
+        </dl>
+        <div class="actions">
+          <a class="btn btn-gold" href="2026-09-wpa-stockholm-attendance.pdf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8.5 12v1.6h9V12h-9zm0 3.2v1.6h9v-1.6h-9zm0 3.2V20h6v-1.6h-6z"/></svg><span data-i18n="bPdf">Open PDF</span></a>
+        </div>
+      </div>
+    </article>
 
     <article class="rec" id="calass-2026">
       <a class="thumb" href="2026-08-calass-montreal-oral.pdf" aria-label="Attestation de participation, CALASS 2026 (PDF)">
@@ -281,31 +304,6 @@
     </article>
   </section>
 
-  <section aria-labelledby="h-att">
-    <h2 id="h-att" data-i18n="h2Att">Attendance</h2>
-
-    <article class="rec" id="wpa-2026">
-      <a class="thumb" href="2026-09-wpa-stockholm-attendance.pdf" aria-label="Certificate of Attendance, 26th WPA World Congress of Psychiatry (PDF)">
-        <img src="previews/2026-09-wpa-stockholm-attendance.jpg" width="400" height="566" alt="" loading="lazy">
-      </a>
-      <div>
-        <span class="kind attend" data-i18n="kAttend">Attendance</span>
-        <h3>26th WPA World Congress of Psychiatry</h3>
-        <p class="when" data-i18n="wpaWhen">23–26 September 2026 · Stockholm, Sweden</p>
-        <p class="note" data-i18n="wpaNote">Clinical context for the depression, Alzheimer’s and Parkinson’s series that <span class="nw">EpiForecast-MX</span> forecasts.</p>
-        <dl class="facts">
-          <div><dt data-i18n="fDoc">Document</dt><dd>Certificate of Attendance</dd></div>
-          <div><dt data-i18n="fIssued">Issued by</dt><dd data-i18n="wpaIssuer">World Psychiatric Association. Signed by Professor Danuta Wasserman, President</dd></div>
-          <div><dt data-i18n="fVerify">Verification</dt><dd><span data-i18n="wpaVerify">Verification ID</span> <code>e17e9dd1-8bed-41c1-afaa-3cc77a85586b</code></dd></div>
-          <div><dt>SHA-256</dt><dd><code>77b160d6b0d706f7aa79e491efe6095baf419ce07f128d27da6d710c3c4ee2d6</code></dd></div>
-        </dl>
-        <div class="actions">
-          <a class="btn btn-gold" href="2026-09-wpa-stockholm-attendance.pdf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8.5 12v1.6h9V12h-9zm0 3.2v1.6h9v-1.6h-9zm0 3.2V20h6v-1.6h-6z"/></svg><span data-i18n="bPdf">Open PDF</span></a>
-        </div>
-      </div>
-    </article>
-  </section>
-
   <section aria-labelledby="h-check">
     <h2 id="h-check" data-i18n="h2Check">Checking a file</h2>
     <div class="verify">
@@ -347,9 +345,8 @@
       chip:'Registro de congresos · 2026',
       h1:'Constancias',
       lead:'Los documentos originales que cada organizador emitió para las presentaciones y la asistencia a congresos de mi currículum. Cada archivo se sirve tal como se emitió, con su huella SHA-256, para que cualquiera pueda confirmar que no fue alterado.',
-      t1:'<b>2</b> presentaciones', t2:'<b>1</b> asistencia', t3:'Canadá · Macedonia del Norte · Suecia',
-      h2Pres:'Presentaciones',
-      presNote:'Ambas presentan <strong class="nw">EpiForecast-MX</strong>, la plataforma de pronóstico epidemiológico desarrollada en el Tecnológico de Monterrey con el Instituto Mexicano del Seguro Social (IMSS).',
+      t1:'<b>2</b> presentaciones', t2:'<b>1</b> asistencia', t3:'Suecia · Canadá · Macedonia del Norte',
+      yearNote:'De la más reciente a la más antigua. Las dos presentaciones exponen <strong class="nw">EpiForecast-MX</strong>, la plataforma de pronóstico epidemiológico desarrollada en el Tecnológico de Monterrey con el Instituto Mexicano del Seguro Social (IMSS).',
       kOral:'Comunicación oral', kPoster:'Póster', kAttend:'Asistencia',
       calassWhen:'27–29 de agosto de 2026 · Université de Montréal, Canadá',
       calassGloss:'De la vigilancia epidemiológica a la inteligencia predictiva: el papel de la inteligencia artificial en la organización prospectiva de los sistemas públicos de salud.',
@@ -361,11 +358,11 @@
       skopjeGloss:'Pronóstico basado en IA para llevar la vigilancia epidemiológica hacia enfoques predictivos: depresión, Alzheimer y Parkinson como casos de uso.',
       skopjeIssuer:'Comité organizador. Firmada por la Prof. Fimka Tozija, presidenta',
       valid:'Válida', skopjeVerify:'en el registro del organizador, folio',
-      h2Att:'Asistencia',
       wpaWhen:'23–26 de septiembre de 2026 · Estocolmo, Suecia',
       wpaNote:'Contexto clínico para las series de depresión, Alzheimer y Parkinson que pronostica <span class="nw">EpiForecast-MX</span>.',
       wpaIssuer:'World Psychiatric Association. Firmada por la profesora Danuta Wasserman, presidenta',
       wpaVerify:'Folio de verificación',
+      wpaVerify2:'lo emite el organizador del congreso, <a href="https://wcp-congress.com/contact-us/" target="_blank" rel="noopener noreferrer">Kenes Group</a>; no hay página pública de consulta',
       h2Check:'Cómo comprobar un archivo',
       check1:'Cada huella es el SHA-256 del PDF exactamente como lo emitió su organizador. Descarga el archivo y compara: <code>shasum -a 256</code> en macOS o Linux, <code>Get-FileHash</code> en Windows.',
       check2:'La constancia de Skopje trae además un código QR que lleva al registro del propio organizador.',
@@ -377,9 +374,8 @@
       chip:'2026 · 学术会议记录',
       h1:'证书与证明',
       lead:'以下为各主办方就我简历中所列的学术报告与会议出席所颁发的原始文件。每份文件均按原样提供，并附 SHA-256 指纹，任何人都可以核验其未经改动。',
-      t1:'学术报告 <b>2</b> 场', t2:'会议出席 <b>1</b> 次', t3:'加拿大 · 北马其顿 · 瑞典',
-      h2Pres:'学术报告',
-      presNote:'两场报告均介绍 <strong class="nw">EpiForecast-MX</strong>：由蒙特雷科技大学与墨西哥社会保障局（IMSS）合作开发的流行病学预测平台。',
+      t1:'学术报告 <b>2</b> 场', t2:'会议出席 <b>1</b> 次', t3:'瑞典 · 加拿大 · 北马其顿',
+      yearNote:'按时间由近及远排列。两场学术报告均介绍 <strong class="nw">EpiForecast-MX</strong>：由蒙特雷科技大学与墨西哥社会保障局（IMSS）合作开发的流行病学预测平台。',
       kOral:'口头报告', kPoster:'海报展示', kAttend:'会议出席',
       calassWhen:'2026年8月27–29日 · 加拿大蒙特利尔大学',
       calassGloss:'从流行病学监测到预测性智能：人工智能在公共卫生体系前瞻性组织中的作用。',
@@ -391,11 +387,11 @@
       skopjeGloss:'基于人工智能的预测，推动流行病学监测转向预测性方法：以抑郁症、阿尔茨海默病和帕金森病为应用案例。',
       skopjeIssuer:'大会组委会。由组委会主席 Fimka Tozija 教授签署',
       valid:'有效', skopjeVerify:'已登记于主办方核验系统，编号',
-      h2Att:'会议出席',
       wpaWhen:'2026年9月23–26日 · 瑞典斯德哥尔摩',
       wpaNote:'为 <span class="nw">EpiForecast-MX</span> 所预测的抑郁症、阿尔茨海默病和帕金森病序列提供临床背景。',
       wpaIssuer:'世界精神病学协会（WPA）。由主席 Danuta Wasserman 教授签署',
       wpaVerify:'核验编号',
+      wpaVerify2:'由大会组织方 <a href="https://wcp-congress.com/contact-us/" target="_blank" rel="noopener noreferrer">Kenes Group</a> 签发；暂无公开查询页面',
       h2Check:'如何核验文件',
       check1:'每个指纹都是主办方原始 PDF 的 SHA-256 值。下载文件后即可比对：macOS 或 Linux 使用 <code>shasum -a 256</code>，Windows 使用 <code>Get-FileHash</code>。',
       check2:'斯科普里会议的证书还附有二维码，可直接链接至主办方的核验系统。',
