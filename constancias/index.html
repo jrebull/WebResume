@@ -134,13 +134,6 @@
   .gloss{font-size:.85rem;color:var(--muted);padding-left:16px}
   .gloss:empty{display:none}
   .inst{margin-top:6px;font-size:.74rem;color:var(--muted);line-height:1.5}
-  .ev-title{margin:-2px 0 9px;font-size:.6rem;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--bronze-deep)}
-  .evidence{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
-  .ev{display:flex;flex-direction:column;gap:6px;color:#cfcac0;font-size:.7rem;line-height:1.35}
-  .ev img{display:block;width:100%;height:86px;object-fit:cover;object-position:top;border-radius:5px;background:#fff;
-    box-shadow:0 8px 20px rgba(0,0,0,.45);transition:transform .22s}
-  .ev:hover{color:var(--bronze)}
-  .ev:hover img{transform:translateY(-2px)}
   .authors{margin-top:12px;font-size:.8rem;color:#b9b4a9;line-height:1.55}
   .authors b{color:var(--cream);font-weight:700}
   .authors b,.authors span,.nw{white-space:nowrap}
@@ -197,11 +190,10 @@
     .thumb{max-width:190px}
     .thumb.landscape{max-width:260px}
     .facts div{grid-template-columns:1fr;gap:1px}
-    .ev img{height:64px}
   }
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
-    .thumb:hover,.btn:hover,.ev:hover img{transform:none}
+    .thumb:hover,.btn:hover{transform:none}
   }
   @media print{
     .langs,.actions,.back{display:none}
@@ -260,12 +252,6 @@
           <div><dt data-i18n="fVerify">Verification</dt><dd><span data-i18n="wpaVerify">Verification ID</span> <code>e17e9dd1-8bed-41c1-afaa-3cc77a85586b</code> · <span data-i18n="wpaVerify2">issued by the congress organiser, <a href="https://wcp-congress.com/contact-us/" target="_blank" rel="noopener noreferrer">Kenes Group</a>; no public lookup page</span></dd></div>
           <div><dt>SHA-256</dt><dd><code>77b160d6b0d706f7aa79e491efe6095baf419ce07f128d27da6d710c3c4ee2d6</code></dd></div>
         </dl>
-        <p class="ev-title" data-i18n="evTitle">Evidence from the congress app</p>
-        <div class="evidence">
-          <a class="ev" href="2026-09-wcp-stockholm-eposter-3134.pdf"><img src="previews/2026-09-wcp-stockholm-eposter-3134.jpg" width="400" height="225" alt="" loading="lazy"><span data-i18n="ev1">The ePoster (PDF)</span></a>
-          <a class="ev" href="evidencia/2026-09-wcp-app-1-programa.jpeg"><img src="previews/2026-09-wcp-app-1-programa.jpg" width="400" height="273" alt="" loading="lazy"><span data-i18n="ev2">Programme: listed as presenter</span></a>
-          <a class="ev" href="evidencia/2026-09-wcp-app-2-resumen.jpeg"><img src="previews/2026-09-wcp-app-2-resumen.jpg" width="400" height="561" alt="" loading="lazy"><span data-i18n="ev3">Abstract: authors and affiliations</span></a>
-        </div>
         <div class="actions">
           <a class="btn btn-gold" href="2026-09-wpa-stockholm-attendance.pdf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8.5 12v1.6h9V12h-9zm0 3.2v1.6h9v-1.6h-9zm0 3.2V20h6v-1.6h-6z"/></svg><span data-i18n="bPdf">Certificate</span></a>
           <a class="btn btn-ghost" href="2026-09-wcp-stockholm-eposter-3134.pdf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v16H3V4zm2 2v9.6l4-4 3.5 3.5 2.5-2.5 4 4V6H5zm11 3.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg><span data-i18n="bPoster">ePoster</span></a>
@@ -382,8 +368,6 @@
       fProg:'Programa',
       wpaProg:'ePóster <b>EV0467</b> · resumen ID 3134 · sesión AS17 Digital Psychiatry · presentador: Javier Augusto Rebull Saucedo',
       wpaDocNote:'La constancia acredita la asistencia; el papel de presentador consta en la app del congreso, donde se publicaron los ePósteres (el programa web público no los incluye).',
-      evTitle:'Evidencia de la app del congreso',
-      ev1:'El ePóster (PDF)', ev2:'Programa: figura como presentador', ev3:'Resumen: autores y afiliaciones',
       bPoster:'ePóster', bPosterSk:'Póster',
       wpaIssuer:'World Psychiatric Association. Firmada por la profesora Danuta Wasserman, presidenta',
       wpaVerify:'Folio de verificación',
@@ -417,8 +401,6 @@
       fProg:'大会日程',
       wpaProg:'电子海报 <b>EV0467</b> · 摘要编号 3134 · AS17 Digital Psychiatry 专场 · 报告人：Javier Augusto Rebull Saucedo',
       wpaDocNote:'该证书证明参会；报告人身份记录于大会应用程序中，电子海报即在该程序内发布（公开的网页版日程未收录电子海报）。',
-      evTitle:'大会应用程序中的证据',
-      ev1:'电子海报（PDF）', ev2:'日程：列为报告人', ev3:'摘要：作者与单位',
       bPoster:'电子海报', bPosterSk:'海报',
       wpaIssuer:'世界精神病学协会（WPA）。由主席 Danuta Wasserman 教授签署',
       wpaVerify:'核验编号',

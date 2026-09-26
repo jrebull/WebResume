@@ -17,9 +17,8 @@ La carpeta se publica en **[rebull.org/constancias/](https://rebull.org/constanc
 | `AAAA-MM-ciudad-evento-modalidad.pdf` | Constancias emitidas por los organizadores, byte por byte |
 | `2026-09-wcp-stockholm-eposter-3134.pdf` | El ePóster presentado en la WPA (obra propia, no constancia) |
 | `2026-05-skopje-cartel.pdf` | El póster presentado en Skopje (obra propia, no constancia) |
-| `evidencia/` | Capturas de la app del congreso que prueban el papel de presentador |
 | `previews/` | Miniaturas para la página web; se regeneran, no son evidencia |
-| `SHA256SUMS` | Huellas de los PDF y de la evidencia |
+| `SHA256SUMS` | Huellas de los PDF |
 | `citas.bib` | Las tres presentaciones en BibTeX |
 | `index.html` | La página pública |
 
@@ -29,7 +28,7 @@ De la más reciente a la más antigua, igual que en el sitio y en el CV.
 
 | # | Fechas | Evento | Sede | Modalidad | Archivos |
 |---|---|---|---|---|---|
-| 1 | 23–26 sep 2026 | 26th WPA World Congress of Psychiatry | Estocolmo, Suecia | ePóster, como presentador | [constancia](2026-09-wpa-stockholm-attendance.pdf) · [ePóster](2026-09-wcp-stockholm-eposter-3134.pdf) · [evidencia](evidencia/) |
+| 1 | 23–26 sep 2026 | 26th WPA World Congress of Psychiatry | Estocolmo, Suecia | ePóster, como presentador | [constancia](2026-09-wpa-stockholm-attendance.pdf) · [ePóster](2026-09-wcp-stockholm-eposter-3134.pdf) |
 | 2 | 27–29 ago 2026 | CALASS 2026, Congrès de l'ALASS | Université de Montréal, Canadá | Comunicación oral | [constancia](2026-08-calass-montreal-oral.pdf) |
 | 3 | 21–22 may 2026 | 2nd Public Health Conference & 2nd HSG Europe Preconference | Skopje, Macedonia del Norte | Póster | [constancia](2026-05-skopje-public-health-poster.pdf) · [póster](2026-05-skopje-cartel.pdf) |
 
@@ -51,7 +50,7 @@ Las tres presentaciones son del mismo proyecto, **EpiForecast-MX**, la plataform
 | Afiliaciones, según el resumen | 1 Rebull Saucedo y Sánchez Salazar: Maestría en Inteligencia Artificial Aplicada, Tecnológico de Monterrey (ITESM Hidalgo), Pachuca · 2 Pérez Nava: IMSS, Ciudad de México · 3 Barceló Alonso: *Associate National Director*, Maestría en IA Aplicada, Tecnológico de Monterrey · 4 Díaz Castro: Dirección de Investigaciones Epidemiológicas y Psicosociales, Instituto Nacional de Psiquiatría Ramón de la Fuente Muñiz · 5 Cuadra Hernández: Centro de Investigación en Sistemas de Salud, Instituto Nacional de Salud Pública, Cuernavaca · 6 Pérez Hernández: IMSS, Ciudad de México |
 | Constancia | *Certificate of Attendance* (inglés), 1 página A4, a nombre de «Javier Augusto Rebull Saucedo M.Sc.». Firma: Professor Danuta Wasserman, President, World Psychiatric Association. **Solo acredita asistencia**; el papel de presentador lo prueba el programa (abajo) |
 | Verificación de la constancia | Verification ID `e17e9dd1-8bed-41c1-afaa-3cc77a85586b`, sin página pública de consulta. Lo emite el organizador profesional del congreso, **Kenes Group** (Ginebra). Revisado el 27 sep 2026: el PDF no trae QR, enlace ni metadatos; las rutas `/verify/`, `/certificate/` y `/verification/` de wcp-congress.com devuelven 404; ni la FAQ ni la página CME mencionan verificación. Un tercero tendría que escribir a la secretaría ([wcp-congress.com/contact-us](https://wcp-congress.com/contact-us/)) citando el folio |
-| Evidencia de presentador | Tres capturas de la app oficial del congreso, en `evidencia/`: (1) el listado de la sesión *Digital Psychiatry: Artificial Intelligence…* con EV0467 y «Presenter: Javier Augusto Rebull Saucedo»; (2) la ficha del resumen con autores y afiliaciones; (3) el ePóster tal como se publicó en la galería. Las guías del congreso dicen que los ePósteres se publican en la galería de la app; el 27 sep 2026 el programa web público ([cslide.ctimeetingtech.com/wcp26](https://cslide.ctimeetingtech.com/wcp26/attendee)) no encontraba ni este ePóster ni los de otros autores de la misma sesión |
+| Evidencia de presentador | Tres capturas de la app oficial del congreso, **guardadas fuera del sitio y sin publicar** (eran contexto para documentar la ficha): (1) el listado de la sesión *Digital Psychiatry: Artificial Intelligence…* con EV0467 y «Presenter: Javier Augusto Rebull Saucedo»; (2) la ficha del resumen con autores y afiliaciones; (3) el ePóster tal como se publicó en la galería. Las guías del congreso dicen que los ePósteres se publican en la galería de la app; el 27 sep 2026 el programa web público ([cslide.ctimeetingtech.com/wcp26](https://cslide.ctimeetingtech.com/wcp26/attendee)) no encontraba ni este ePóster ni los de otros autores de la misma sesión |
 | Archivos originales | Constancia: `Certificate of Attendance WCP 2026.pdf` (WeasyPrint 69.0). ePóster: `WCP2026ePoster3134Rebull.pdf` (1 página 16:9, ReportLab). Capturas: `WCPeviden1.jpeg`, `WCPeviden2.jpeg`, `WCPeviden3.jpeg` |
 | SHA-256, constancia | `77b160d6b0d706f7aa79e491efe6095baf419ce07f128d27da6d710c3c4ee2d6` |
 | SHA-256, ePóster | `ec5ebd80e3c3f5293a69b1e97ece8b14ab9f0159628ca403cd609666f6e06b7a` |
@@ -110,17 +109,17 @@ Cada presentación se cita **como la registra su propio documento**, aunque difi
 |---|---|
 | `index.html`, sección *Speaking & Research*, en los tres bloques de idioma (EN, ES, ZH) | De la más reciente a la más antigua: el ePóster de la WPA con enlace al póster y a la constancia, CALASS como tarjeta destacada con título, coautores y constancia, y Skopje con póster, constancia y verificación |
 | `alass26/index.html` | Título oficial, coautores y enlace a la atestación de CALASS, en ES, FR y EN |
-| `constancias/index.html` | Las tres presentaciones, de la más reciente a la más antigua, con miniatura, verificación, huella y, para la WPA, la evidencia de la app |
+| `constancias/index.html` | Las tres presentaciones, de la más reciente a la más antigua, con miniatura, verificación y huella |
 | CV LaTeX `Personal/Interviews/Latex/javier_rebull_cv_september2026.tex` | Sección *Conferences*, de la más reciente a la más antigua |
 | `citas.bib` | Las tres presentaciones en BibTeX, listas para ORCID (*Works → Add → BibTeX*) o para un CV académico |
 
 ## Cómo agregar una constancia nueva
 
-1. Copiar el PDF **tal cual** a esta carpeta con el nombre `AAAA-MM-ciudad-evento-modalidad.pdf`, y cualquier evidencia adicional a `evidencia/`.
-2. Regenerar las huellas: `shasum -a 256 *.pdf evidencia/* > SHA256SUMS`.
+1. Copiar el PDF **tal cual** a esta carpeta con el nombre `AAAA-MM-ciudad-evento-modalidad.pdf`. Capturas u otro material de contexto **no** van aquí: todo lo que está en esta carpeta es público.
+2. Regenerar las huellas: `shasum -a 256 *.pdf > SHA256SUMS`.
 3. Generar la miniatura:
    `pdftoppm -jpeg -jpegopt quality=85,optimize=y -scale-to-x 400 -scale-to-y -1 -singlefile ARCHIVO.pdf previews/ARCHIVO`
 4. Si trae QR, decodificarlo y comprobar que la verificación responde antes de enlazarla.
-5. Si la constancia no dice lo que pasó (por ejemplo, *attendance* cuando hubo presentación), guardar la evidencia del programa y explicarlo en la ficha.
+5. Si la constancia no dice lo que pasó (por ejemplo, *attendance* cuando hubo presentación), explicarlo en la ficha con los datos del programa, sin publicar las capturas.
 6. Agregar su ficha aquí y su tarjeta en `index.html` de esta carpeta (los tres idiomas), **en orden cronológico, de la más reciente a la más antigua**.
 7. Actualizar el sitio principal en **los tres bloques de idioma**, el CV LaTeX (versión nueva, no sobrescribir), `citas.bib` y la fecha de «Last updated».
