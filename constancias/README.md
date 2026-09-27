@@ -16,6 +16,7 @@ La carpeta se publica en **[rebull.org/constancias/](https://rebull.org/constanc
 |---|---|
 | `AAAA-MM-ciudad-evento-modalidad.pdf` | Constancias emitidas por los organizadores, byte por byte |
 | `2026-09-wcp-stockholm-eposter-3134.pdf` | El ePóster presentado en la WPA (obra propia, no constancia) |
+| `2026-08-calass-montreal-slides-fr.pdf` | Las diapositivas proyectadas en CALASS 2026 (obra propia, no constancia) |
 | `2026-05-skopje-cartel.pdf` | El póster presentado en Skopje (obra propia, no constancia) |
 | `previews/` | Miniaturas para la página web; se regeneran, no son evidencia |
 | `SHA256SUMS` | Huellas de los PDF |
@@ -29,7 +30,7 @@ De la más reciente a la más antigua, igual que en el sitio y en el CV.
 | # | Fechas | Evento | Sede | Modalidad | Archivos |
 |---|---|---|---|---|---|
 | 1 | 23–26 sep 2026 | 26th WPA World Congress of Psychiatry | Estocolmo, Suecia | ePóster, como presentador | [constancia](2026-09-wpa-stockholm-attendance.pdf) · [ePóster](2026-09-wcp-stockholm-eposter-3134.pdf) |
-| 2 | 27–29 ago 2026 | CALASS 2026, Congrès de l'ALASS | Université de Montréal, Canadá | Comunicación oral | [constancia](2026-08-calass-montreal-oral.pdf) |
+| 2 | 27–29 ago 2026 | CALASS 2026, Congrès de l'ALASS | Université de Montréal, Canadá | Comunicación oral | [constancia](2026-08-calass-montreal-oral.pdf) · [diapositivas](2026-08-calass-montreal-slides-fr.pdf) |
 | 3 | 21–22 may 2026 | 2nd Public Health Conference & 2nd HSG Europe Preconference | Skopje, Macedonia del Norte | Póster | [constancia](2026-05-skopje-public-health-poster.pdf) · [póster](2026-05-skopje-cartel.pdf) |
 
 Las tres presentaciones son del mismo proyecto, **EpiForecast-MX**, la plataforma de pronóstico epidemiológico desarrollada en el Tecnológico de Monterrey con el Instituto Mexicano del Seguro Social (IMSS), centrada en su cohorte neurológica y psiquiátrica: depresión (F32), Alzheimer (G30) y Parkinson (G20).
@@ -71,6 +72,9 @@ Las tres presentaciones son del mismo proyecto, **EpiForecast-MX**, la plataform
 | Verificación | Atestación firmada, sin folio ni portal en línea. La ponencia tiene su página en [rebull.org/alass26](https://rebull.org/alass26/) |
 | Archivo original | `Javier Augusto Rebull Saucedo.pdf` (Microsoft Word, 22 sep 2026; autor en los metadatos: Borgès Da Silva Roxane) |
 | SHA-256 | `e094a3c142461a4e6595ddfe0bb34b9ed026caaa00480403b37dfbe313cd9340` |
+| Sesión, según las diapositivas | *Communication 75* · Séance 4.1, *L'IA pour la gestion des services* · jeudi 27 août 2026, 11 h 30 – 13 h 00. La portada dice «Présentent: Javier Rebull · Ruth Pérez-Hernández» y «Avec» Pérez-Nava, Sánchez-Salazar, Barceló-Alonso, **Lina Díaz-Castro** y Cuadra-Hernández |
+| Diapositivas | `2026-08-calass-montreal-slides-fr.pdf`, 15 láminas 16:9 en francés. Es el archivo proyectado: su huella coincide con `1_PRESENTACION_fr_PROYECTAR.pdf` y con `075-Rebull_Javier-Perez_Ruth_Frances.pdf` de la carpeta del congreso (original `calass2026_fr.pdf`). La última lámina muestra la foto y el nombre de Ruth Pérez-Hernández con su sitio, sin correos |
+| SHA-256, diapositivas | `225edf5c790acd7c9b6ab5344dd91c13b252c0d12877a0ad53b96e59006cf571` |
 
 ## 3. Póster · Skopje · mayo de 2026
 
@@ -97,7 +101,7 @@ Las tres presentaciones son del mismo proyecto, **EpiForecast-MX**, la plataform
 
 Cada presentación se cita **como la registra su propio documento**, aunque difieran entre sí:
 
-- **Autores.** Skopje y la WPA listan los mismos siete autores en el mismo orden, con Lina Díaz-Castro; CALASS lista seis, sin ella, y pone a Ruth Pérez-Hernández antes de Silvia Magali Cuadra-Hernández.
+- **Autores.** Skopje y la WPA listan los mismos siete autores en el mismo orden, con Lina Díaz-Castro; la atestación de CALASS lista seis, sin ella, y pone a Ruth Pérez-Hernández antes de Silvia Magali Cuadra-Hernández. Las diapositivas de CALASS sí incluyen a Lina: el sitio cita la atestación, que es el registro del congreso.
 - **Nombres.** CALASS escribe «Ruth Pérez-Hernández» y «Rebull Saucedo»; Skopje y el ePóster, «Ruth Manuela Pérez-Hernández» y «Rebull-Saucedo». La app de la WPA quita guiones y algunos acentos («Perez Nava», «Diaz Castro», «R..M.»): se cita como el ePóster, que es la obra.
 - **La WPA.** La constancia dice *attendance*, pero Javier presentó el ePóster: eso consta en el programa de la app. En el sitio y en el CV se presenta como ePóster, y la ficha pública explica la diferencia en vez de ocultarla.
 - **Título de Skopje.** La constancia termina en «(Epi-Forecast)»; la página de verificación lo omite, y el póster impreso usa otro título (*…Toward Predictive Approaches and Inform Health System Planning (EpiForecast-)*). Se cita el de la constancia, con el sufijo, porque es el registro firmado del congreso; el póster se enlaza tal cual, sin corregirlo.
@@ -107,8 +111,8 @@ Cada presentación se cita **como la registra su propio documento**, aunque difi
 
 | Lugar | Qué muestra |
 |---|---|
-| `index.html`, sección *Speaking & Research*, en los tres bloques de idioma (EN, ES, ZH) | De la más reciente a la más antigua: el ePóster de la WPA con enlace al póster y a la constancia, CALASS como tarjeta destacada con título, coautores y constancia, y Skopje con póster, constancia y verificación |
-| `alass26/index.html` | Título oficial, coautores y enlace a la atestación de CALASS, en ES, FR y EN |
+| `index.html`, sección *Speaking & Research*, en los tres bloques de idioma (EN, ES, ZH) | De la más reciente a la más antigua: el ePóster de la WPA con enlace al póster y a la constancia, CALASS como tarjeta destacada con título, coautores, diapositivas y constancia, y Skopje con póster, constancia y verificación |
+| `alass26/index.html` | Título oficial, coautores y enlaces a las diapositivas y a la atestación de CALASS, en ES, FR y EN |
 | `constancias/index.html` | Las tres presentaciones, de la más reciente a la más antigua, con miniatura, verificación y huella |
 | CV LaTeX `Personal/Interviews/Latex/javier_rebull_cv_september2026.tex` | Sección *Conferences*, de la más reciente a la más antigua |
 | `citas.bib` | Las tres presentaciones en BibTeX, listas para ORCID (*Works → Add → BibTeX*) o para un CV académico |
