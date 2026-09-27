@@ -117,6 +117,7 @@
     font-size:.6rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;
   }
   .chip svg{width:12px;height:12px;fill:#e3c27e;flex-shrink:0}
+  .nw{white-space:nowrap}
   h1{
     font-family:'Playfair Display',serif;font-weight:800;
     font-size:clamp(2.1rem,6.4vw,3rem);line-height:1.02;letter-spacing:-.6px;
@@ -245,7 +246,7 @@
   .foot-links{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 20px;margin-bottom:14px;
     font-size:.7rem;letter-spacing:1.2px;text-transform:uppercase}
   .foot-links a{display:inline-flex;align-items:center;min-height:26px;padding:3px 0}
-  .updated{opacity:.6;letter-spacing:.6px}
+  .updated{letter-spacing:.6px}
 
   @media (max-width:600px){
     header.hero{padding:64px 0 36px}
@@ -281,7 +282,7 @@
   <div class="wrap hero-inner">
     <img class="portrait" src="../Images/profile.jpg" alt="Javier Rebull" width="104" height="104">
     <div class="hero-copy">
-      <span class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4zm-1.6 15.2-4-4 1.4-1.4 2.6 2.6 5.8-5.8 1.4 1.4-7.2 7.2z"/></svg><span data-i18n="chip">Ponencia presentada · CALASS 2026</span></span>
+      <span class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4zm-1.6 15.2-4-4 1.4-1.4 2.6 2.6 5.8-5.8 1.4 1.4-7.2 7.2z"/></svg><span data-i18n="chip">Ponencia presentada · <span class="nw">CALASS 2026</span></span></span>
       <h1>Javier Rebull</h1>
       <p class="role" data-i18n="role">M.Sc. en Inteligencia Artificial Aplicada, Tecnológico de Monterrey · Ingeniero de software e IA aplicada a la salud pública</p>
     </div>
@@ -299,7 +300,7 @@
     <h2 data-i18n="h2Work">La ponencia</h2>
     <figure class="record">
       <p class="rec-kind" data-i18n="recKind">Comunicación oral · título oficial</p>
-      <blockquote lang="fr">« De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé »</blockquote>
+      <blockquote lang="fr">« De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé »</blockquote>
       <figcaption>
         <span class="rec-gloss" data-i18n="recGloss">De la vigilancia epidemiológica a la inteligencia predictiva: el papel de la inteligencia artificial en la organización prospectiva de los sistemas públicos de salud.</span>
         <span class="rec-authors"><b>Javier Augusto Rebull Saucedo</b>, <span>Juan Carlos Pérez-Nava</span>, <span>Luis Gerardo Sánchez-Salazar</span>, <span>Grettel Barceló-Alonso</span>, <span>Ruth Pérez-Hernández</span>, <span>Silvia Magali Cuadra-Hernández</span></span>
@@ -309,7 +310,7 @@
         </span>
       </figcaption>
     </figure>
-    <p class="lead" data-i18n="lead1"><strong>EpiForecast-MX</strong> es una plataforma de inteligencia epidemiológica desarrollada en el <strong>Tecnológico de Monterrey</strong> en colaboración con el <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> que pronostica la incidencia semanal de enfermedades en las 32 entidades federativas de México, con un horizonte de 52 semanas.</p>
+    <p class="lead" data-i18n="lead1"><strong>EpiForecast-MX</strong> es una plataforma de inteligencia epidemiológica desarrollada en el <strong>Tecnológico de Monterrey</strong> en colaboración con el <strong>Instituto Mexicano del Seguro Social (IMSS)</strong> que pronostica los casos notificados semanales en las 32 entidades federativas de México, con un horizonte de 52 semanas.</p>
     <p data-i18n="lead2">Se alimenta exclusivamente de los boletines públicos del Sistema Nacional de Vigilancia Epidemiológica (SINAVE). En lugar de imponer un solo algoritmo a todo el sistema de vigilancia, entrena una biblioteca de modelos con supuestos deliberadamente distintos y elige, para cada serie, el que su propia evidencia respalda mejor.</p>
   </section>
 
@@ -319,9 +320,9 @@
       <div><b>32</b><span data-i18n="fig1">Entidades federativas</span></div>
       <div><b>52</b><span data-i18n="fig2">Semanas de horizonte</span></div>
       <div><b>4</b><span data-i18n="fig3">Padecimientos</span></div>
-      <div><b>333</b><span data-i18n="fig4">Modelos neurológicos</span></div>
+      <div><b>333</b><span data-i18n="fig4">Modelos neuropsiquiátricos</span></div>
     </div>
-    <p style="margin-top:16px;font-size:.88rem;color:var(--muted)" data-i18n="figNote">Padecimientos: depresión (CIE-10 F32), enfermedad de Parkinson (G20), enfermedad de Alzheimer (G30) y dengue (A97). La cohorte neurológica suma 333 modelos en producción; el dengue corre por su propio flujo de conteos, con 99 series adicionales.</p>
+    <p style="margin-top:16px;font-size:.88rem;color:var(--muted)" data-i18n="figNote">Padecimientos: depresión (CIE-10 F32), enfermedad de Parkinson (G20), enfermedad de Alzheimer (G30) y dengue (A97). La cohorte neuropsiquiátrica suma 333 modelos en producción; el dengue corre por su propio flujo de conteos, con 99 series adicionales.</p>
   </section>
 
   <section>
@@ -379,19 +380,19 @@
     <div class="links">
       <a class="link" href="https://epiforecast.mx" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h2v18H3V3zm4 12h3v6H7v-6zm5-6h3v12h-3V9zm5-4h3v16h-3V5z"/></svg>
-        <span data-i18n="l1t">epiforecast.mx<small data-i18n="l1b">La plataforma en vivo, con los pronósticos publicados</small></span>
+        <span><span data-i18n="l1t">epiforecast.mx</span><small data-i18n="l1b">La plataforma en vivo, con los pronósticos publicados</small></span>
       </a>
       <a class="link" href="https://medium.com/@rebull/forecasting-dengue-in-mexico-an-end-to-end-data-science-story-0d2d5d62b3bd" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v2H4V4zm0 5h16v2H4V9zm0 5h11v2H4v-2zm0 5h11v2H4v-2z"/></svg>
-        <span data-i18n="l2t">Artículo en Medium<small data-i18n="l2b">El flujo completo del caso dengue, de principio a fin</small></span>
+        <span><span data-i18n="l2t">Artículo en Medium</span><small data-i18n="l2b">El flujo completo del caso dengue, de principio a fin</small></span>
       </a>
       <a class="link" href="https://rebull.org/" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 9h-3a15 15 0 00-1.2-5.3A8 8 0 0118.9 11zM12 4.2c.8 1.2 1.5 3.1 1.7 6.8h-3.4c.2-3.7.9-5.6 1.7-6.8zM4.3 13h3c.1 2 .5 3.8 1.1 5.3A8 8 0 014.3 13zm3-2h-3a8 8 0 014.1-5.3A15 15 0 007.3 11zm4.7 8.8c-.8-1.2-1.5-3.1-1.7-6.8h3.4c-.2 3.7-.9 5.6-1.7 6.8zm2.7-.5c.6-1.5 1-3.3 1.1-5.3h3a8 8 0 01-4.1 5.3z"/></svg>
-        <span data-i18n="l3t">rebull.org<small data-i18n="l3b">Trayectoria profesional completa y currículum</small></span>
+        <span><span data-i18n="l3t">rebull.org</span><small data-i18n="l3b">Trayectoria profesional completa y currículum</small></span>
       </a>
       <a class="link" href="https://alass.org/" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1a5 5 0 00-5 5v5a5 5 0 0010 0V6a5 5 0 00-5-5zm7 10a7 7 0 01-6 6.9V21h3v2H8v-2h3v-3.1A7 7 0 015 11h2a5 5 0 0010 0h2z"/></svg>
-        <span data-i18n="l4t">alass.org<small data-i18n="l4b">Programa e información del congreso</small></span>
+        <span><span data-i18n="l4t">alass.org</span><small data-i18n="l4b">Programa e información del congreso</small></span>
       </a>
     </div>
   </section>
@@ -440,7 +441,7 @@
   // El español vive en el HTML (funciona sin JS); FR y EN se sustituyen desde aquí.
   var DICT = {
     fr: {
-      chip:'Communication présentée · CALASS 2026',
+      chip:'Communication présentée · <span class="nw">CALASS 2026</span>',
       role:"M.Sc. en intelligence artificielle appliquée, Tecnológico de Monterrey · Ingénieur logiciel et IA appliquée à la santé publique",
       venueDates:'27–29 août 2026',
       venuePlace:'Université de Montréal · Montréal, Canada',
@@ -449,11 +450,11 @@
       recGloss:'',
       recPdf:'Attestation de participation (PDF)',
       recSlides:'Diapositives (PDF)',
-      lead1:"<strong>EpiForecast-MX</strong> est une plateforme d'intelligence épidémiologique développée au <strong>Tecnológico de Monterrey</strong> en collaboration avec l'<strong>Institut mexicain de sécurité sociale (IMSS)</strong> qui prévoit l'incidence hebdomadaire des maladies dans les 32 entités fédérales du Mexique, sur un horizon de 52 semaines.",
+      lead1:"<strong>EpiForecast-MX</strong> est une plateforme d'intelligence épidémiologique développée au <strong>Tecnológico de Monterrey</strong> en collaboration avec l'<strong>Institut mexicain de sécurité sociale (IMSS)</strong> qui prévoit les cas notifiés chaque semaine dans les 32 entités fédérales du Mexique, sur un horizon de 52 semaines.",
       lead2:"Elle se nourrit uniquement des bulletins publics du Système national de surveillance épidémiologique (SINAVE). Plutôt que d'imposer un seul algorithme à tout le système de surveillance, elle entraîne une bibliothèque de modèles aux hypothèses délibérément différentes et retient, pour chaque série, celui que ses propres données appuient le mieux.",
       h2Figures:'En chiffres',
-      fig1:'Entités fédérales', fig2:'Semaines d’horizon', fig3:'Maladies', fig4:'Modèles neurologiques',
-      figNote:"Maladies : dépression (CIM-10 F32), maladie de Parkinson (G20), maladie d'Alzheimer (G30) et dengue (A97). La cohorte neurologique totalise 333 modèles en production ; la dengue suit son propre flux de comptages, avec 99 séries supplémentaires.",
+      fig1:'Entités fédérales', fig2:'Semaines d’horizon', fig3:'Maladies', fig4:'Modèles neuropsychiatriques',
+      figNote:"Maladies : dépression (CIM-10 F32), maladie de Parkinson (G20), maladie d'Alzheimer (G30) et dengue (A97). La cohorte neuropsychiatrique totalise 333 modèles en production ; la dengue suit son propre flux de comptages, avec 99 séries supplémentaires.",
       h2Method:'La méthode',
       s1t:'Des données publiques, extraites et auditées',
       s1b:"Les tableaux des bulletins SINAVE sont extraits des PDF et validés cellule par cellule contre le total imprimé, avant d'être fusionnés dans un jeu de données versionné.",
@@ -485,20 +486,20 @@
       updated:'Mis à jour le'
     },
     en: {
-      chip:'Talk delivered · CALASS 2026',
+      chip:'Presented · <span class="nw">CALASS 2026</span>',
       role:'M.Sc. in Applied Artificial Intelligence, Tecnológico de Monterrey · Software engineer, AI applied to public health',
       venueDates:'27–29 August 2026',
       venuePlace:'Université de Montréal · Montréal, Canada',
       h2Work:'The talk',
-      recKind:'Oral communication · official title',
-      recGloss:'From epidemiological surveillance to predictive intelligence: the role of artificial intelligence in the prospective organisation of public health systems.',
+      recKind:'Oral presentation · official title',
+      recGloss:'From epidemiological surveillance to predictive intelligence: the role of artificial intelligence in the prospective organization of public health systems.',
       recPdf:'Certificate of participation (PDF)',
       recSlides:'Slides (PDF, in French)',
-      lead1:'<strong>EpiForecast-MX</strong> is an epidemiological intelligence platform built at the <strong>Tecnológico de Monterrey</strong> in collaboration with the <strong>Mexican Social Security Institute (IMSS)</strong> that forecasts weekly disease incidence across Mexico’s 32 federal entities on a 52-week horizon.',
+      lead1:'<strong>EpiForecast-MX</strong> is an epidemiological intelligence platform built at the <strong>Tecnológico de Monterrey</strong> in collaboration with the <strong>Mexican Social Security Institute (IMSS)</strong> that forecasts weekly notified cases across Mexico’s 32 federal entities on a 52-week horizon.',
       lead2:'It is fed entirely by the public bulletins of the National Epidemiological Surveillance System (SINAVE). Rather than imposing one algorithm across an entire surveillance system, it trains a library of models with deliberately different assumptions and keeps, for each series, the one its own evidence supports best.',
       h2Figures:'In numbers',
-      fig1:'Federal entities', fig2:'Week horizon', fig3:'Conditions', fig4:'Neurological models',
-      figNote:'Conditions: depression (ICD-10 F32), Parkinson’s disease (G20), Alzheimer’s disease (G30) and dengue (A97). The neurological cohort totals 333 production models; dengue runs its own count-based pipeline, with 99 further series.',
+      fig1:'Federal entities', fig2:'Week horizon', fig3:'Conditions', fig4:'Neuropsychiatric models',
+      figNote:'Conditions: depression (ICD-10 F32), Parkinson’s disease (G20), Alzheimer’s disease (G30) and dengue (A97). The neuropsychiatric cohort totals 333 production models; dengue runs its own count-based pipeline, with 99 further series.',
       h2Method:'The method',
       s1t:'Public data, extracted and audited',
       s1b:'The tables in the SINAVE bulletins are parsed out of the PDFs and validated cell by cell against the printed total before being merged into a versioned dataset.',
