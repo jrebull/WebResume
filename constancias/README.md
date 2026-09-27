@@ -8,7 +8,7 @@ Cada PDF emitido por un organizador es **el original, sin modificar**. Solo se c
 cd constancias && shasum -a 256 -c SHA256SUMS
 ```
 
-La carpeta se publica en **[rebull.org/constancias/](https://rebull.org/constancias/)**, una página trilingüe (EN · ES · 中文) que muestra cada constancia con su miniatura, su verificación y su PDF. Toda la carpeta sale con `X-Robots-Tag: noindex` (ver `netlify.toml`): se abre desde los enlaces del sitio, pero no aparece en buscadores, porque los documentos nombran a los coautores.
+La carpeta se publica en **[rebull.org/constancias/](https://rebull.org/constancias/)**, una página trilingüe (EN · ES · 中文) que muestra cada constancia con su miniatura, su verificación y su PDF. Toda la carpeta sale con `X-Robots-Tag: noindex` (ver `netlify.toml`): se abre desde los enlaces del sitio, pero no aparece en buscadores, porque los documentos nombran a los coautores. Este `README.md` y `citas.bib` son internos: viven en el repo, pero `netlify.toml` responde 404 para ambos.
 
 ## Estructura
 
@@ -20,7 +20,7 @@ La carpeta se publica en **[rebull.org/constancias/](https://rebull.org/constanc
 | `2026-05-skopje-cartel.pdf` | El póster presentado en Skopje (obra propia, no constancia) |
 | `previews/` | Miniaturas para la página web; se regeneran, no son evidencia |
 | `SHA256SUMS` | Huellas de los PDF |
-| `citas.bib` | Las tres presentaciones en BibTeX |
+| `citas.bib` | Las tres presentaciones en BibTeX, con autores (interno: no se publica) |
 | `index.html` | La página pública |
 
 ## Índice
@@ -111,11 +111,11 @@ Cada presentación se cita **como la registra su propio documento**, aunque difi
 
 | Lugar | Qué muestra |
 |---|---|
-| `index.html`, sección *Speaking & Research*, en los tres bloques de idioma (EN, ES, ZH) | De la más reciente a la más antigua: el ePóster de la WPA con enlace al póster y a la constancia, CALASS como tarjeta destacada con título, coautores, diapositivas y constancia, y Skopje con póster, constancia y verificación |
-| `alass26/index.html` | Título oficial, coautores y enlaces a las diapositivas y a la atestación de CALASS, en ES, FR y EN |
-| `constancias/index.html` | Las tres presentaciones, de la más reciente a la más antigua, con miniatura, verificación y huella |
-| CV LaTeX `Personal/Interviews/Latex/javier_rebull_cv_september2026.tex` | Sección *Conferences*, de la más reciente a la más antigua |
-| `citas.bib` | Las tres presentaciones en BibTeX, listas para ORCID (*Works → Add → BibTeX*) o para un CV académico |
+| `index.html`, sección *Speaking & Research*, en los tres bloques de idioma (EN, ES, ZH) | De la más reciente a la más antigua: el ePóster de la WPA con enlace al póster y a la constancia, CALASS como tarjeta destacada con título, diapositivas y constancia, y Skopje con póster, constancia y verificación. Sin nombres de coautores |
+| `alass26/index.html` | Título oficial y enlaces a las diapositivas y a la atestación de CALASS, en ES, FR y EN. Sin nombres de coautores |
+| `constancias/index.html` | Las tres presentaciones, de la más reciente a la más antigua, con miniatura, verificación y huella. Sin nombres de coautores |
+| CV LaTeX `Personal/Interviews/Latex/javier_rebull_cv_september2026.tex` | Sección *Conferences & Publications* por impacto académico: ponencia oral, luego pósteres (del más reciente al más antiguo), luego el artículo. Enlaza diapositivas, pósteres y esta carpeta. Sin nombres de coautores |
+| `citas.bib` | Las tres presentaciones en BibTeX, listas para ORCID (*Works → Add → BibTeX*) o para un CV académico. No se publica |
 
 ## Cómo agregar una constancia nueva
 
@@ -126,4 +126,4 @@ Cada presentación se cita **como la registra su propio documento**, aunque difi
 4. Si trae QR, decodificarlo y comprobar que la verificación responde antes de enlazarla. Guardar la constancia que entrega el organizador, nunca una versión rehecha; si el registro la regenera en cada descarga, anotar la fecha de la copia guardada.
 5. Si la constancia no dice lo que pasó (por ejemplo, *attendance* cuando hubo presentación), explicarlo en la ficha con los datos del programa, sin publicar las capturas.
 6. Agregar su ficha aquí y su tarjeta en `index.html` de esta carpeta (los tres idiomas), **en orden cronológico, de la más reciente a la más antigua**.
-7. Actualizar el sitio principal en **los tres bloques de idioma**, el CV LaTeX (versión nueva, no sobrescribir), `citas.bib` y la fecha de «Last updated».
+7. Actualizar el sitio principal en **los tres bloques de idioma**, el CV LaTeX (versión nueva, no sobrescribir), `citas.bib` y la fecha de «Last updated». **Nunca** poner nombres de coautores en el sitio ni en el CV: solo los documentos los llevan.
