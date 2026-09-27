@@ -134,9 +134,7 @@
   .gloss{font-size:.85rem;color:var(--muted);padding-left:16px}
   .gloss:empty{display:none}
   .inst{margin-top:6px;font-size:.74rem;color:var(--muted);line-height:1.5}
-  .authors{margin-top:12px;font-size:.8rem;color:#b9b4a9;line-height:1.55}
-  .authors b{color:var(--cream);font-weight:700}
-  .authors b,.authors span,.nw{white-space:nowrap}
+  .nw{white-space:nowrap}
   .facts{margin:16px 0 18px;display:grid;gap:7px;font-size:.8rem}
   .facts div{display:grid;grid-template-columns:104px 1fr;gap:12px}
   .facts dt{
@@ -200,7 +198,7 @@
     body{background:#fff;color:#111}
     h1{background:none;-webkit-text-fill-color:#111;color:#111}
     .rec,.verify{background:none;border-color:#ccc;break-inside:avoid}
-    .rec h3,.work,.facts dd,.authors,.authors b,.lead{color:#111}
+    .rec h3,.work,.facts dd,.lead{color:#111}
     a{color:#111}
   }
 </style>
@@ -243,7 +241,6 @@
         <p class="when" data-i18n="wpaWhen">23–26 September 2026 · Stockholm, Sweden</p>
         <p class="work" lang="en">“Population-level prediction of depression, Alzheimer’s disease, and Parkinson’s disease incidence using artificial intelligence: implications for health service planning”</p>
         <p class="gloss" data-i18n="wpaGloss"></p>
-        <p class="authors"><b>J. A. Rebull-Saucedo</b>, <span>J. C. Pérez-Nava</span>, <span>L. G. Sánchez-Salazar</span>, <span>G. Barceló-Alonso</span>, <span>L. Díaz-Castro</span>, <span>S. M. Cuadra-Hernández</span>, <span>R. M. Pérez-Hernández</span></p>
         <p class="inst">Tecnológico de Monterrey · Instituto Nacional de Psiquiatría Ramón de la Fuente Muñiz · Instituto Nacional de Salud Pública · Instituto Mexicano del Seguro Social</p>
         <dl class="facts">
           <div><dt data-i18n="fProg">Program</dt><dd><span data-i18n="wpaProg">ePoster <b>EV0467</b> · abstract ID 3134 · topic AS17 Digital Psychiatry · presenter: Javier Augusto Rebull Saucedo</span></dd></div>
@@ -269,10 +266,8 @@
         <p class="when" data-i18n="calassWhen">27–29 August 2026 · Université de Montréal, Canada</p>
         <p class="work" lang="fr">« De la surveillance épidémiologique à l’intelligence prédictive : le rôle de l’intelligence artificielle dans l’organisation prospective des systèmes publics de santé »</p>
         <p class="gloss" data-i18n="calassGloss">From epidemiological surveillance to predictive intelligence: the role of artificial intelligence in the prospective organization of public health systems.</p>
-        <p class="authors"><b>J. A. Rebull Saucedo</b>, <span>J. C. Pérez-Nava</span>, <span>L. G. Sánchez-Salazar</span>, <span>G. Barceló-Alonso</span>, <span>R. Pérez-Hernández</span>, <span>S. M. Cuadra-Hernández</span></p>
         <dl class="facts">
           <div><dt data-i18n="fSession">Session</dt><dd><span data-i18n="calassSession">Presentation 75 · Session 4.1, <i lang="fr">L’IA pour la gestion des services</i> · Thursday 27 August 2026, <span class="nw">11:30–13:00</span> (from the slides)</span></dd></div>
-          <div><dt data-i18n="fSlides">Slides</dt><dd data-i18n="calassSlidesNote">The slides also credit L. Díaz-Castro and list J. Rebull and R. Pérez-Hernández as presenters.</dd></div>
           <div><dt data-i18n="fDoc">Document</dt><dd lang="fr">Attestation de participation</dd></div>
           <div><dt data-i18n="fIssued">Issued by</dt><dd data-i18n="calassIssuer">École de santé publique, Université de Montréal. Signed by Roxane Borgès Da Silva, President of ALASS, on behalf of the CALASS 2026 Organizing Committee</dd></div>
           <div><dt data-i18n="fVerify">Verification</dt><dd data-i18n="calassVerify">Signed attestation, issued without an online verification ID</dd></div>
@@ -296,7 +291,6 @@
         <p class="when" data-i18n="skopjeWhen">21–22 May 2026 · Skopje, North Macedonia</p>
         <p class="work" lang="en">“AI-Based Forecasting to Shift Epidemiological Surveillance toward Predictive Approaches: Depression, Alzheimer’s, and Parkinson’s as Use Cases”</p>
         <p class="gloss" data-i18n="skopjeGloss"></p>
-        <p class="authors"><b>J. A. Rebull-Saucedo</b>, <span>J. C. Pérez-Nava</span>, <span>L. G. Sánchez-Salazar</span>, <span>G. Barceló-Alonso</span>, <span>L. Díaz-Castro</span>, <span>S. M. Cuadra-Hernández</span>, <span>R. M. Pérez-Hernández</span></p>
         <dl class="facts">
           <div><dt data-i18n="fDoc">Document</dt><dd lang="en">Certificate of Presentation</dd></div>
           <div><dt data-i18n="fIssued">Issued by</dt><dd data-i18n="skopjeIssuer">Organizing Committee. Signed by Prof. Fimka Tozija, Chair</dd></div>
@@ -319,7 +313,6 @@
       <p data-i18n="check2">The Skopje certificate also carries a QR code that resolves to the organizer’s own register. That organizer regenerates the PDF on every download, so a fresh copy will not match the hash: check it against the register instead.</p>
       <div class="files">
         <a href="SHA256SUMS" data-i18n="fSums">All fingerprints · SHA256SUMS</a>
-        <a href="citas.bib" data-i18n="fBib">Cite the three presentations · BibTeX</a>
       </div>
     </div>
   </section>
@@ -362,8 +355,7 @@
       calassIssuer:'École de santé publique, Université de Montréal. Firma: Roxane Borgès Da Silva, presidenta de la ALASS, en nombre del Comité organizador de CALASS 2026',
       calassVerify:'Constancia firmada, sin folio de verificación en línea',
       fSession:'Sesión', calassSession:'Comunicación 75 · Sesión 4.1, <i lang="fr">L’IA pour la gestion des services</i> · jueves 27 de agosto de 2026, <span class="nw">11:30–13:00</span> (según las diapositivas)',
-      bSlides:'Diapositivas', fSlides:'Diapositivas',
-      calassSlidesNote:'Las diapositivas acreditan además a L. Díaz-Castro y listan como presentadores a J. Rebull y R. Pérez-Hernández.',
+      bSlides:'Diapositivas',
       bAtt:'Constancia de asistencia',
       ariaWpa:'Constancia de asistencia, 26th WPA World Congress of Psychiatry (PDF)', ariaCalass:'Constancia de participación, CALASS 2026 (PDF)', ariaSkopje:'Constancia de presentación, Skopje 2026 (PDF)',
       bPdf:'Constancia', bTalk:'Página de la ponencia', bVerify:'Verificar en línea',
@@ -383,7 +375,7 @@
       h2Check:'Cómo comprobar un archivo',
       check1:'Cada huella es el SHA-256 del PDF guardado aquí, byte por byte. Descarga el archivo y compara: <code>shasum -a 256</code> en macOS o Linux, <code>Get-FileHash</code> en Windows.',
       check2:'La constancia de Skopje trae además un código QR que lleva al registro del propio organizador. Ese organizador regenera el PDF en cada descarga, así que una copia nueva no coincidirá con la huella: compruébala en su registro.',
-      fSums:'Todas las huellas · SHA256SUMS', fBib:'Citar las tres presentaciones · BibTeX',
+      fSums:'Todas las huellas · SHA256SUMS',
       fResume:'Currículum', updated:'Actualizado el'
     },
     zh: {
@@ -400,8 +392,7 @@
       calassIssuer:'蒙特利尔大学公共卫生学院。由 ALASS 主席 Roxane Borgès Da Silva 代表 CALASS 2026 组委会签署',
       calassVerify:'经签署的证明，未附在线核验编号',
       fSession:'场次', calassSession:'第 75 号报告 · 4.1 分会场“<i lang="fr">L’IA pour la gestion des services</i>” · 2026年8月27日（星期四）<span class="nw">11:30–13:00</span>（据幻灯片）',
-      bSlides:'幻灯片', fSlides:'幻灯片',
-      calassSlidesNote:'幻灯片另列 L. Díaz-Castro 为合著者，并将 J. Rebull 与 R. Pérez-Hernández 列为报告人。',
+      bSlides:'幻灯片',
       bAtt:'参会证明',
       ariaWpa:'参会证明，第 26 届世界精神病学大会（PDF）', ariaCalass:'参会证明，CALASS 2026（PDF）', ariaSkopje:'报告证书，斯科普里 2026（PDF）',
       bPdf:'证书', bTalk:'报告页面', bVerify:'在线核验',
@@ -421,7 +412,7 @@
       h2Check:'如何核验文件',
       check1:'每个指纹都是此处所存 PDF 的逐字节 SHA-256 值。下载文件后即可比对：macOS 或 Linux 使用 <code>shasum -a 256</code>，Windows 使用 <code>Get-FileHash</code>。',
       check2:'斯科普里会议的证书还附有二维码，可直接链接至主办方的核验系统。该主办方每次下载都会重新生成 PDF，因此新下载的副本与指纹不会一致，请以其核验系统为准。',
-      fSums:'全部指纹 · SHA256SUMS', fBib:'引用三项发表 · BibTeX',
+      fSums:'全部指纹 · SHA256SUMS',
       fResume:'简历', updated:'最后更新于'
     }
   };
